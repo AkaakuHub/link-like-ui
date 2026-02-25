@@ -1,29 +1,29 @@
-# react-components-starter
+# Link-Like UI
 
-A starter for creating a React component library.
+A certain UI library that looks like Link-Like-OS.
 
 ## Development
 
 - Install dependencies:
 
 ```bash
-npm install
+pnpm install
 ```
 
 - Run the playground:
 
 ```bash
-npm run play
+pnpm run play
 ```
 
 - Run the unit tests:
 
 ```bash
-npm run test
+pnpm run test
 ```
 
 - Build the library:
 
 ```bash
-npm run build
+pnpm run build
 ```
