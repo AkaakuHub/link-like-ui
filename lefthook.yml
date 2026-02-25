@@ -1,0 +1,9 @@
+pre-commit:
+  parallel: false
+  commands:
+    biome:
+      run: pnpm run check
+      stage_fixed: true
+    knip:
+      run: pnpm run knip
+      stage_fixed: true

@@ -1,0 +1,69 @@
+@import "tailwindcss";
+@import "simplebar/dist/simplebar.css";
+@source "../../src";
+
+@theme {
+	--color-ll-system-left: #65defc;
+	--color-ll-system-right: #938aff;
+	--color-ll-label: #73a1ff;
+	--color-ll-white: #fdfdfb;
+	--color-ll-gray: #606f75;
+	--color-ll-pink: #ef296a;
+	--color-ll-disabled: #9ba9b2;
+	--color-ll-scroll: #bec3c7;
+	--color-ll-modal-content-gray: #f5f7f7;
+	--color-ll-prism-1: #8ca4fb;
+	--color-ll-prism-2: #95a1fb;
+	--color-ll-prism-3: #979ffb;
+	--color-ll-prism-4: #93a5fb;
+	--color-ll-prism-5: #9da3fb;
+	--color-ll-prism-6: #a3a7fb;
+}
+
+@keyframes ll-system-modal-open {
+	from {
+		opacity: 0;
+		scale: 0.5;
+	}
+	to {
+		opacity: 1;
+		scale: 1;
+	}
+}
+
+@keyframes ll-system-modal-close {
+	from {
+		opacity: 1;
+		scale: 1;
+	}
+	to {
+		opacity: 0;
+		scale: 0.5;
+	}
+}
+
+.ll-system-modal-scrollbar .simplebar-track.simplebar-horizontal {
+	display: none;
+}
+
+.ll-system-modal-scrollbar .simplebar-track.simplebar-vertical {
+	top: 0.5rem;
+	right: 0.35rem;
+	bottom: 0.5rem;
+	width: 0.2rem;
+	background: transparent;
+}
+
+.ll-system-modal-scrollbar .simplebar-scrollbar::before {
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	border-radius: 9999px;
+	background: var(--color-ll-scroll);
+	opacity: 1;
+}
+
+.ll-system-modal-scrollbar .simplebar-scrollbar.simplebar-visible::before {
+	opacity: 1;
+}
