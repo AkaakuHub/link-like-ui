@@ -45,7 +45,7 @@ export const ModalTabTrigger = forwardRef<
 		<ModalTabTriggerPrimitive
 			ref={ref}
 			className={cn(
-				"relative inline-flex min-h-11 flex-1 items-center justify-center px-3 text-[0.95rem] leading-none font-bold text-ll-disabled transition-colors data-[state=active]:text-ll-label after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:block after:h-[0.16rem] after:w-full after:bg-ll-modal-tab-gray data-[state=active]:after:bg-linear-to-r data-[state=active]:after:from-ll-system-left data-[state=active]:after:to-ll-system-right [&:not(:first-child)]:before:pointer-events-none [&:not(:first-child)]:before:absolute [&:not(:first-child)]:before:top-2 [&:not(:first-child)]:before:bottom-2 [&:not(:first-child)]:before:left-0 [&:not(:first-child)]:before:w-px [&:not(:first-child)]:before:bg-ll-table [&:not(:first-child)]:before:content-['']",
+				"relative inline-flex min-h-11 flex-1 items-center justify-center px-3 text-[0.95rem] leading-none font-bold text-ll-disabled transition-colors data-[state=active]:text-ll-label after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:block after:h-[0.16rem] after:w-full after:bg-ll-modal-tab-gray data-[state=active]:after:bg-linear-to-r data-[state=active]:after:from-ll-system-left data-[state=active]:after:to-ll-system-right [&:not(:first-child)]:before:pointer-events-none [&:not(:first-child)]:before:absolute [&:not(:first-child)]:before:top-2 [&:not(:first-child)]:before:bottom-2 [&:not(:first-child)]:before:left-0 [&:not(:first-child)]:before:w-[0.05rem] [&:not(:first-child)]:before:bg-ll-table [&:not(:first-child)]:before:content-['']",
 				className,
 			)}
 			{...props}
