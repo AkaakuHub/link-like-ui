@@ -8,6 +8,21 @@ import {
 import SimpleBar from "simplebar-react";
 import { cn } from "../utils";
 
+type SystemModalBodyPadding = "default" | "compact" | "comfortable";
+
+const bodyPaddingClassMap: Record<SystemModalBodyPadding, string> = {
+	default: "p-[1rem_1.1rem_0.75rem]",
+	compact: "p-3",
+	comfortable: "p-4",
+};
+
+type SystemModalFooterTone = "default" | "separated";
+
+const footerToneClassMap: Record<SystemModalFooterTone, string> = {
+	default: "p-[0.7rem_1rem_1rem]",
+	separated: "p-[0.7rem_1rem_1rem] pt-3",
+};
+
 export function SystemModalHeader({
 	className,
 	children,
@@ -40,9 +55,10 @@ export function SystemModalHeader({
 export function SystemModalBody({
 	className,
 	children,
+	padding = "default",
 	style,
 	...props
-}: HTMLAttributes<HTMLDivElement>) {
+}: HTMLAttributes<HTMLDivElement> & { padding?: SystemModalBodyPadding }) {
 	return (
 		<SimpleBar
 			autoHide={false}
@@ -50,16 +66,19 @@ export function SystemModalBody({
 			style={{ maxHeight: "min(58dvh, 33rem)", ...style }}
 			{...props}
 		>
-			<div className={cn("p-[1rem_1.1rem_0.75rem]", className)}>{children}</div>
+			<div className={cn(bodyPaddingClassMap[padding], className)}>
+				{children}
+			</div>
 		</SimpleBar>
 	);
 }
 
 export function SystemModalFooter({
 	className,
+	tone = "default",
 	...props
-}: HTMLAttributes<HTMLDivElement>) {
-	return <div className={cn("p-[0.7rem_1rem_1rem]", className)} {...props} />;
+}: HTMLAttributes<HTMLDivElement> & { tone?: SystemModalFooterTone }) {
+	return <div className={cn(footerToneClassMap[tone], className)} {...props} />;
 }
 
 export const SystemModalTitle = forwardRef<

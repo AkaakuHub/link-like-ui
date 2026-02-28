@@ -1,18 +1,83 @@
 import type { HTMLAttributes } from "react";
 import { cn } from "../utils";
 
+type SystemModalHeadingSize = "default" | "compact";
+
+const headingSizeClassMap: Record<SystemModalHeadingSize, string> = {
+	default: "h-7 min-w-50 px-5 text-[1rem]",
+	compact: "h-[1.8rem] min-w-38 px-5 text-[0.95rem]",
+};
+
 export function SystemModalHeading({
+	className,
+	size = "default",
+	withoutTopMargin = false,
+	...props
+}: HTMLAttributes<HTMLDivElement> & {
+	size?: SystemModalHeadingSize;
+	withoutTopMargin?: boolean;
+}) {
+	return (
+		<div
+			className={cn(
+				"inline-flex items-center justify-center rounded-full bg-linear-to-r from-ll-system-left to-ll-system-right font-bold text-ll-white",
+				withoutTopMargin ? "" : "mt-4",
+				headingSizeClassMap[size],
+				className,
+			)}
+			{...props}
+		/>
+	);
+}
+
+export function SystemModalPanel({
 	className,
 	...props
 }: HTMLAttributes<HTMLDivElement>) {
 	return (
 		<div
 			className={cn(
-				"mt-4 inline-flex h-7 min-w-50 items-center justify-center rounded-full bg-linear-to-r from-ll-system-left to-ll-system-right px-5 text-[1rem] font-bold text-ll-white",
+				"space-y-4 rounded-[0.65rem] bg-ll-modal-content-gray p-3",
 				className,
 			)}
 			{...props}
 		/>
+	);
+}
+
+type SystemModalActionsSpacing = "default" | "compact";
+
+const actionsSpacingClassMap: Record<SystemModalActionsSpacing, string> = {
+	default: "mt-6",
+	compact: "mt-5",
+};
+
+export function SystemModalActions({
+	children,
+	className,
+	spacing = "default",
+	...props
+}: HTMLAttributes<HTMLDivElement> & { spacing?: SystemModalActionsSpacing }) {
+	return (
+		<div
+			className={cn(
+				actionsSpacingClassMap[spacing],
+				"flex justify-center",
+				className,
+			)}
+			{...props}
+		>
+			{children}
+		</div>
+	);
+}
+
+export function SystemModalActionGrid({
+	className,
+	...props
+}: HTMLAttributes<HTMLDivElement>) {
+	return (
+		<div className={cn("grid grid-cols-3 gap-2.5", className)} {...props} />
 	);
 }
 

@@ -2,7 +2,7 @@ export { TabTrigger } from "./content";
 export {
 	TabListPrimitive,
 	TabPanelPrimitive,
-	TabRoot,
+	TabRootPrimitive,
 	TabTriggerPrimitive,
 } from "./primitives";
-export { TabList, TabPanel } from "./structure";
+export { TabList, TabPanel, TabRoot } from "./structure";

@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
 	Button,
 	RadioField,
+	RadioFieldRow,
 	SliderToggleRow,
 	SystemModal,
 	SystemModalBody,
@@ -9,10 +10,13 @@ import {
 	SystemModalContent,
 	SystemModalFooter,
 	SystemModalHeader,
+	SystemModalActionGrid,
+	SystemModalActions,
 	SystemModalHeading,
 	SystemModalHeadingContent,
 	SystemModalHeadingGrid,
 	SystemModalMessage,
+	SystemModalPanel,
 	SystemModalTitle,
 	SystemModalTrigger,
 	SystemModalSection,
@@ -193,20 +197,16 @@ export function App() {
 				<SystemModalTrigger asChild>
 					<Button size="lg">Open Modal</Button>
 				</SystemModalTrigger>
-				<SystemModalContent className="max-w-[24rem]">
+				<SystemModalContent size="panel">
 					<SystemModalHeader>
 						<SystemModalTitle>Panel</SystemModalTitle>
 					</SystemModalHeader>
-					<SystemModalBody className="px-3 pt-4 pb-6">
+					<SystemModalBody>
 						<SystemModalHeading>Group A</SystemModalHeading>
 						<SystemModalHeadingContent>
 							<SystemModalHeadingGrid>
 								{accountItems.map((item) => (
-									<Button
-										key={item}
-										variant="secondary"
-										className="h-12 rounded-[12px]"
-									>
+									<Button key={item} variant="secondary" size="lg">
 										{item}
 									</Button>
 								))}
@@ -216,26 +216,19 @@ export function App() {
 						<SystemModalHeadingContent>
 							<SystemModalHeadingGrid>
 								{supportItems.map((item) => (
-									<Button
-										key={item}
-										variant="secondary"
-										className="h-12 rounded-[12px]"
-									>
+									<Button key={item} variant="secondary" size="lg">
 										{item}
 									</Button>
 								))}
 							</SystemModalHeadingGrid>
 						</SystemModalHeadingContent>
-						<div className="mt-6 flex justify-center">
+						<SystemModalActions>
 							<SystemModalClose asChild>
-								<Button
-									variant="secondary"
-									className="h-12 w-[72%] rounded-[13px]"
-								>
+								<Button variant="secondary" size="lg" radius="dialog" width="dialog">
 									Close
 								</Button>
 							</SystemModalClose>
-						</div>
+						</SystemModalActions>
 					</SystemModalBody>
 				</SystemModalContent>
 			</SystemModal>
@@ -245,11 +238,11 @@ export function App() {
 						Open Control Modal
 					</Button>
 				</SystemModalTrigger>
-				<SystemModalContent className="max-w-[24rem]">
+				<SystemModalContent size="panel">
 					<SystemModalHeader>
 						<SystemModalTitle>Control Settings</SystemModalTitle>
 					</SystemModalHeader>
-					<SystemModalBody className="px-3 pt-4 pb-6">
+					<SystemModalBody>
 						<SliderToggleRow
 							label="Main"
 							value={values.master ?? 70}
@@ -260,11 +253,7 @@ export function App() {
 							}}
 							toggleAriaLabel="Toggle Main"
 						/>
-						<TabRoot
-							value={activeTab}
-							onValueChange={handleTabChange}
-							className="mt-4"
-						>
+						<TabRoot value={activeTab} onValueChange={handleTabChange}>
 							<TabList>
 								{tabLabels.map((tabItem) => (
 									<TabTrigger key={tabItem.value} value={tabItem.value}>
@@ -273,11 +262,7 @@ export function App() {
 								))}
 							</TabList>
 							{tabLabels.map((tabItem) => (
-								<TabPanel
-									key={tabItem.value}
-									value={tabItem.value}
-									className="space-y-[0.65rem] bg-ll-modal-content-gray p-2"
-								>
+								<TabPanel key={tabItem.value} value={tabItem.value} tone="surface">
 									{rowsByTab[tabItem.value].map((rowItem) => (
 										<SliderToggleRow
 											key={rowItem.id}
@@ -296,16 +281,13 @@ export function App() {
 								</TabPanel>
 							))}
 						</TabRoot>
-						<div className="mt-5 flex justify-center">
+						<SystemModalActions spacing="compact">
 							<SystemModalClose asChild>
-								<Button
-									variant="secondary"
-									className="h-12 w-[72%] rounded-[13px]"
-								>
+								<Button variant="secondary" size="lg" radius="dialog" width="dialog">
 									Close
 								</Button>
 							</SystemModalClose>
-						</div>
+						</SystemModalActions>
 					</SystemModalBody>
 				</SystemModalContent>
 			</SystemModal>
@@ -315,29 +297,26 @@ export function App() {
 						Open Info Modal
 					</Button>
 				</SystemModalTrigger>
-				<SystemModalContent className="max-w-[21.75rem]">
+				<SystemModalContent size="info">
 					<SystemModalHeader>
 						<SystemModalTitle>Info</SystemModalTitle>
 					</SystemModalHeader>
-					<SystemModalBody className="p-4">
+					<SystemModalBody padding="comfortable">
 						<SystemModalMessage>
-							<p className="font-semibold">NOTICE</p>
+							<p>NOTICE</p>
 							<p>Sample text for UI preview.</p>
 							<p>This content is for layout testing only.</p>
 						</SystemModalMessage>
 						<SystemModalWarning>
 							This is a warning message for layout verification only.
 						</SystemModalWarning>
-						<div className="mt-5 flex justify-center">
+						<SystemModalActions spacing="compact">
 							<SystemModalClose asChild>
-								<Button
-									variant="secondary"
-									className="h-12 w-[72%] rounded-[13px]"
-								>
+								<Button variant="secondary" size="lg" radius="dialog" width="dialog">
 									Close
 								</Button>
 							</SystemModalClose>
-						</div>
+						</SystemModalActions>
 					</SystemModalBody>
 				</SystemModalContent>
 			</SystemModal>
@@ -347,13 +326,13 @@ export function App() {
 						Open Filter Modal
 					</Button>
 				</SystemModalTrigger>
-				<SystemModalContent className="max-w-[24rem]">
+				<SystemModalContent size="panel">
 					<SystemModalHeader>
 						<SystemModalTitle>Filter</SystemModalTitle>
 					</SystemModalHeader>
-					<SystemModalBody className="p-3">
-						<div className="space-y-4 rounded-[0.65rem] bg-ll-modal-content-gray p-3">
-							<SystemModalHeading className="mt-0 h-[1.8rem] min-w-38 text-[0.95rem]">
+					<SystemModalBody padding="compact">
+						<SystemModalPanel>
+							<SystemModalHeading size="compact" withoutTopMargin>
 								Group 01
 							</SystemModalHeading>
 							<RadioField
@@ -373,50 +352,44 @@ export function App() {
 								options={filterAfterOptions}
 							/>
 
-							<SystemModalHeading className="mt-4 h-[1.8rem] min-w-38 text-[0.95rem]">
+							<SystemModalHeading size="compact">
 								Group 02
 							</SystemModalHeading>
 							{performerRows.map((row) => (
-								<div
+								<RadioFieldRow
 									key={row.key}
-									className="grid grid-cols-[4.3rem_1fr] items-center gap-2"
-								>
-									<p className="text-[1rem] leading-none font-semibold text-ll-gray">
-										{row.label}
-									</p>
-									<RadioField
-										className="space-y-0"
-										groupProps={{
-											value: performerFilters[row.key] ?? "all",
-											onValueChange: (value) => {
-												updatePerformerFilter(row.key, value);
-											},
-											className: "gap-x-3",
-										}}
-										options={[
-											{ label: "All", value: "all" },
-											{ label: "Show", value: "show" },
-											{ label: "Hide", value: "hide" },
-										]}
-									/>
-								</div>
+									label={row.label}
+									groupProps={{
+										value: performerFilters[row.key] ?? "all",
+										onValueChange: (value) => {
+											updatePerformerFilter(row.key, value);
+										},
+									}}
+									options={[
+										{ label: "All", value: "all" },
+										{ label: "Show", value: "show" },
+										{ label: "Hide", value: "hide" },
+									]}
+								/>
 							))}
-						</div>
+						</SystemModalPanel>
 					</SystemModalBody>
-					<SystemModalFooter className="pt-3">
-						<div className="grid grid-cols-3 gap-2.5">
+					<SystemModalFooter tone="separated">
+						<SystemModalActionGrid>
 							<SystemModalClose asChild>
-								<Button variant="secondary" className="h-11 rounded-[13px]">
+								<Button variant="secondary" size="modal" radius="dialog">
 									Cancel
 								</Button>
 							</SystemModalClose>
-							<Button variant="secondary" className="h-11 rounded-[13px]">
+							<Button variant="secondary" size="modal" radius="dialog">
 								Reset
 							</Button>
 							<SystemModalClose asChild>
-								<Button className="h-11 rounded-[13px]">OK</Button>
+								<Button size="modal" radius="dialog">
+									OK
+								</Button>
 							</SystemModalClose>
-						</div>
+						</SystemModalActionGrid>
 					</SystemModalFooter>
 				</SystemModalContent>
 			</SystemModal>
@@ -426,11 +399,11 @@ export function App() {
 						Open Text Modal
 					</Button>
 				</SystemModalTrigger>
-				<SystemModalContent className="max-w-[22rem]">
+				<SystemModalContent size="text">
 					<SystemModalHeader>
 						<SystemModalTitle>Document</SystemModalTitle>
 					</SystemModalHeader>
-					<SystemModalBody className="p-4">
+					<SystemModalBody padding="comfortable">
 						<p>
 							This is sample text for layout preview in a modal component.
 						</p>
@@ -468,13 +441,13 @@ export function App() {
 							</SystemModalSectionBody>
 						</SystemModalSection>
 
-						<div className="mt-6 flex justify-center">
+						<SystemModalActions>
 							<SystemModalClose asChild>
-								<Button variant="secondary" className="h-12 w-[72%] rounded-[13px]">
+								<Button variant="secondary" size="lg" radius="dialog" width="dialog">
 									Close
 								</Button>
 							</SystemModalClose>
-						</div>
+						</SystemModalActions>
 					</SystemModalBody>
 				</SystemModalContent>
 			</SystemModal>

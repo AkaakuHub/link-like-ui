@@ -1,8 +1,11 @@
 export {
+	SystemModalActionGrid,
+	SystemModalActions,
 	SystemModalHeading,
 	SystemModalHeadingContent,
 	SystemModalHeadingGrid,
 	SystemModalMessage,
+	SystemModalPanel,
 	SystemModalSection,
 	SystemModalSectionBody,
 	SystemModalSectionTitle,

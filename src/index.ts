@@ -2,6 +2,8 @@ export { Button, type ButtonProps } from "./Button";
 export {
 	RadioField,
 	type RadioFieldProps,
+	RadioFieldRow,
+	type RadioFieldRowProps,
 	RadioGroup,
 	RadioGroupIndicatorPrimitive,
 	RadioGroupItemPrimitive,
@@ -18,6 +20,8 @@ export {
 } from "./Slider";
 export {
 	SystemModal,
+	SystemModalActionGrid,
+	SystemModalActions,
 	SystemModalBody,
 	SystemModalClose,
 	SystemModalContent,
@@ -30,6 +34,7 @@ export {
 	SystemModalHeadingGrid,
 	SystemModalMessage,
 	SystemModalOverlay,
+	SystemModalPanel,
 	SystemModalSection,
 	SystemModalSectionBody,
 	SystemModalSectionTitle,
@@ -43,6 +48,7 @@ export {
 	TabPanel,
 	TabPanelPrimitive,
 	TabRoot,
+	TabRootPrimitive,
 	TabTrigger,
 	TabTriggerPrimitive,
 } from "./Tab";

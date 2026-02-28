@@ -58,3 +58,36 @@ export function RadioField({
 		</div>
 	);
 }
+
+export interface RadioFieldRowProps extends Omit<RadioFieldProps, "className"> {
+	label: string;
+	rowClassName?: string;
+}
+
+export function RadioFieldRow({
+	groupProps,
+	label,
+	options,
+	rowClassName,
+}: RadioFieldRowProps) {
+	return (
+		<div
+			className={cn(
+				"grid grid-cols-[4.3rem_1fr] items-center gap-2",
+				rowClassName,
+			)}
+		>
+			<p className="text-[1rem] leading-none font-semibold text-ll-gray">
+				{label}
+			</p>
+			<RadioField
+				className="space-y-0"
+				groupProps={{
+					...groupProps,
+					className: cn("gap-x-3", groupProps.className),
+				}}
+				options={options}
+			/>
+		</div>
+	);
+}

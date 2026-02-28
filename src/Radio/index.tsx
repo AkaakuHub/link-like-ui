@@ -1,4 +1,10 @@
-export { RadioField, type RadioFieldProps, type RadioOption } from "./content";
+export {
+	RadioField,
+	type RadioFieldProps,
+	RadioFieldRow,
+	type RadioFieldRowProps,
+	type RadioOption,
+} from "./content";
 export {
 	RadioGroupIndicatorPrimitive,
 	RadioGroupItemPrimitive,
