@@ -222,14 +222,16 @@ export function App() {
 								))}
 							</SystemModalHeadingGrid>
 						</SystemModalHeadingContent>
-						<SystemModalActions>
+					</SystemModalBody>
+					<SystemModalFooter>
+						<SystemModalActions spacing="none">
 							<SystemModalClose asChild>
 								<Button variant="secondary" size="lg" radius="dialog" width="dialog">
 									Close
 								</Button>
 							</SystemModalClose>
 						</SystemModalActions>
-					</SystemModalBody>
+					</SystemModalFooter>
 				</SystemModalContent>
 			</SystemModal>
 			<SystemModal>
