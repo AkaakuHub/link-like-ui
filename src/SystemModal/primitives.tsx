@@ -18,15 +18,14 @@ const systemModalOverlayClassName = tv({
 const systemModalContentClassName = tv({
 	base: "fixed top-1/2 left-1/2 max-h-[84dvh] w-[calc(100vw-1rem)] -translate-x-1/2 -translate-y-1/2 origin-center overflow-hidden rounded-[16px] border-none data-[state=open]:animate-[ll-system-modal-open_100ms_cubic-bezier(.93,.23,.71,.94)_both] data-[state=closed]:animate-[ll-system-modal-close_100ms_cubic-bezier(.93,.23,.71,.94)_both] focus-visible:outline-3 focus-visible:outline-ll-label",
 	variants: {
-		size: {
-			default: "max-w-[22.75rem]",
-			panel: "max-w-[24rem]",
-			info: "max-w-[21.75rem]",
-			text: "max-w-[22rem]",
+		width: {
+			sm: "max-w-[21.75rem]",
+			md: "max-w-[24rem]",
+			lg: "max-w-[26rem]",
 		},
 	},
 	defaultVariants: {
-		size: "default",
+		width: "md",
 	},
 });
 
@@ -48,19 +47,19 @@ SystemModalOverlay.displayName = "SystemModalOverlay";
 export interface SystemModalContentProps
 	extends ComponentPropsWithoutRef<typeof Dialog.Content> {
 	bodyClassName?: string;
-	size?: "default" | "panel" | "info" | "text";
+	width?: "sm" | "md" | "lg";
 }
 
 export const SystemModalContent = forwardRef<
 	ElementRef<typeof Dialog.Content>,
 	SystemModalContentProps
->(({ bodyClassName, children, className, size = "default", ...props }, ref) => {
+>(({ bodyClassName, children, className, width = "md", ...props }, ref) => {
 	return (
 		<Dialog.Portal>
 			<SystemModalOverlay />
 			<Dialog.Content
 				ref={ref}
-				className={cn(systemModalContentClassName({ size }), className)}
+				className={cn(systemModalContentClassName({ width }), className)}
 				{...props}
 			>
 				<div className={cn("bg-ll-white", bodyClassName)}>{children}</div>

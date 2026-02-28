@@ -197,7 +197,7 @@ export function App() {
 				<SystemModalTrigger asChild>
 					<Button size="lg">Open Modal</Button>
 				</SystemModalTrigger>
-				<SystemModalContent size="panel">
+				<SystemModalContent width="md">
 					<SystemModalHeader>
 						<SystemModalTitle>Panel</SystemModalTitle>
 					</SystemModalHeader>
@@ -238,7 +238,7 @@ export function App() {
 						Open Control Modal
 					</Button>
 				</SystemModalTrigger>
-				<SystemModalContent size="panel">
+				<SystemModalContent width="md">
 					<SystemModalHeader>
 						<SystemModalTitle>Control Settings</SystemModalTitle>
 					</SystemModalHeader>
@@ -297,7 +297,7 @@ export function App() {
 						Open Info Modal
 					</Button>
 				</SystemModalTrigger>
-				<SystemModalContent size="info">
+				<SystemModalContent width="md">
 					<SystemModalHeader>
 						<SystemModalTitle>Info</SystemModalTitle>
 					</SystemModalHeader>
@@ -326,7 +326,7 @@ export function App() {
 						Open Filter Modal
 					</Button>
 				</SystemModalTrigger>
-				<SystemModalContent size="panel">
+				<SystemModalContent width="md">
 					<SystemModalHeader>
 						<SystemModalTitle>Filter</SystemModalTitle>
 					</SystemModalHeader>
@@ -399,7 +399,7 @@ export function App() {
 						Open Text Modal
 					</Button>
 				</SystemModalTrigger>
-				<SystemModalContent size="text">
+				<SystemModalContent width="md">
 					<SystemModalHeader>
 						<SystemModalTitle>Document</SystemModalTitle>
 					</SystemModalHeader>
