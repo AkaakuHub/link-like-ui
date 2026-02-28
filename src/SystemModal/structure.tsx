@@ -12,7 +12,7 @@ type SystemModalBodyPadding = "default" | "compact" | "comfortable" | "none";
 
 const bodyPaddingClassMap: Record<SystemModalBodyPadding, string> = {
 	default: "p-[1rem_1.1rem_0.75rem]",
-	compact: "p-3",
+	compact: "px-3 pt-3",
 	comfortable: "p-4",
 	none: "p-0",
 };
