@@ -1,5 +1,12 @@
 export { Button, type ButtonProps } from "./Button";
 export {
+	Slider,
+	SliderRow,
+	type SliderRowProps,
+	SliderToggleRow,
+	type SliderToggleRowProps,
+} from "./Slider";
+export {
 	SystemModal,
 	SystemModalBody,
 	SystemModalClose,
@@ -20,3 +27,13 @@ export {
 	SystemModalTrigger,
 	SystemModalWarning,
 } from "./SystemModal";
+export {
+	TabList,
+	TabListPrimitive,
+	TabPanel,
+	TabPanelPrimitive,
+	TabRoot,
+	TabTrigger,
+	TabTriggerPrimitive,
+} from "./Tab";
+export { AudioIcon, Toggle, TogglePrimitive } from "./Toggle";
