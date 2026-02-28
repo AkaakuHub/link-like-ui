@@ -6,7 +6,7 @@ type SystemModalHeadingTone = "gradient" | "label";
 
 const headingSizeClassMap: Record<SystemModalHeadingSize, string> = {
 	default: "h-7 min-w-50 px-5 text-[1rem]",
-	compact: "h-[1.8rem] min-w-38 px-5 text-[0.95rem]",
+	compact: "h-[1.4rem] min-w-38 px-5 text-[0.95rem]",
 };
 
 const headingToneClassMap: Record<SystemModalHeadingTone, string> = {
