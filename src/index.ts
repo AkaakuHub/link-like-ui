@@ -1,5 +1,15 @@
 export { Button, type ButtonProps } from "./Button";
 export {
+	ModalTabList,
+	ModalTabListPrimitive,
+	ModalTabPanel,
+	ModalTabPanelPrimitive,
+	ModalTabRoot,
+	ModalTabRootPrimitive,
+	ModalTabTrigger,
+	ModalTabTriggerPrimitive,
+} from "./ModalTab";
+export {
 	RadioField,
 	type RadioFieldProps,
 	RadioFieldRow,
@@ -52,4 +62,12 @@ export {
 	TabTrigger,
 	TabTriggerPrimitive,
 } from "./Tab";
+export {
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeaderCell,
+	TableRoot,
+	TableRow,
+} from "./Table";
 export { AudioIcon, Toggle, TogglePrimitive } from "./Toggle";

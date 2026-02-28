@@ -1,6 +1,10 @@
 import { useState } from "react";
 import {
 	Button,
+	ModalTabList,
+	ModalTabPanel,
+	ModalTabRoot,
+	ModalTabTrigger,
 	RadioField,
 	RadioFieldRow,
 	SliderToggleRow,
@@ -27,6 +31,12 @@ import {
 	TabPanel,
 	TabRoot,
 	TabTrigger,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeaderCell,
+	TableRoot,
+	TableRow,
 } from "../../src";
 
 const tabValues = ["tab-01", "tab-02", "tab-03", "tab-04", "tab-05"] as const;
@@ -72,6 +82,73 @@ const tabLabels: Array<{ label: string; value: ControlTabValue }> = [
 	{ label: "Tab 04", value: "tab-04" },
 	{ label: "Tab 05", value: "tab-05" },
 ];
+
+const detailTabValues = ["detail-01", "detail-02"] as const;
+type DetailTabValue = (typeof detailTabValues)[number];
+const detailTabs: Array<{ label: string; value: DetailTabValue }> = [
+	{ label: "Tab A", value: "detail-01" },
+	{ label: "Tab B", value: "detail-02" },
+];
+
+const rarityRateRows: Array<{ rarity: string; ratio: string }> = [
+	{ rarity: "VR", ratio: "3.00%" },
+	{ rarity: "UR", ratio: "18.00%" },
+	{ rarity: "R", ratio: "79.00%" },
+];
+
+const cardRateRowsByTab: Record<
+	DetailTabValue,
+	Array<{ rarity: string; name: string; ratio: string }>
+> = {
+	"detail-01": [
+		{ rarity: "VR", name: "Entry 01", ratio: "0.04%" },
+		{ rarity: "UR", name: "Entry 02", ratio: "0.04%" },
+		{ rarity: "UR", name: "Entry 03", ratio: "0.04%" },
+		{ rarity: "UR", name: "Entry 04", ratio: "0.04%" },
+		{ rarity: "UR", name: "Entry 05", ratio: "0.04%" },
+		{ rarity: "UR", name: "Entry 06", ratio: "0.04%" },
+		{ rarity: "UR", name: "Entry 07", ratio: "0.04%" },
+		{ rarity: "UR", name: "Entry 08", ratio: "0.04%" },
+		{ rarity: "UR", name: "Entry 09", ratio: "0.04%" },
+		{ rarity: "UR", name: "Entry 10", ratio: "0.04%" },
+		{ rarity: "UR", name: "Entry 11", ratio: "0.04%" },
+		{ rarity: "UR", name: "Entry 12", ratio: "0.04%" },
+		{ rarity: "UR", name: "Entry 13", ratio: "0.04%" },
+		{ rarity: "UR", name: "Entry 14", ratio: "0.04%" },
+		{ rarity: "UR", name: "Entry 15", ratio: "0.04%" },
+		{ rarity: "UR", name: "Entry 16", ratio: "0.04%" },
+		{ rarity: "UR", name: "Entry 17", ratio: "0.04%" },
+		{ rarity: "UR", name: "Entry 18", ratio: "0.04%" },
+		{ rarity: "UR", name: "Entry 19", ratio: "0.04%" },
+		{ rarity: "UR", name: "Entry 20", ratio: "0.04%" },
+	],
+	"detail-02": [
+		{ rarity: "VR", name: "Alt 01", ratio: "0.08%" },
+		{ rarity: "UR", name: "Alt 02", ratio: "0.08%" },
+		{ rarity: "UR", name: "Alt 03", ratio: "0.08%" },
+		{ rarity: "UR", name: "Alt 04", ratio: "0.08%" },
+		{ rarity: "UR", name: "Alt 05", ratio: "0.08%" },
+		{ rarity: "UR", name: "Alt 06", ratio: "0.08%" },
+		{ rarity: "UR", name: "Alt 07", ratio: "0.08%" },
+		{ rarity: "UR", name: "Alt 08", ratio: "0.08%" },
+		{ rarity: "UR", name: "Alt 09", ratio: "0.08%" },
+		{ rarity: "UR", name: "Alt 10", ratio: "0.08%" },
+		{ rarity: "UR", name: "Alt 11", ratio: "0.08%" },
+		{ rarity: "UR", name: "Alt 12", ratio: "0.08%" },
+		{ rarity: "UR", name: "Alt 13", ratio: "0.08%" },
+		{ rarity: "UR", name: "Alt 14", ratio: "0.08%" },
+		{ rarity: "UR", name: "Alt 15", ratio: "0.08%" },
+		{ rarity: "UR", name: "Alt 16", ratio: "0.08%" },
+		{ rarity: "UR", name: "Alt 17", ratio: "0.08%" },
+		{ rarity: "UR", name: "Alt 18", ratio: "0.08%" },
+		{ rarity: "UR", name: "Alt 19", ratio: "0.08%" },
+		{ rarity: "UR", name: "Alt 20", ratio: "0.08%" },
+	],
+};
+
+function isDetailTabValue(value: string): value is DetailTabValue {
+	return detailTabValues.some((tabValue) => tabValue === value);
+}
 
 const rowsByTab: Record<ControlTabValue, Array<{ id: string; label: string }>> = {
 	"tab-01": [
@@ -144,6 +221,8 @@ function createInitialPerformerFilters(): Record<string, string> {
 
 export function App() {
 	const [activeTab, setActiveTab] = useState<ControlTabValue>("tab-01");
+	const [activeDetailTab, setActiveDetailTab] =
+		useState<DetailTabValue>("detail-01");
 	const [values, setValues] = useState<Record<string, number>>(
 		createInitialMap(70),
 	);
@@ -159,6 +238,12 @@ export function App() {
 	function handleTabChange(value: string) {
 		if (isControlTabValue(value)) {
 			setActiveTab(value);
+		}
+	}
+
+	function handleDetailTabChange(value: string) {
+		if (isDetailTabValue(value)) {
+			setActiveDetailTab(value);
 		}
 	}
 
@@ -334,7 +419,7 @@ export function App() {
 					</SystemModalHeader>
 					<SystemModalBody padding="compact">
 						<SystemModalPanel>
-							<SystemModalHeading size="compact" withoutTopMargin>
+							<SystemModalHeading size="compact" tone="label" withoutTopMargin>
 								Group 01
 							</SystemModalHeading>
 							<RadioField
@@ -354,7 +439,7 @@ export function App() {
 								options={filterAfterOptions}
 							/>
 
-							<SystemModalHeading size="compact">
+							<SystemModalHeading size="compact" tone="label">
 								Group 02
 							</SystemModalHeading>
 							{performerRows.map((row) => (
@@ -392,6 +477,98 @@ export function App() {
 								</Button>
 							</SystemModalClose>
 						</SystemModalActionGrid>
+					</SystemModalFooter>
+				</SystemModalContent>
+			</SystemModal>
+			<SystemModal>
+				<SystemModalTrigger asChild>
+					<Button size="lg" variant="secondary">
+						Open Table Modal
+					</Button>
+				</SystemModalTrigger>
+				<SystemModalContent width="md">
+					<SystemModalHeader>
+						<SystemModalTitle>Detail</SystemModalTitle>
+					</SystemModalHeader>
+					<ModalTabRoot
+						value={activeDetailTab}
+						onValueChange={handleDetailTabChange}
+					>
+						<ModalTabList>
+							{detailTabs.map((tabItem) => (
+								<ModalTabTrigger key={tabItem.value} value={tabItem.value}>
+									{tabItem.label}
+								</ModalTabTrigger>
+							))}
+						</ModalTabList>
+						<SystemModalBody padding="compact">
+							{detailTabs.map((tabItem) => (
+								<ModalTabPanel key={tabItem.value} value={tabItem.value}>
+									<div className="space-y-2">
+										<SystemModalHeading
+											size="compact"
+											tone="label"
+											withoutTopMargin
+											className="w-full rounded-[0.6rem]"
+										>
+											Rate Group 01
+										</SystemModalHeading>
+										<TableRoot>
+											<TableHead>
+												<TableRow>
+													<TableHeaderCell>Type</TableHeaderCell>
+													<TableHeaderCell>Rate</TableHeaderCell>
+												</TableRow>
+											</TableHead>
+											<TableBody>
+												{rarityRateRows.map((row) => (
+													<TableRow key={`${tabItem.value}-${row.rarity}`}>
+														<TableCell className="text-center">{row.rarity}</TableCell>
+														<TableCell className="text-right">{row.ratio}</TableCell>
+													</TableRow>
+												))}
+											</TableBody>
+										</TableRoot>
+										<SystemModalHeading
+											size="compact"
+											tone="label"
+											className="w-full rounded-[0.6rem]"
+										>
+											Rate Group 02
+										</SystemModalHeading>
+										<TableRoot>
+											<TableHead>
+												<TableRow>
+													<TableHeaderCell className="w-[20%]">Type</TableHeaderCell>
+													<TableHeaderCell>Name</TableHeaderCell>
+													<TableHeaderCell className="w-[22%]">Rate</TableHeaderCell>
+												</TableRow>
+											</TableHead>
+											<TableBody>
+												{cardRateRowsByTab[tabItem.value].map((row) => (
+													<TableRow
+														key={`${tabItem.value}-${row.rarity}-${row.name}`}
+													>
+														<TableCell className="text-center">{row.rarity}</TableCell>
+														<TableCell>{row.name}</TableCell>
+														<TableCell className="text-right">{row.ratio}</TableCell>
+													</TableRow>
+												))}
+											</TableBody>
+										</TableRoot>
+									</div>
+								</ModalTabPanel>
+							))}
+						</SystemModalBody>
+					</ModalTabRoot>
+					<SystemModalFooter>
+						<SystemModalActions spacing="none">
+							<SystemModalClose asChild>
+								<Button variant="secondary" size="lg" radius="dialog">
+									Close
+								</Button>
+							</SystemModalClose>
+						</SystemModalActions>
 					</SystemModalFooter>
 				</SystemModalContent>
 			</SystemModal>

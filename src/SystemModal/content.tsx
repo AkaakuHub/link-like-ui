@@ -2,27 +2,37 @@ import type { HTMLAttributes } from "react";
 import { cn } from "../utils";
 
 type SystemModalHeadingSize = "default" | "compact";
+type SystemModalHeadingTone = "gradient" | "label";
 
 const headingSizeClassMap: Record<SystemModalHeadingSize, string> = {
 	default: "h-7 min-w-50 px-5 text-[1rem]",
 	compact: "h-[1.8rem] min-w-38 px-5 text-[0.95rem]",
 };
 
+const headingToneClassMap: Record<SystemModalHeadingTone, string> = {
+	gradient:
+		"bg-linear-to-r from-ll-system-left to-ll-system-right text-ll-white",
+	label: "bg-ll-label text-ll-white",
+};
+
 export function SystemModalHeading({
 	className,
 	size = "default",
+	tone = "gradient",
 	withoutTopMargin = false,
 	...props
 }: HTMLAttributes<HTMLDivElement> & {
 	size?: SystemModalHeadingSize;
+	tone?: SystemModalHeadingTone;
 	withoutTopMargin?: boolean;
 }) {
 	return (
 		<div
 			className={cn(
-				"inline-flex items-center justify-center rounded-full bg-linear-to-r from-ll-system-left to-ll-system-right font-bold text-ll-white",
+				"inline-flex items-center justify-center rounded-full font-bold",
 				withoutTopMargin ? "" : "mt-4",
 				headingSizeClassMap[size],
+				headingToneClassMap[tone],
 				className,
 			)}
 			{...props}
