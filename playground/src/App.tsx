@@ -1,11 +1,13 @@
 import { useState } from "react";
 import {
 	Button,
+	RadioField,
 	SliderToggleRow,
 	SystemModal,
 	SystemModalBody,
 	SystemModalClose,
 	SystemModalContent,
+	SystemModalFooter,
 	SystemModalHeader,
 	SystemModalHeading,
 	SystemModalHeadingContent,
@@ -33,6 +35,30 @@ const supportItems = [
 	"Option 04",
 	"Option 05",
 	"Option 06",
+];
+const filterTopOptions = [
+	{ label: "Choice 01", value: "choice-01" },
+	{ label: "Choice 02", value: "choice-02" },
+	{ label: "Choice 03", value: "choice-03" },
+];
+const filterAfterOptions = [
+	{ label: "None", value: "none" },
+	{ label: "Has", value: "has" },
+	{ label: "No", value: "no" },
+];
+const performerRows = [
+	{ key: "row-01", label: "Item 01" },
+	{ key: "row-02", label: "Item 02" },
+	{ key: "row-03", label: "Item 03" },
+	{ key: "row-04", label: "Item 04" },
+	{ key: "row-05", label: "Item 05" },
+	{ key: "row-06", label: "Item 06" },
+	{ key: "row-07", label: "Item 07" },
+	{ key: "row-08", label: "Item 08" },
+	{ key: "row-09", label: "Item 09" },
+	{ key: "row-10", label: "Item 10" },
+	{ key: "row-11", label: "Item 11" },
+	{ key: "row-12", label: "Item 12" },
 ];
 
 const tabLabels: Array<{ label: string; value: ControlTabValue }> = [
@@ -104,6 +130,14 @@ function createInitialToggleMap(): Record<string, boolean> {
 	return initialMap;
 }
 
+function createInitialPerformerFilters(): Record<string, string> {
+	const initialMap: Record<string, string> = {};
+	for (const performer of performerRows) {
+		initialMap[performer.key] = "all";
+	}
+	return initialMap;
+}
+
 export function App() {
 	const [activeTab, setActiveTab] = useState<ControlTabValue>("tab-01");
 	const [values, setValues] = useState<Record<string, number>>(
@@ -111,6 +145,11 @@ export function App() {
 	);
 	const [toggles, setToggles] = useState<Record<string, boolean>>(
 		createInitialToggleMap(),
+	);
+	const [topFilter, setTopFilter] = useState<string>("choice-01");
+	const [afterFilter, setAfterFilter] = useState<string>("none");
+	const [performerFilters, setPerformerFilters] = useState<Record<string, string>>(
+		createInitialPerformerFilters(),
 	);
 
 	function handleTabChange(value: string) {
@@ -130,6 +169,13 @@ export function App() {
 		setToggles((prevToggles) => ({
 			...prevToggles,
 			[id]: pressed,
+		}));
+	}
+
+	function updatePerformerFilter(rowKey: string, value: string) {
+		setPerformerFilters((prevFilters) => ({
+			...prevFilters,
+			[rowKey]: value,
 		}));
 	}
 
@@ -293,6 +339,85 @@ export function App() {
 							</SystemModalClose>
 						</div>
 					</SystemModalBody>
+				</SystemModalContent>
+			</SystemModal>
+			<SystemModal>
+				<SystemModalTrigger asChild>
+					<Button size="lg" variant="secondary">
+						Open Filter Modal
+					</Button>
+				</SystemModalTrigger>
+				<SystemModalContent className="max-w-[24rem]">
+					<SystemModalHeader>
+						<SystemModalTitle>Filter</SystemModalTitle>
+					</SystemModalHeader>
+					<SystemModalBody className="p-3">
+						<div className="space-y-4 rounded-[0.65rem] bg-ll-modal-content-gray p-3">
+							<SystemModalHeading className="mt-0 h-[1.8rem] min-w-38 text-[0.95rem]">
+								Group 01
+							</SystemModalHeading>
+							<RadioField
+								label="Category"
+								groupProps={{
+									value: topFilter,
+									onValueChange: setTopFilter,
+								}}
+								options={filterTopOptions}
+							/>
+							<RadioField
+								label="Category After"
+								groupProps={{
+									value: afterFilter,
+									onValueChange: setAfterFilter,
+								}}
+								options={filterAfterOptions}
+							/>
+
+							<SystemModalHeading className="mt-4 h-[1.8rem] min-w-38 text-[0.95rem]">
+								Group 02
+							</SystemModalHeading>
+							{performerRows.map((row) => (
+								<div
+									key={row.key}
+									className="grid grid-cols-[4.3rem_1fr] items-center gap-2"
+								>
+									<p className="text-[1rem] leading-none font-semibold text-ll-gray">
+										{row.label}
+									</p>
+									<RadioField
+										className="space-y-0"
+										groupProps={{
+											value: performerFilters[row.key] ?? "all",
+											onValueChange: (value) => {
+												updatePerformerFilter(row.key, value);
+											},
+											className: "gap-x-3",
+										}}
+										options={[
+											{ label: "All", value: "all" },
+											{ label: "Show", value: "show" },
+											{ label: "Hide", value: "hide" },
+										]}
+									/>
+								</div>
+							))}
+						</div>
+					</SystemModalBody>
+					<SystemModalFooter className="pt-3">
+						<div className="grid grid-cols-3 gap-2.5">
+							<SystemModalClose asChild>
+								<Button variant="secondary" className="h-11 rounded-[13px]">
+									Cancel
+								</Button>
+							</SystemModalClose>
+							<Button variant="secondary" className="h-11 rounded-[13px]">
+								Reset
+							</Button>
+							<SystemModalClose asChild>
+								<Button className="h-11 rounded-[13px]">OK</Button>
+							</SystemModalClose>
+						</div>
+					</SystemModalFooter>
 				</SystemModalContent>
 			</SystemModal>
 			<SystemModal>
