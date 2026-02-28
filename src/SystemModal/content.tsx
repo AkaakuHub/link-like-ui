@@ -45,11 +45,12 @@ export function SystemModalPanel({
 	);
 }
 
-type SystemModalActionsSpacing = "default" | "compact";
+type SystemModalActionsSpacing = "default" | "compact" | "none";
 
 const actionsSpacingClassMap: Record<SystemModalActionsSpacing, string> = {
 	default: "mt-6",
 	compact: "mt-5",
+	none: "",
 };
 
 export function SystemModalActions({
@@ -149,12 +150,14 @@ export function SystemModalSectionTitle({
 
 export function SystemModalSectionBody({
 	className,
+	withoutTopMargin = false,
 	...props
-}: HTMLAttributes<HTMLDivElement>) {
+}: HTMLAttributes<HTMLDivElement> & { withoutTopMargin?: boolean }) {
 	return (
 		<div
 			className={cn(
-				"mt-3 text-[0.9rem] leading-[1.8] text-ll-gray [&_ol]:list-decimal [&_ol]:pl-5 [&_p+p]:mt-2 [&_li+li]:mt-1",
+				"text-[0.9rem] leading-[1.8] text-ll-gray [&_ol]:list-decimal [&_ol]:pl-5 [&_p+p]:mt-2 [&_li+li]:mt-1",
+				withoutTopMargin ? "mt-0" : "mt-3",
 				className,
 			)}
 			{...props}
