@@ -86,7 +86,7 @@ export function FormFieldErrorText({
 	return (
 		<span
 			className={cn(
-				'font-["Noto_Sans_JP","Segoe_UI",sans-serif] text-right text-ll-pink',
+				'font-["Noto_Sans_JP","Segoe_UI",sans-serif] text-right text-ll-red',
 				className,
 			)}
 			{...props}

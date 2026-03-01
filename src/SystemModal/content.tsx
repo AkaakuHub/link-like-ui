@@ -137,7 +137,7 @@ export function SystemModalWarning({
 	return (
 		<p
 			className={cn(
-				"mt-3 text-center text-[0.78rem] leading-[1.5] font-semibold text-ll-pink",
+				"mt-3 text-center text-[0.78rem] leading-[1.5] font-semibold text-ll-red",
 				className,
 			)}
 			{...props}

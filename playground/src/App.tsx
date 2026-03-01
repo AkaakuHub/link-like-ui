@@ -7,6 +7,9 @@ import {
 	FormStack,
 	FormSubmitActions,
 	FormTextareaField,
+	ListItems,
+	ListNoticeCard,
+	ListRoot,
 	ModalTabList,
 	ModalTabPanel,
 	ModalTabRoot,
@@ -157,6 +160,40 @@ function isDetailTabValue(value: string): value is DetailTabValue {
 	return detailTabValues.some((tabValue) => tabValue === value);
 }
 
+const noticeTabValues = ["notice-01", "notice-02"] as const;
+type NoticeTabValue = (typeof noticeTabValues)[number];
+
+const noticeTabs: Array<{ label: string; value: NoticeTabValue }> = [
+	{ label: "お知らせ", value: "notice-01" },
+	{ label: "不具合情報", value: "notice-02" },
+];
+
+const noticeRowsByTab: Record<
+	NoticeTabValue,
+	Array<{ heading: string; meta: string; text: string }>
+> = {
+	"notice-01": [
+		{ heading: "お知らせ", meta: "2024/02/10 10:00", text: "サンプル告知テキストです。" },
+		{ heading: "お知らせ", meta: "2024/02/10 09:00", text: "表示確認用の文言です。" },
+		{ heading: "お知らせ", meta: "2024/02/09 18:00", text: "汎用的な案内文です。" },
+		{ heading: "お知らせ", meta: "2024/02/09 12:00", text: "内容はダミーの説明です。" },
+		{ heading: "お知らせ", meta: "2024/02/08 20:00", text: "カード表示の検証用テキストです。" },
+		{ heading: "お知らせ", meta: "2024/02/08 10:00", text: "更新情報のテスト表示です。" },
+		{ heading: "お知らせ", meta: "2024/02/07 15:00", text: "通知一覧の見た目調整用です。" },
+	],
+	"notice-02": [
+		{ heading: "お知らせ", meta: "2024/02/06 11:00", text: "動作報告のテスト文です。" },
+		{ heading: "お知らせ", meta: "2024/02/05 16:00", text: "確認用の簡易メッセージです。" },
+		{ heading: "お知らせ", meta: "2024/02/04 13:00", text: "表示の安定性チェック用です。" },
+		{ heading: "お知らせ", meta: "2024/02/03 09:00", text: "一覧タブの検証文です。" },
+		{ heading: "お知らせ", meta: "2024/02/02 22:00", text: "テーブル外カードの比較用です。" },
+	],
+};
+
+function isNoticeTabValue(value: string): value is NoticeTabValue {
+	return noticeTabValues.some((tabValue) => tabValue === value);
+}
+
 const destinationOptions = [
 	{ label: "Option 01", value: "option-01" },
 	{ label: "Option 02", value: "option-02" },
@@ -236,6 +273,8 @@ export function App() {
 	const [activeTab, setActiveTab] = useState<ControlTabValue>("tab-01");
 	const [activeDetailTab, setActiveDetailTab] =
 		useState<DetailTabValue>("detail-01");
+	const [activeNoticeTab, setActiveNoticeTab] =
+		useState<NoticeTabValue>("notice-01");
 	const [destination, setDestination] = useState<string>("");
 	const [nickname, setNickname] = useState<string>("");
 	const [formMessage, setFormMessage] = useState<string>("");
@@ -260,6 +299,12 @@ export function App() {
 	function handleDetailTabChange(value: string) {
 		if (isDetailTabValue(value)) {
 			setActiveDetailTab(value);
+		}
+	}
+
+	function handleNoticeTabChange(value: string) {
+		if (isNoticeTabValue(value)) {
+			setActiveNoticeTab(value);
 		}
 	}
 
@@ -544,6 +589,57 @@ export function App() {
 							</FormSubmitActions>
 						</FormStack>
 					</SystemModalBody>
+					<SystemModalFooter>
+						<SystemModalActions spacing="none">
+							<SystemModalClose asChild>
+								<Button variant="secondary" size="lg" radius="dialog">
+									Close
+								</Button>
+							</SystemModalClose>
+						</SystemModalActions>
+					</SystemModalFooter>
+				</SystemModalContent>
+			</SystemModal>
+			<SystemModal>
+				<SystemModalTrigger asChild>
+					<Button size="lg" variant="secondary">
+						Open List Modal
+					</Button>
+				</SystemModalTrigger>
+				<SystemModalContent width="md">
+					<SystemModalHeader>
+						<SystemModalTitle>お知らせ</SystemModalTitle>
+					</SystemModalHeader>
+					<ModalTabRoot
+						value={activeNoticeTab}
+						onValueChange={handleNoticeTabChange}
+					>
+						<ModalTabList>
+							{noticeTabs.map((tabItem) => (
+								<ModalTabTrigger key={tabItem.value} value={tabItem.value}>
+									{tabItem.label}
+								</ModalTabTrigger>
+							))}
+						</ModalTabList>
+						<SystemModalBody padding="compact">
+							{noticeTabs.map((tabItem) => (
+								<ModalTabPanel key={tabItem.value} value={tabItem.value}>
+									<ListRoot>
+										<ListItems>
+											{noticeRowsByTab[tabItem.value].map((row) => (
+												<ListNoticeCard
+													key={`${tabItem.value}-${row.meta}-${row.text}`}
+													heading={row.heading}
+													meta={row.meta}
+													text={row.text}
+												/>
+											))}
+										</ListItems>
+									</ListRoot>
+								</ModalTabPanel>
+							))}
+						</SystemModalBody>
+					</ModalTabRoot>
 					<SystemModalFooter>
 						<SystemModalActions spacing="none">
 							<SystemModalClose asChild>
