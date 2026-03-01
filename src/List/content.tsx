@@ -1,5 +1,6 @@
 import type { ComponentPropsWithoutRef } from "react";
 import { Separator } from "../Separator";
+import { cn } from "../utils";
 import {
 	ListCard,
 	ListCardHeader,
@@ -12,17 +13,44 @@ export interface ListNoticeCardProps
 	extends Omit<ComponentPropsWithoutRef<typeof ListCard>, "children"> {
 	heading: string;
 	meta: string;
+	onAction?: (() => void) | undefined;
 	text: string;
 }
 
 export function ListNoticeCard({
 	heading,
 	meta,
+	onAction,
 	text,
+	className,
+	onClick,
 	...props
 }: ListNoticeCardProps) {
+	const handleClick: ComponentPropsWithoutRef<typeof ListCard>["onClick"] = (
+		event,
+	) => {
+		onClick?.(event);
+		onAction?.();
+	};
+
 	return (
-		<ListCard {...props}>
+		<ListCard
+			className={cn(onAction ? "cursor-pointer" : "", className)}
+			onKeyDown={
+				onAction
+					? (event) => {
+							if (event.key === "Enter" || event.key === " ") {
+								event.preventDefault();
+								onAction();
+							}
+						}
+					: undefined
+			}
+			onClick={onAction ? handleClick : onClick}
+			role={onAction ? "button" : undefined}
+			tabIndex={onAction ? 0 : undefined}
+			{...props}
+		>
 			<div className="space-y-2">
 				<ListCardHeader>
 					<ListCardHeading>{heading}</ListCardHeading>

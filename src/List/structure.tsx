@@ -1,4 +1,8 @@
-import type { HTMLAttributes } from "react";
+import type {
+	ButtonHTMLAttributes,
+	ComponentPropsWithoutRef,
+	HTMLAttributes,
+} from "react";
 import { cn } from "../utils";
 import { ListCard, ListItems, ListRoot } from "./primitives";
 
@@ -13,6 +17,15 @@ export function ListCardHeader({
 			className={cn("flex items-center justify-between gap-3", className)}
 			{...props}
 		/>
+	);
+}
+
+export function ListCardLead({
+	className,
+	...props
+}: HTMLAttributes<HTMLDivElement>) {
+	return (
+		<div className={cn("flex items-center gap-2.5", className)} {...props} />
 	);
 }
 
@@ -58,5 +71,73 @@ export function ListCardText({
 			)}
 			{...props}
 		/>
+	);
+}
+
+export function ListActionButton({
+	className,
+	type,
+	...props
+}: ButtonHTMLAttributes<HTMLButtonElement>) {
+	return (
+		<button
+			type={type ?? "button"}
+			className={cn(
+				"inline-flex min-w-16 items-center justify-center rounded-full bg-linear-to-r from-ll-system-left to-ll-system-right px-3 py-0.5 text-[0.72rem] leading-none font-bold text-ll-white",
+				className,
+			)}
+			{...props}
+		/>
+	);
+}
+
+export function ListDetailBody({
+	className,
+	...props
+}: HTMLAttributes<HTMLDivElement>) {
+	return (
+		<div
+			className={cn(
+				"space-y-3 rounded-[0.6rem] bg-ll-white p-3 text-[0.86rem] leading-[1.5] text-ll-gray",
+				className,
+			)}
+			{...props}
+		/>
+	);
+}
+
+export function ListDetailActions({
+	className,
+	...props
+}: HTMLAttributes<HTMLDivElement>) {
+	return <div className={cn("flex justify-end", className)} {...props} />;
+}
+
+export function ListDetailImage({
+	alt = "",
+	className,
+	src,
+	...props
+}: Omit<ComponentPropsWithoutRef<"img">, "alt"> & { alt?: string }) {
+	if (src) {
+		return (
+			<img
+				alt={alt}
+				src={src}
+				className={cn("h-24 w-full rounded-[0.5rem] object-cover", className)}
+				{...props}
+			/>
+		);
+	}
+
+	return (
+		<div
+			className={cn(
+				"grid h-24 w-full place-items-center rounded-[0.5rem] bg-ll-modal-tab-gray text-[0.75rem] text-ll-gray",
+				className,
+			)}
+		>
+			Image
+		</div>
 	);
 }

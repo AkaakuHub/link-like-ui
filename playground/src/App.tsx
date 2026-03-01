@@ -1,5 +1,10 @@
 import { useState } from "react";
 import {
+	noticeTabValues,
+	type NoticeTabValue,
+	useNoticeModalStore,
+} from "./stores/useNoticeModalStore";
+import {
 	Button,
 	FormInputField,
 	FormNote,
@@ -7,6 +12,16 @@ import {
 	FormStack,
 	FormSubmitActions,
 	FormTextareaField,
+	ListActionButton,
+	ListCard,
+	ListCardHeader,
+	ListCardHeading,
+	ListCardLead,
+	ListCardMeta,
+	ListCardText,
+	ListDetailActions,
+	ListDetailBody,
+	ListDetailImage,
 	ListItems,
 	ListNoticeCard,
 	ListRoot,
@@ -16,6 +31,7 @@ import {
 	ModalTabTrigger,
 	RadioField,
 	RadioFieldRow,
+	Separator,
 	SliderToggleRow,
 	SystemModal,
 	SystemModalBody,
@@ -160,38 +176,165 @@ function isDetailTabValue(value: string): value is DetailTabValue {
 	return detailTabValues.some((tabValue) => tabValue === value);
 }
 
-const noticeTabValues = ["notice-01", "notice-02"] as const;
-type NoticeTabValue = (typeof noticeTabValues)[number];
-
 const noticeTabs: Array<{ label: string; value: NoticeTabValue }> = [
 	{ label: "お知らせ", value: "notice-01" },
 	{ label: "不具合情報", value: "notice-02" },
 ];
 
+function isNoticeTabValue(value: string): value is NoticeTabValue {
+	return noticeTabValues.some((tabValue) => tabValue === value);
+}
+
 const noticeRowsByTab: Record<
 	NoticeTabValue,
-	Array<{ heading: string; meta: string; text: string }>
+	Array<{ id: string; heading: string; meta: string; text: string; detail: string[] }>
 > = {
 	"notice-01": [
-		{ heading: "お知らせ", meta: "2024/02/10 10:00", text: "サンプル告知テキストです。" },
-		{ heading: "お知らせ", meta: "2024/02/10 09:00", text: "表示確認用の文言です。" },
-		{ heading: "お知らせ", meta: "2024/02/09 18:00", text: "汎用的な案内文です。" },
-		{ heading: "お知らせ", meta: "2024/02/09 12:00", text: "内容はダミーの説明です。" },
-		{ heading: "お知らせ", meta: "2024/02/08 20:00", text: "カード表示の検証用テキストです。" },
-		{ heading: "お知らせ", meta: "2024/02/08 10:00", text: "更新情報のテスト表示です。" },
-		{ heading: "お知らせ", meta: "2024/02/07 15:00", text: "通知一覧の見た目調整用です。" },
+		{
+			id: "notice-01-01",
+			heading: "お知らせ",
+			meta: "2024/02/10 10:00",
+			text: "サンプル告知テキストです。",
+			detail: [
+				"詳細表示のレイアウトを確認するためのテキストです。",
+				"画像の代わりにプレースホルダーを表示しています。",
+				"この文章は実データを含まないテスト用の内容です。",
+			],
+		},
+		{
+			id: "notice-01-02",
+			heading: "お知らせ",
+			meta: "2024/02/10 09:00",
+			text: "表示確認用の文言です。",
+			detail: [
+				"この項目は詳細画面遷移の確認用です。",
+				"戻る操作で一覧タブに復帰できます。",
+				"履歴スタックで画面状態を管理しています。",
+			],
+		},
+		{
+			id: "notice-01-03",
+			heading: "お知らせ",
+			meta: "2024/02/09 18:00",
+			text: "汎用的な案内文です。",
+			detail: [
+				"内容はダミー文字列で構成されています。",
+				"スクロール量の確認用として段落を追加しています。",
+				"モーダル下部のボタンは固定表示です。",
+			],
+		},
+		{
+			id: "notice-01-04",
+			heading: "お知らせ",
+			meta: "2024/02/09 12:00",
+			text: "内容はダミーの説明です。",
+			detail: [
+				"カードの自由編集に対応するため、本文は children で差し替えできます。",
+				"セパレータは独立したコンポーネントです。",
+				"再利用しやすい構成に分割しています。",
+			],
+		},
+		{
+			id: "notice-01-05",
+			heading: "お知らせ",
+			meta: "2024/02/08 20:00",
+			text: "カード表示の検証用テキストです。",
+			detail: [
+				"見出し、メタ情報、本文の位置合わせを検証します。",
+				"この段落は余白バランス確認用です。",
+				"一覧と詳細で同じ配色テーマを使用します。",
+			],
+		},
+		{
+			id: "notice-01-06",
+			heading: "お知らせ",
+			meta: "2024/02/08 10:00",
+			text: "更新情報のテスト表示です。",
+			detail: [
+				"表示文言は当たり障りのない内容のみを使用しています。",
+				"固有名詞や実在情報は含めていません。",
+				"この行は詳細画面の行間確認用です。",
+			],
+		},
+		{
+			id: "notice-01-07",
+			heading: "お知らせ",
+			meta: "2024/02/07 15:00",
+			text: "通知一覧の見た目調整用です。",
+			detail: [
+				"履歴機能により、戻る操作で直前画面へ戻れます。",
+				"モーダルを閉じると初期画面へリセットされます。",
+				"追加モーダルが増えても影響しない実装です。",
+			],
+		},
 	],
 	"notice-02": [
-		{ heading: "お知らせ", meta: "2024/02/06 11:00", text: "動作報告のテスト文です。" },
-		{ heading: "お知らせ", meta: "2024/02/05 16:00", text: "確認用の簡易メッセージです。" },
-		{ heading: "お知らせ", meta: "2024/02/04 13:00", text: "表示の安定性チェック用です。" },
-		{ heading: "お知らせ", meta: "2024/02/03 09:00", text: "一覧タブの検証文です。" },
-		{ heading: "お知らせ", meta: "2024/02/02 22:00", text: "テーブル外カードの比較用です。" },
+		{
+			id: "notice-02-01",
+			heading: "お知らせ",
+			meta: "2024/02/06 11:00",
+			text: "動作報告のテスト文です。",
+			detail: [
+				"二つ目タブ側の詳細表示確認用です。",
+				"タブ状態は履歴遷移後も維持されます。",
+				"この段落はサンプル文です。",
+			],
+		},
+		{
+			id: "notice-02-02",
+			heading: "お知らせ",
+			meta: "2024/02/05 16:00",
+			text: "確認用の簡易メッセージです。",
+			detail: [
+				"戻るボタンはグラデーションの小ボタンです。",
+				"押下で一覧画面に戻ります。",
+				"この文は無害な確認用の文章です。",
+			],
+		},
+		{
+			id: "notice-02-03",
+			heading: "お知らせ",
+			meta: "2024/02/04 13:00",
+			text: "表示の安定性チェック用です。",
+			detail: [
+				"詳細画面の本文は複数段落を許可しています。",
+				"画像領域はプレースホルダーです。",
+				"必要に応じて実画像に差し替え可能です。",
+			],
+		},
+		{
+			id: "notice-02-04",
+			heading: "お知らせ",
+			meta: "2024/02/03 09:00",
+			text: "一覧タブの検証文です。",
+			detail: [
+				"この項目も同じ部品で描画されています。",
+				"再利用性を優先した構成です。",
+				"シンプルな依存関係で管理します。",
+			],
+		},
+		{
+			id: "notice-02-05",
+			heading: "お知らせ",
+			meta: "2024/02/02 22:00",
+			text: "テーブル外カードの比較用です。",
+			detail: [
+				"一覧カードは children 差し替えで自由に編集できます。",
+				"セパレータも個別利用できます。",
+				"この説明はデモ用途です。",
+			],
+		},
 	],
 };
 
-function isNoticeTabValue(value: string): value is NoticeTabValue {
-	return noticeTabValues.some((tabValue) => tabValue === value);
+function findNoticeItemById(id: string) {
+	for (const tabItems of Object.values(noticeRowsByTab)) {
+		const foundItem = tabItems.find((item) => item.id === id);
+		if (foundItem) {
+			return foundItem;
+		}
+	}
+	return null;
 }
 
 const destinationOptions = [
@@ -273,8 +416,13 @@ export function App() {
 	const [activeTab, setActiveTab] = useState<ControlTabValue>("tab-01");
 	const [activeDetailTab, setActiveDetailTab] =
 		useState<DetailTabValue>("detail-01");
-	const [activeNoticeTab, setActiveNoticeTab] =
-		useState<NoticeTabValue>("notice-01");
+	const activeNoticeTab = useNoticeModalStore((state) => state.activeTab);
+	const noticeHistory = useNoticeModalStore((state) => state.history);
+	const isListModalOpen = useNoticeModalStore((state) => state.isOpen);
+	const setNoticeTab = useNoticeModalStore((state) => state.setTab);
+	const openNoticeDetail = useNoticeModalStore((state) => state.openDetail);
+	const backNoticeView = useNoticeModalStore((state) => state.back);
+	const setListModalOpen = useNoticeModalStore((state) => state.setModalOpen);
 	const [destination, setDestination] = useState<string>("");
 	const [nickname, setNickname] = useState<string>("");
 	const [formMessage, setFormMessage] = useState<string>("");
@@ -304,8 +452,12 @@ export function App() {
 
 	function handleNoticeTabChange(value: string) {
 		if (isNoticeTabValue(value)) {
-			setActiveNoticeTab(value);
+			setNoticeTab(value);
 		}
+	}
+
+	function handleListModalOpenChange(nextOpen: boolean) {
+		setListModalOpen(nextOpen);
 	}
 
 	function updateValue(id: string, nextValue: number) {
@@ -328,6 +480,12 @@ export function App() {
 			[rowKey]: value,
 		}));
 	}
+
+	const currentNoticeView = noticeHistory[noticeHistory.length - 1];
+	const currentNoticeDetailItem =
+		currentNoticeView?.type === "detail"
+			? findNoticeItemById(currentNoticeView.itemId)
+			: null;
 
 	return (
 		<main className="grid min-h-screen place-items-center bg-ll-tab-gray p-6">
@@ -600,7 +758,7 @@ export function App() {
 					</SystemModalFooter>
 				</SystemModalContent>
 			</SystemModal>
-			<SystemModal>
+			<SystemModal open={isListModalOpen} onOpenChange={handleListModalOpenChange}>
 				<SystemModalTrigger asChild>
 					<Button size="lg" variant="secondary">
 						Open List Modal
@@ -628,9 +786,12 @@ export function App() {
 										<ListItems>
 											{noticeRowsByTab[tabItem.value].map((row) => (
 												<ListNoticeCard
-													key={`${tabItem.value}-${row.meta}-${row.text}`}
+													key={row.id}
 													heading={row.heading}
 													meta={row.meta}
+													onAction={() => {
+														openNoticeDetail(row.id);
+													}}
 													text={row.text}
 												/>
 											))}
@@ -649,6 +810,52 @@ export function App() {
 							</SystemModalClose>
 						</SystemModalActions>
 					</SystemModalFooter>
+				</SystemModalContent>
+			</SystemModal>
+			<SystemModal
+				open={currentNoticeView?.type === "detail"}
+				onOpenChange={(nextOpen) => {
+					if (!nextOpen) {
+						backNoticeView();
+					}
+				}}
+			>
+				<SystemModalContent width="md">
+					<SystemModalHeader>
+						<SystemModalTitle>お知らせ</SystemModalTitle>
+					</SystemModalHeader>
+					<SystemModalBody padding="compact">
+						<ListRoot>
+							<ListDetailBody>
+								<SystemModalStack spacing="sm">
+									<ListCard>
+										<SystemModalStack spacing="sm">
+											<ListCardHeader>
+												<ListCardLead>
+													<ListCardHeading>
+														{currentNoticeDetailItem?.heading ?? "お知らせ"}
+													</ListCardHeading>
+													<ListCardMeta>
+														{currentNoticeDetailItem?.meta ?? ""}
+													</ListCardMeta>
+												</ListCardLead>
+												<ListActionButton onClick={backNoticeView}>戻る</ListActionButton>
+											</ListCardHeader>
+											<Separator />
+											<ListCardText>{currentNoticeDetailItem?.text ?? ""}</ListCardText>
+										</SystemModalStack>
+									</ListCard>
+									<ListDetailImage />
+									{(currentNoticeDetailItem?.detail ?? []).map((line) => (
+										<p key={line}>{line}</p>
+									))}
+									<ListDetailActions>
+										<ListActionButton onClick={backNoticeView}>戻る</ListActionButton>
+									</ListDetailActions>
+								</SystemModalStack>
+							</ListDetailBody>
+						</ListRoot>
+					</SystemModalBody>
 				</SystemModalContent>
 			</SystemModal>
 			<SystemModal>
