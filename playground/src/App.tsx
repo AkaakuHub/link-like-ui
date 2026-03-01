@@ -1,6 +1,12 @@
 import { useState } from "react";
 import {
 	Button,
+	FormInputField,
+	FormNote,
+	FormSelectField,
+	FormStack,
+	FormSubmitActions,
+	FormTextareaField,
 	ModalTabList,
 	ModalTabPanel,
 	ModalTabRoot,
@@ -26,6 +32,7 @@ import {
 	SystemModalSection,
 	SystemModalSectionBody,
 	SystemModalSectionTitle,
+	SystemModalStack,
 	SystemModalWarning,
 	TabList,
 	TabPanel,
@@ -150,6 +157,12 @@ function isDetailTabValue(value: string): value is DetailTabValue {
 	return detailTabValues.some((tabValue) => tabValue === value);
 }
 
+const destinationOptions = [
+	{ label: "Option 01", value: "option-01" },
+	{ label: "Option 02", value: "option-02" },
+	{ label: "Option 03", value: "option-03" },
+];
+
 const rowsByTab: Record<ControlTabValue, Array<{ id: string; label: string }>> = {
 	"tab-01": [
 		{ id: "tab-01-row-01", label: "Row 01" },
@@ -223,6 +236,9 @@ export function App() {
 	const [activeTab, setActiveTab] = useState<ControlTabValue>("tab-01");
 	const [activeDetailTab, setActiveDetailTab] =
 		useState<DetailTabValue>("detail-01");
+	const [destination, setDestination] = useState<string>("");
+	const [nickname, setNickname] = useState<string>("");
+	const [formMessage, setFormMessage] = useState<string>("");
 	const [values, setValues] = useState<Record<string, number>>(
 		createInitialMap(70),
 	);
@@ -417,7 +433,7 @@ export function App() {
 					<SystemModalHeader>
 						<SystemModalTitle>Filter</SystemModalTitle>
 					</SystemModalHeader>
-					<SystemModalBody padding="compact">
+					<SystemModalBody>
 						<SystemModalPanel>
 							<SystemModalHeading size="compact" tone="label" withoutTopMargin>
 								Group 01
@@ -483,6 +499,64 @@ export function App() {
 			<SystemModal>
 				<SystemModalTrigger asChild>
 					<Button size="lg" variant="secondary">
+						Open Form Modal
+					</Button>
+				</SystemModalTrigger>
+				<SystemModalContent width="md">
+					<SystemModalHeader>
+						<SystemModalTitle>Form</SystemModalTitle>
+					</SystemModalHeader>
+					<SystemModalBody padding="default">
+						<FormStack>
+							<FormSelectField
+								label="項目A"
+								required
+								value={destination}
+								onChange={(event) => {
+									setDestination(event.currentTarget.value);
+								}}
+								placeholder="選択してください"
+								options={destinationOptions}
+							/>
+							<FormInputField
+								label="項目B"
+								required
+								value={nickname}
+								onChange={(event) => {
+									setNickname(event.currentTarget.value);
+								}}
+							/>
+							<FormTextareaField
+								label="項目C"
+								required
+								value={formMessage}
+								onChange={(event) => {
+									setFormMessage(event.currentTarget.value);
+								}}
+								placeholder="ここに入力してください"
+							/>
+							<FormNote>※サンプル入力を想定した表示です。</FormNote>
+							<FormSubmitActions>
+								<Button radius="dialog" size="modal" width="dialog">
+									実行
+								</Button>
+							</FormSubmitActions>
+						</FormStack>
+					</SystemModalBody>
+					<SystemModalFooter>
+						<SystemModalActions spacing="none">
+							<SystemModalClose asChild>
+								<Button variant="secondary" size="lg" radius="dialog">
+									Close
+								</Button>
+							</SystemModalClose>
+						</SystemModalActions>
+					</SystemModalFooter>
+				</SystemModalContent>
+			</SystemModal>
+			<SystemModal>
+				<SystemModalTrigger asChild>
+					<Button size="lg" variant="secondary">
 						Open Table Modal
 					</Button>
 				</SystemModalTrigger>
@@ -504,12 +578,12 @@ export function App() {
 						<SystemModalBody padding="compact">
 							{detailTabs.map((tabItem) => (
 								<ModalTabPanel key={tabItem.value} value={tabItem.value}>
-									<div className="space-y-2">
+									<SystemModalStack spacing="sm">
 										<SystemModalHeading
 											size="compact"
 											tone="label"
 											withoutTopMargin
-											className="w-full rounded-[0.6rem]"
+											layout="bar"
 										>
 											Rate Group 01
 										</SystemModalHeading>
@@ -523,8 +597,8 @@ export function App() {
 											<TableBody>
 												{rarityRateRows.map((row) => (
 													<TableRow key={`${tabItem.value}-${row.rarity}`}>
-														<TableCell className="text-center">{row.rarity}</TableCell>
-														<TableCell className="text-right">{row.ratio}</TableCell>
+														<TableCell align="center">{row.rarity}</TableCell>
+														<TableCell align="right">{row.ratio}</TableCell>
 													</TableRow>
 												))}
 											</TableBody>
@@ -532,16 +606,16 @@ export function App() {
 										<SystemModalHeading
 											size="compact"
 											tone="label"
-											className="w-full rounded-[0.6rem]"
+											layout="bar"
 										>
 											Rate Group 02
 										</SystemModalHeading>
 										<TableRoot>
 											<TableHead>
 												<TableRow>
-													<TableHeaderCell className="w-[20%]">Type</TableHeaderCell>
+													<TableHeaderCell columnWidth="20%">Type</TableHeaderCell>
 													<TableHeaderCell>Name</TableHeaderCell>
-													<TableHeaderCell className="w-[22%]">Rate</TableHeaderCell>
+													<TableHeaderCell columnWidth="22%">Rate</TableHeaderCell>
 												</TableRow>
 											</TableHead>
 											<TableBody>
@@ -549,14 +623,14 @@ export function App() {
 													<TableRow
 														key={`${tabItem.value}-${row.rarity}-${row.name}`}
 													>
-														<TableCell className="text-center">{row.rarity}</TableCell>
+														<TableCell align="center">{row.rarity}</TableCell>
 														<TableCell>{row.name}</TableCell>
-														<TableCell className="text-right">{row.ratio}</TableCell>
+														<TableCell align="right">{row.ratio}</TableCell>
 													</TableRow>
 												))}
 											</TableBody>
 										</TableRoot>
-									</div>
+									</SystemModalStack>
 								</ModalTabPanel>
 							))}
 						</SystemModalBody>
@@ -583,7 +657,7 @@ export function App() {
 						<SystemModalTitle>Document</SystemModalTitle>
 					</SystemModalHeader>
 					<SystemModalBody padding="none" tone="surface">
-						<SystemModalSectionBody withoutTopMargin className="p-4">
+						<SystemModalSectionBody withoutTopMargin padding="md">
 							<p>
 								This is sample text for layout preview in a modal component.
 							</p>

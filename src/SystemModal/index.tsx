@@ -9,6 +9,7 @@ export {
 	SystemModalSection,
 	SystemModalSectionBody,
 	SystemModalSectionTitle,
+	SystemModalStack,
 	SystemModalWarning,
 } from "./content";
 export {

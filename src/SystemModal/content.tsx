@@ -3,6 +3,7 @@ import { cn } from "../utils";
 
 type SystemModalHeadingSize = "default" | "compact";
 type SystemModalHeadingTone = "gradient" | "label";
+type SystemModalHeadingLayout = "chip" | "bar";
 
 const headingSizeClassMap: Record<SystemModalHeadingSize, string> = {
 	default: "h-7 min-w-50 px-5 text-[1rem]",
@@ -15,13 +16,20 @@ const headingToneClassMap: Record<SystemModalHeadingTone, string> = {
 	label: "bg-ll-label text-ll-white",
 };
 
+const headingLayoutClassMap: Record<SystemModalHeadingLayout, string> = {
+	chip: "rounded-full",
+	bar: "w-full rounded-[0.6rem]",
+};
+
 export function SystemModalHeading({
 	className,
+	layout = "chip",
 	size = "default",
 	tone = "gradient",
 	withoutTopMargin = false,
 	...props
 }: HTMLAttributes<HTMLDivElement> & {
+	layout?: SystemModalHeadingLayout;
 	size?: SystemModalHeadingSize;
 	tone?: SystemModalHeadingTone;
 	withoutTopMargin?: boolean;
@@ -29,8 +37,9 @@ export function SystemModalHeading({
 	return (
 		<div
 			className={cn(
-				"inline-flex items-center justify-center rounded-full font-bold",
+				"inline-flex items-center justify-center font-bold",
 				withoutTopMargin ? "" : "mt-4",
+				headingLayoutClassMap[layout],
 				headingSizeClassMap[size],
 				headingToneClassMap[tone],
 				className,
@@ -136,6 +145,24 @@ export function SystemModalWarning({
 	);
 }
 
+type SystemModalStackSpacing = "sm" | "md" | "lg";
+
+const stackSpacingClassMap: Record<SystemModalStackSpacing, string> = {
+	sm: "space-y-2",
+	md: "space-y-4",
+	lg: "space-y-5",
+};
+
+export function SystemModalStack({
+	className,
+	spacing = "md",
+	...props
+}: HTMLAttributes<HTMLDivElement> & { spacing?: SystemModalStackSpacing }) {
+	return (
+		<div className={cn(stackSpacingClassMap[spacing], className)} {...props} />
+	);
+}
+
 export function SystemModalSection({
 	className,
 	...props
@@ -160,14 +187,19 @@ export function SystemModalSectionTitle({
 
 export function SystemModalSectionBody({
 	className,
+	padding = "none",
 	withoutTopMargin = false,
 	...props
-}: HTMLAttributes<HTMLDivElement> & { withoutTopMargin?: boolean }) {
+}: HTMLAttributes<HTMLDivElement> & {
+	padding?: "none" | "md";
+	withoutTopMargin?: boolean;
+}) {
 	return (
 		<div
 			className={cn(
 				"text-[0.9rem] leading-[1.8] text-ll-gray [&_ol]:list-decimal [&_ol]:pl-5 [&_p+p]:mt-2 [&_li+li]:mt-1",
 				withoutTopMargin ? "mt-0" : "mt-3",
+				padding === "md" ? "p-4" : "",
 				className,
 			)}
 			{...props}
