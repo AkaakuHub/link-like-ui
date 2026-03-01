@@ -16,8 +16,10 @@ export {
 } from "./primitives";
 export {
 	FormField,
+	FormFieldErrorText,
 	FormFieldHeader,
 	FormFieldLabelText,
+	FormFieldMeta,
 	FormFieldRequiredText,
 	FormNote,
 	FormSelectIndicator,

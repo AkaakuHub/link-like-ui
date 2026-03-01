@@ -527,6 +527,7 @@ export function App() {
 								}}
 							/>
 							<FormTextareaField
+								errorText="入力してください"
 								label="項目C"
 								required
 								value={formMessage}

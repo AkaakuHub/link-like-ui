@@ -7,8 +7,10 @@ import {
 } from "./primitives";
 import {
 	FormField,
+	FormFieldErrorText,
 	FormFieldHeader,
 	FormFieldLabelText,
+	FormFieldMeta,
 	FormFieldRequiredText,
 	FormSelectIndicator,
 } from "./structure";
@@ -19,22 +21,27 @@ export interface FormOption {
 }
 
 export interface FormFieldLabelProps {
+	errorText?: string | undefined;
 	label: string;
 	required?: boolean | undefined;
 	requiredText?: string | undefined;
 }
 
 export function FormFieldLabel({
+	errorText,
 	label,
 	required = false,
 	requiredText = "必須項目",
 }: FormFieldLabelProps) {
 	return (
 		<FormFieldHeader>
-			<FormFieldLabelText>{label}</FormFieldLabelText>
-			{required ? (
-				<FormFieldRequiredText>{requiredText}</FormFieldRequiredText>
-			) : null}
+			<FormFieldMeta>
+				<FormFieldLabelText>{label}</FormFieldLabelText>
+				{required ? (
+					<FormFieldRequiredText>{requiredText}</FormFieldRequiredText>
+				) : null}
+			</FormFieldMeta>
+			{errorText ? <FormFieldErrorText>{errorText}</FormFieldErrorText> : null}
 		</FormFieldHeader>
 	);
 }
@@ -46,6 +53,7 @@ export interface FormInputFieldProps
 }
 
 export function FormInputField({
+	errorText,
 	fieldClassName,
 	label,
 	required,
@@ -56,6 +64,7 @@ export function FormInputField({
 	return (
 		<FormField className={fieldClassName}>
 			<FormFieldLabel
+				errorText={errorText}
 				label={label}
 				required={required}
 				requiredText={requiredText}
@@ -75,6 +84,7 @@ export interface FormTextareaFieldProps
 }
 
 export function FormTextareaField({
+	errorText,
 	fieldClassName,
 	label,
 	required,
@@ -85,6 +95,7 @@ export function FormTextareaField({
 	return (
 		<FormField className={fieldClassName}>
 			<FormFieldLabel
+				errorText={errorText}
 				label={label}
 				required={required}
 				requiredText={requiredText}
@@ -106,6 +117,7 @@ export interface FormSelectFieldProps
 }
 
 export function FormSelectField({
+	errorText,
 	fieldClassName,
 	label,
 	required,
@@ -124,6 +136,7 @@ export function FormSelectField({
 	return (
 		<FormField className={fieldClassName}>
 			<FormFieldLabel
+				errorText={errorText}
 				label={label}
 				required={required}
 				requiredText={requiredText}

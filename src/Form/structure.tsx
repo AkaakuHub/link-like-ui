@@ -33,6 +33,18 @@ export function FormFieldHeader({
 	...props
 }: HTMLAttributes<HTMLDivElement>) {
 	return (
+		<div
+			className={cn("flex items-center justify-between gap-3", className)}
+			{...props}
+		/>
+	);
+}
+
+export function FormFieldMeta({
+	className,
+	...props
+}: HTMLAttributes<HTMLDivElement>) {
+	return (
 		<div className={cn("flex items-center gap-4", className)} {...props} />
 	);
 }
@@ -60,6 +72,21 @@ export function FormFieldRequiredText({
 		<span
 			className={cn(
 				'font-["Noto_Sans_JP","Segoe_UI",sans-serif] text-ll-orange',
+				className,
+			)}
+			{...props}
+		/>
+	);
+}
+
+export function FormFieldErrorText({
+	className,
+	...props
+}: HTMLAttributes<HTMLSpanElement>) {
+	return (
+		<span
+			className={cn(
+				'font-["Noto_Sans_JP","Segoe_UI",sans-serif] text-right text-ll-pink',
 				className,
 			)}
 			{...props}

@@ -1,10 +1,12 @@
 export { Button, type ButtonProps } from "./Button";
 export {
 	FormField,
+	FormFieldErrorText,
 	FormFieldHeader,
 	FormFieldLabel,
 	type FormFieldLabelProps,
 	FormFieldLabelText,
+	FormFieldMeta,
 	FormFieldRequiredText,
 	FormInputField,
 	type FormInputFieldProps,
