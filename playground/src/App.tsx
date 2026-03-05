@@ -25,6 +25,7 @@ import {
 	ListItems,
 	ListNoticeCard,
 	ListRoot,
+	LoadingOverlay,
 	ModalTabList,
 	ModalTabPanel,
 	ModalTabRoot,
@@ -413,6 +414,7 @@ function createInitialPerformerFilters(): Record<string, string> {
 }
 
 export function App() {
+	const [isLoadingVisible, setIsLoadingVisible] = useState<boolean>(false);
 	const [activeTab, setActiveTab] = useState<ControlTabValue>("tab-01");
 	const [activeDetailTab, setActiveDetailTab] =
 		useState<DetailTabValue>("detail-01");
@@ -488,13 +490,21 @@ export function App() {
 			: null;
 
 	return (
-		<main className="grid min-h-screen place-items-center bg-ll-tab-gray p-6">
+		<main className="grid min-h-screen place-items-center bg-ll-white p-6">
 			<div className="mb-4 flex flex-wrap gap-3">
 				<Button>Primary</Button>
 				<Button variant="secondary">Secondary</Button>
 				<Button disabled>Primary Disabled</Button>
 				<Button variant="secondary" disabled>
 					Secondary Disabled
+				</Button>
+				<Button
+					variant="secondary"
+					onClick={() => {
+						setIsLoadingVisible((previous) => !previous);
+					}}
+				>
+					Toggle Loading
 				</Button>
 			</div>
 			<SystemModal>
@@ -1011,6 +1021,7 @@ export function App() {
 					</SystemModalFooter>
 				</SystemModalContent>
 			</SystemModal>
+			{isLoadingVisible ? <LoadingOverlay /> : null}
 		</main>
 	);
 }

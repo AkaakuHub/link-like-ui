@@ -2,6 +2,14 @@
 @import "simplebar/dist/simplebar.css";
 @source "../../src";
 
+@font-face {
+	font-family: "Poppins";
+	src: url("./assets/fonts/Poppins-Regular.ttf") format("truetype");
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+}
+
 @theme {
 	--color-ll-system-left: #65defc;
 	--color-ll-system-right: #938aff;
@@ -12,6 +20,7 @@
 	--color-ll-pink: #ff86c8;
 	--color-ll-orange: #ee8543;
 	--color-ll-disabled: #9ba9b2;
+	--color-ll-loading-border: #abc1cb;
 	--color-ll-scroll: #bec3c7;
 	--color-ll-tab-gray: #f4f4f4;
 	--color-ll-tab-active: #5e6d74;
@@ -47,6 +56,21 @@
 	to {
 		opacity: 0;
 		scale: 0.5;
+	}
+}
+
+@keyframes ll-loading-dot {
+	0% {
+		opacity: 0.2;
+	}
+	30% {
+		opacity: 1;
+	}
+	70% {
+		opacity: 0.35;
+	}
+	100% {
+		opacity: 0.2;
 	}
 }
 
