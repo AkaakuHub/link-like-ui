@@ -15,6 +15,7 @@
 	},
 	"exports": {
 		".": "./dist/index.js",
+		"./style.css": "./dist/styles/index.css",
 		"./package.json": "./package.json"
 	},
 	"main": "./dist/index.js",
@@ -27,8 +28,9 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build": "tsdown",
-		"dev": "tsdown --watch",
+		"build": "pnpm run build:js && pnpm run build:css && node ./scripts/build-style.mjs",
+		"build:css": "tailwindcss -i ./src/styles/index.css -o ./dist/styles/index.css --minify",
+		"build:js": "tsdown",
 		"play": "vite",
 		"check": "biome check --fix --error-on-warnings .",
 		"check:ci": "biome check --error-on-warnings .",
@@ -44,6 +46,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.14",
+		"@tailwindcss/cli": "^4.2.2",
 		"@tailwindcss/vite": "^4.2.1",
 		"@tsconfig/strictest": "^2.0.8",
 		"@types/node": "^25.0.3",

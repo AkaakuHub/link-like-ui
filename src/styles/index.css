@@ -1,10 +1,11 @@
-@import "tailwindcss";
+@import "tailwindcss" source(none);
 @import "simplebar/dist/simplebar.css";
-@source "../../src";
+
+@source "../**/*.{ts,tsx}";
 
 @font-face {
 	font-family: "Poppins";
-	src: url("./assets/fonts/Poppins-Regular.ttf") format("truetype");
+	src: url("../assets/fonts/Poppins-Regular.ttf") format("truetype");
 	font-style: normal;
 	font-weight: 400;
 	font-display: swap;

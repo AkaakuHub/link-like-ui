@@ -2,6 +2,13 @@
 
 A certain UI library that looks like Link-Like-OS.
 
+## Usage
+
+```tsx
+import "react-components-starter/style.css";
+import { LoadingOverlay } from "react-components-starter";
+```
+
 ## Development
 
 - Install dependencies:
