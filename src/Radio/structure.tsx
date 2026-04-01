@@ -7,15 +7,15 @@ import { cn } from "../utils";
 import {
 	RadioGroupIndicatorPrimitive,
 	RadioGroupItemPrimitive,
-	RadioGroupRoot,
+	RadioGroupPrimitive,
 } from "./primitives";
 
 export const RadioGroup = forwardRef<
-	ElementRef<typeof RadioGroupRoot>,
-	ComponentPropsWithoutRef<typeof RadioGroupRoot>
+	ElementRef<typeof RadioGroupPrimitive>,
+	ComponentPropsWithoutRef<typeof RadioGroupPrimitive>
 >(({ className, ...props }, ref) => {
 	return (
-		<RadioGroupRoot
+		<RadioGroupPrimitive
 			ref={ref}
 			className={cn("flex flex-wrap items-center gap-x-3 gap-y-2", className)}
 			{...props}

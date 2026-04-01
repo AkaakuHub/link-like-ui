@@ -1,8 +1,7 @@
-export { TabTrigger } from "./content";
 export {
 	TabListPrimitive,
 	TabPanelPrimitive,
 	TabRootPrimitive,
 	TabTriggerPrimitive,
 } from "./primitives";
-export { TabList, TabPanel, TabRoot } from "./structure";
+export { TabList, TabPanel, TabRoot, TabTrigger } from "./structure";

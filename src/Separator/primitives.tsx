@@ -3,19 +3,10 @@ import {
 	type ElementRef,
 	forwardRef,
 } from "react";
-import { cn } from "../utils";
 
-export const SeparatorPrimitive = forwardRef<
+export const SeparatorBase = forwardRef<
 	ElementRef<"div">,
 	ComponentPropsWithoutRef<"div">
->(({ className, ...props }, ref) => {
-	return (
-		<div
-			ref={ref}
-			className={cn("h-px w-full bg-ll-modal-tab-gray", className)}
-			{...props}
-		/>
-	);
-});
+>(({ ...props }, ref) => <div ref={ref} {...props} />);
 
-SeparatorPrimitive.displayName = "SeparatorPrimitive";
+SeparatorBase.displayName = "SeparatorBase";

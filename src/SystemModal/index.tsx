@@ -15,15 +15,20 @@ export {
 export {
 	SystemModal,
 	SystemModalClose,
-	SystemModalContent,
-	type SystemModalContentProps,
-	SystemModalOverlay,
+	SystemModalContentPrimitive,
+	SystemModalDescriptionPrimitive,
+	SystemModalOverlayPrimitive,
+	SystemModalPortalPrimitive,
+	SystemModalTitlePrimitive,
 	SystemModalTrigger,
 } from "./primitives";
 export {
 	SystemModalBody,
+	SystemModalContent,
+	type SystemModalContentProps,
 	SystemModalDescription,
 	SystemModalFooter,
 	SystemModalHeader,
+	SystemModalOverlay,
 	SystemModalTitle,
 } from "./structure";

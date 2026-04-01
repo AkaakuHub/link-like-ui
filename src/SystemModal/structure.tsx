@@ -1,4 +1,3 @@
-import * as Dialog from "@radix-ui/react-dialog";
 import {
 	type ComponentPropsWithoutRef,
 	type ElementRef,
@@ -6,7 +5,15 @@ import {
 	type HTMLAttributes,
 } from "react";
 import SimpleBar from "simplebar-react";
+import { tv } from "tailwind-variants";
 import { cn } from "../utils";
+import {
+	SystemModalContentPrimitive,
+	SystemModalDescriptionPrimitive,
+	SystemModalOverlayPrimitive,
+	SystemModalPortalPrimitive,
+	SystemModalTitlePrimitive,
+} from "./primitives";
 
 type SystemModalBodyPadding = "default" | "compact" | "comfortable" | "none";
 
@@ -23,6 +30,65 @@ const bodyToneClassMap: Record<SystemModalBodyTone, string> = {
 	default: "",
 	surface: "bg-ll-modal-content-gray",
 };
+
+const systemModalOverlayClassName = tv({
+	base: "fixed inset-0 bg-black/67 transition-opacity duration-[180ms] ease-out data-[state=closed]:duration-[160ms] data-[state=closed]:ease-in data-[state=closed]:opacity-0 data-[state=open]:opacity-100",
+});
+
+const systemModalContentClassName = tv({
+	base: "fixed top-1/2 left-1/2 max-h-[84dvh] w-[calc(100vw-1rem)] -translate-x-1/2 -translate-y-1/2 origin-center overflow-hidden rounded-[16px] border-none data-[state=open]:animate-[ll-system-modal-open_100ms_cubic-bezier(.93,.23,.71,.94)_both] data-[state=closed]:animate-[ll-system-modal-close_100ms_cubic-bezier(.93,.23,.71,.94)_both] focus-visible:outline-3 focus-visible:outline-ll-label",
+	variants: {
+		width: {
+			sm: "max-w-[21.75rem]",
+			md: "max-w-[24rem]",
+			lg: "max-w-[26rem]",
+		},
+	},
+	defaultVariants: {
+		width: "md",
+	},
+});
+
+export const SystemModalOverlay = forwardRef<
+	ElementRef<typeof SystemModalOverlayPrimitive>,
+	ComponentPropsWithoutRef<typeof SystemModalOverlayPrimitive>
+>(({ className, ...props }, ref) => {
+	return (
+		<SystemModalOverlayPrimitive
+			ref={ref}
+			className={cn(systemModalOverlayClassName(), className)}
+			{...props}
+		/>
+	);
+});
+
+SystemModalOverlay.displayName = "SystemModalOverlay";
+
+export interface SystemModalContentProps
+	extends ComponentPropsWithoutRef<typeof SystemModalContentPrimitive> {
+	bodyClassName?: string;
+	width?: "sm" | "md" | "lg";
+}
+
+export const SystemModalContent = forwardRef<
+	ElementRef<typeof SystemModalContentPrimitive>,
+	SystemModalContentProps
+>(({ bodyClassName, children, className, width = "md", ...props }, ref) => {
+	return (
+		<SystemModalPortalPrimitive>
+			<SystemModalOverlay />
+			<SystemModalContentPrimitive
+				ref={ref}
+				className={cn(systemModalContentClassName({ width }), className)}
+				{...props}
+			>
+				<div className={cn("bg-ll-white", bodyClassName)}>{children}</div>
+			</SystemModalContentPrimitive>
+		</SystemModalPortalPrimitive>
+	);
+});
+
+SystemModalContent.displayName = "SystemModalContent";
 
 export function SystemModalHeader({
 	className,
@@ -92,11 +158,11 @@ export function SystemModalFooter({
 }
 
 export const SystemModalTitle = forwardRef<
-	ElementRef<typeof Dialog.Title>,
-	ComponentPropsWithoutRef<typeof Dialog.Title>
+	ElementRef<typeof SystemModalTitlePrimitive>,
+	ComponentPropsWithoutRef<typeof SystemModalTitlePrimitive>
 >(({ className, ...props }, ref) => {
 	return (
-		<Dialog.Title
+		<SystemModalTitlePrimitive
 			ref={ref}
 			className={cn(
 				'relative z-[1] font-["Noto_Sans_JP","Segoe_UI",sans-serif] text-[1.32rem] leading-none tracking-[0.03em] text-ll-white',
@@ -110,11 +176,11 @@ export const SystemModalTitle = forwardRef<
 SystemModalTitle.displayName = "SystemModalTitle";
 
 export const SystemModalDescription = forwardRef<
-	ElementRef<typeof Dialog.Description>,
-	ComponentPropsWithoutRef<typeof Dialog.Description>
+	ElementRef<typeof SystemModalDescriptionPrimitive>,
+	ComponentPropsWithoutRef<typeof SystemModalDescriptionPrimitive>
 >(({ className, ...props }, ref) => {
 	return (
-		<Dialog.Description
+		<SystemModalDescriptionPrimitive
 			ref={ref}
 			className={cn("text-inherit [font:inherit]", className)}
 			{...props}

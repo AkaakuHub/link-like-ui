@@ -10,4 +10,4 @@ export {
 	SliderThumbPrimitive,
 	SliderTrackPrimitive,
 } from "./primitives";
-export { Slider, type SliderProps } from "./structure";
+export { Slider } from "./structure";

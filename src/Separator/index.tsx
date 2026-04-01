@@ -1,2 +1,1 @@
-export { SeparatorPrimitive } from "./primitives";
-export { Separator } from "./structure";
+export { Separator, SeparatorPrimitive } from "./structure";

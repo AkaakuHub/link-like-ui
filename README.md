@@ -5,8 +5,9 @@ A certain UI library that looks like Link-Like-OS.
 ## Usage
 
 ```tsx
-import "react-components-starter/style.css";
-import { LoadingOverlay } from "react-components-starter";
+import { LoadingOverlay } from "react-components-starter/Loading";
+import { TabRoot } from "react-components-starter/Tab";
+import { Button } from "react-components-starter/Button";
 ```
 
 ## Development

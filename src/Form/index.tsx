@@ -10,19 +10,17 @@ export {
 	type FormTextareaFieldProps,
 } from "./content";
 export {
-	FormInputPrimitive,
-	FormSelectPrimitive,
-	FormTextareaPrimitive,
-} from "./primitives";
-export {
 	FormField,
 	FormFieldErrorText,
 	FormFieldHeader,
 	FormFieldLabelText,
 	FormFieldMeta,
 	FormFieldRequiredText,
+	FormInputPrimitive,
 	FormNote,
 	FormSelectIndicator,
+	FormSelectPrimitive,
 	FormStack,
 	FormSubmitActions,
+	FormTextareaPrimitive,
 } from "./structure";

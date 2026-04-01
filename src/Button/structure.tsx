@@ -1,6 +1,7 @@
 import { type ButtonHTMLAttributes, forwardRef } from "react";
 import { tv } from "tailwind-variants";
-import { cn } from "./utils";
+import { cn } from "../utils";
+import { ButtonBase } from "./primitives";
 
 type ButtonVariant = "primary" | "secondary";
 type ButtonSize = "sm" | "md" | "lg" | "modal";
@@ -52,7 +53,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 			className,
 			radius = "default",
 			size = "md",
-			type,
 			variant = "primary",
 			width = "auto",
 			...props
@@ -60,13 +60,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 		ref,
 	) => {
 		return (
-			<button
+			<ButtonBase
 				ref={ref}
 				className={cn(
 					buttonVariants({ radius, size, variant, width }),
 					className,
 				)}
-				type={type ?? "button"}
 				{...props}
 			/>
 		);

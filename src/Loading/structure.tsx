@@ -1,11 +1,36 @@
 import type { ComponentPropsWithoutRef } from "react";
 import { cn } from "../utils";
-import { LoadingContent, LoadingRoot } from "./primitives";
-
-export { LoadingContent, LoadingRoot };
+import { LoadingContentBase, LoadingRootBase } from "./primitives";
 
 const loadingTextOutlineWidthPx = 6;
 const loadingTextOutlineColorVar = "--color-ll-loading-border";
+
+export function LoadingRoot({
+	className,
+	...props
+}: ComponentPropsWithoutRef<typeof LoadingRootBase>) {
+	return (
+		<LoadingRootBase
+			className={cn(
+				"pointer-events-none fixed inset-0 z-[2147483647] grid place-items-center",
+				className,
+			)}
+			{...props}
+		/>
+	);
+}
+
+export function LoadingContent({
+	className,
+	...props
+}: ComponentPropsWithoutRef<typeof LoadingContentBase>) {
+	return (
+		<LoadingContentBase
+			className={cn("grid place-items-center gap-10", className)}
+			{...props}
+		/>
+	);
+}
 
 export function LoadingText({
 	className,

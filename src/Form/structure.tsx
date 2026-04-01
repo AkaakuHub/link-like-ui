@@ -1,5 +1,71 @@
-import type { HTMLAttributes } from "react";
+import {
+	type ComponentPropsWithoutRef,
+	type ElementRef,
+	forwardRef,
+	type HTMLAttributes,
+} from "react";
 import { cn } from "../utils";
+import { FormInputBase, FormSelectBase, FormTextareaBase } from "./primitives";
+
+const formControlBaseClassName =
+	'w-full rounded-[0.7rem] border border-ll-label bg-ll-white px-3 text-ll-gray outline-none font-["Noto_Sans_JP","Segoe_UI",sans-serif] placeholder:text-ll-disabled';
+
+export const FormInputPrimitive = forwardRef<
+	ElementRef<typeof FormInputBase>,
+	ComponentPropsWithoutRef<typeof FormInputBase>
+>(({ className, ...props }, ref) => {
+	return (
+		<FormInputBase
+			ref={ref}
+			className={cn(
+				formControlBaseClassName,
+				"h-[2.9rem] leading-none",
+				className,
+			)}
+			{...props}
+		/>
+	);
+});
+
+FormInputPrimitive.displayName = "FormInputPrimitive";
+
+export const FormTextareaPrimitive = forwardRef<
+	ElementRef<typeof FormTextareaBase>,
+	ComponentPropsWithoutRef<typeof FormTextareaBase>
+>(({ className, ...props }, ref) => {
+	return (
+		<FormTextareaBase
+			ref={ref}
+			className={cn(
+				formControlBaseClassName,
+				"min-h-[10.5rem] py-3 resize-none",
+				className,
+			)}
+			{...props}
+		/>
+	);
+});
+
+FormTextareaPrimitive.displayName = "FormTextareaPrimitive";
+
+export const FormSelectPrimitive = forwardRef<
+	ElementRef<typeof FormSelectBase>,
+	ComponentPropsWithoutRef<typeof FormSelectBase>
+>(({ className, ...props }, ref) => {
+	return (
+		<FormSelectBase
+			ref={ref}
+			className={cn(
+				formControlBaseClassName,
+				"h-[2.9rem] appearance-none pr-10 leading-none",
+				className,
+			)}
+			{...props}
+		/>
+	);
+});
+
+FormSelectPrimitive.displayName = "FormSelectPrimitive";
 
 type FormStackSpacing = "md" | "lg";
 

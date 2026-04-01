@@ -11,8 +11,7 @@ import {
 	SliderTrackPrimitive,
 } from "./primitives";
 
-export interface SliderProps
-	extends ComponentPropsWithoutRef<typeof SliderPrimitive> {
+interface SliderProps extends ComponentPropsWithoutRef<typeof SliderPrimitive> {
 	thumbClassName?: string;
 }
 

@@ -8,6 +8,6 @@ export {
 export {
 	RadioGroupIndicatorPrimitive,
 	RadioGroupItemPrimitive,
-	RadioGroupRoot,
+	RadioGroupPrimitive,
 } from "./primitives";
 export { RadioGroup, RadioItem } from "./structure";

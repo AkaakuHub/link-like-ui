@@ -1,18 +1,16 @@
 import type { ComponentPropsWithoutRef } from "react";
 import { cn } from "../utils";
 import {
-	FormInputPrimitive,
-	FormSelectPrimitive,
-	FormTextareaPrimitive,
-} from "./primitives";
-import {
 	FormField,
 	FormFieldErrorText,
 	FormFieldHeader,
 	FormFieldLabelText,
 	FormFieldMeta,
 	FormFieldRequiredText,
+	FormInputPrimitive,
 	FormSelectIndicator,
+	FormSelectPrimitive,
+	FormTextareaPrimitive,
 } from "./structure";
 
 export interface FormOption {

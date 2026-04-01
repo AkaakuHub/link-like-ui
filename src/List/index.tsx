@@ -1,7 +1,7 @@
 export { ListNoticeCard, type ListNoticeCardProps } from "./content";
-export { ListCard, ListItems, ListRoot } from "./primitives";
 export {
 	ListActionButton,
+	ListCard,
 	ListCardHeader,
 	ListCardHeading,
 	ListCardLead,
@@ -10,4 +10,6 @@ export {
 	ListDetailActions,
 	ListDetailBody,
 	ListDetailImage,
+	ListItems,
+	ListRoot,
 } from "./structure";
