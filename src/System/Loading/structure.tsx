@@ -1,5 +1,5 @@
 import type { ComponentPropsWithoutRef } from "react";
-import { cn } from "../utils";
+import { cn } from "../../utils";
 import { LoadingContentBase, LoadingRootBase } from "./primitives";
 
 const loadingTextOutlineWidthPx = 6;

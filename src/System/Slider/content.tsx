@@ -1,6 +1,6 @@
 import type { HTMLAttributes, ReactNode } from "react";
+import { cn } from "../../utils";
 import { AudioIcon, Toggle } from "../Toggle";
-import { cn } from "../utils";
 import { Slider } from "./structure";
 
 export interface SliderRowProps extends HTMLAttributes<HTMLDivElement> {

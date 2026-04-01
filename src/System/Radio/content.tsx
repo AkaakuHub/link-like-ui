@@ -1,5 +1,5 @@
 import type { ComponentPropsWithoutRef, HTMLAttributes } from "react";
-import { cn } from "../utils";
+import { cn } from "../../utils";
 import { RadioGroup, RadioItem } from "./structure";
 
 export interface RadioOption {

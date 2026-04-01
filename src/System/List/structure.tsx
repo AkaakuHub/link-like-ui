@@ -3,7 +3,7 @@ import type {
 	ComponentPropsWithoutRef,
 	HTMLAttributes,
 } from "react";
-import { cn } from "../utils";
+import { cn } from "../../utils";
 import { ListCardBase, ListItemsBase, ListRootBase } from "./primitives";
 
 export function ListRoot({

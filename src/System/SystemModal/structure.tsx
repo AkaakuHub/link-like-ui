@@ -6,7 +6,7 @@ import {
 } from "react";
 import SimpleBar from "simplebar-react";
 import { tv } from "tailwind-variants";
-import { cn } from "../utils";
+import { cn } from "../../utils";
 import {
 	SystemModalContentPrimitive,
 	SystemModalDescriptionPrimitive,

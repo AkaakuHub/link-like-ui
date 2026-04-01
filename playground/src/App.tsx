@@ -4,7 +4,7 @@ import {
 	type NoticeTabValue,
 	useNoticeModalStore,
 } from "./stores/useNoticeModalStore";
-import { Button } from "../../src/Button";
+import { Button } from "../../src/System/Button";
 import {
 	FormInputField,
 	FormNote,
@@ -12,7 +12,7 @@ import {
 	FormStack,
 	FormSubmitActions,
 	FormTextareaField,
-} from "../../src/Form";
+} from "../../src/System/Form";
 import {
 	ListActionButton,
 	ListCard,
@@ -27,17 +27,17 @@ import {
 	ListItems,
 	ListNoticeCard,
 	ListRoot,
-} from "../../src/List";
-import { LoadingOverlay } from "../../src/Loading";
+} from "../../src/System/List";
+import { LoadingOverlay } from "../../src/System/Loading";
 import {
 	ModalTabList,
 	ModalTabPanel,
 	ModalTabRoot,
 	ModalTabTrigger,
-} from "../../src/ModalTab";
-import { RadioField, RadioFieldRow } from "../../src/Radio";
-import { Separator } from "../../src/Separator";
-import { SliderToggleRow } from "../../src/Slider";
+} from "../../src/System/ModalTab";
+import { RadioField, RadioFieldRow } from "../../src/System/Radio";
+import { Separator } from "../../src/System/Separator";
+import { SliderToggleRow } from "../../src/System/Slider";
 import {
 	SystemModal,
 	SystemModalActionGrid,
@@ -59,8 +59,8 @@ import {
 	SystemModalTitle,
 	SystemModalTrigger,
 	SystemModalWarning,
-} from "../../src/SystemModal";
-import { TabList, TabPanel, TabRoot, TabTrigger } from "../../src/Tab";
+} from "../../src/System/SystemModal";
+import { TabList, TabPanel, TabRoot, TabTrigger } from "../../src/System/Tab";
 import {
 	TableBody,
 	TableCell,
@@ -68,7 +68,7 @@ import {
 	TableHeaderCell,
 	TableRoot,
 	TableRow,
-} from "../../src/Table";
+} from "../../src/System/Table";
 
 const tabValues = ["tab-01", "tab-02", "tab-03", "tab-04", "tab-05"] as const;
 type ControlTabValue = (typeof tabValues)[number];

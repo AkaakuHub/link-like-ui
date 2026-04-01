@@ -4,7 +4,7 @@ import {
 	forwardRef,
 	type HTMLAttributes,
 } from "react";
-import { cn } from "../utils";
+import { cn } from "../../utils";
 import { FormInputBase, FormSelectBase, FormTextareaBase } from "./primitives";
 
 const formControlBaseClassName =

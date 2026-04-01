@@ -1,6 +1,6 @@
 import { type ButtonHTMLAttributes, forwardRef } from "react";
 import { tv } from "tailwind-variants";
-import { cn } from "../utils";
+import { cn } from "../../utils";
 import { ButtonBase } from "./primitives";
 
 type ButtonVariant = "primary" | "secondary";
