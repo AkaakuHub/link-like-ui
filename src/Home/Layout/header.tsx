@@ -12,7 +12,7 @@ import {
 	LayoutHeaderPrimary,
 	LayoutRoundButton,
 } from "./structure";
-import type { LayoutBatteryState } from "./use-battery-state";
+import type { LayoutBatteryState } from "./useBatteryState";
 
 interface HomeLayoutHeaderProps {
 	battery: LayoutBatteryState;

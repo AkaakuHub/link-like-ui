@@ -9,7 +9,7 @@ import {
 	LayoutScenery,
 	LayoutScrim,
 } from "./structure";
-import { useBatteryState } from "./use-battery-state";
+import { useBatteryState } from "./useBatteryState";
 
 export interface LayoutAction {
 	ariaLabel: string;

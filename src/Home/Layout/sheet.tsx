@@ -13,8 +13,8 @@ import {
 
 export interface LayoutTileDefinition {
 	badge?: string;
-	caption?: string;
 	colSpan: LayoutTileColumnSpan;
+	icon?: ReactNode;
 	id: string;
 	illustration?: ReactNode;
 	label: string;
@@ -109,9 +109,8 @@ export function HomeLayoutSheet({
 							label={tile.label}
 							rowSpan={tile.rowSpan}
 							{...(tile.badge ? { badge: tile.badge } : {})}
-							{...(tile.caption ? { caption: tile.caption } : {})}
-							{...(tile.illustration
-								? { illustration: tile.illustration }
+							{...((tile.icon ?? tile.illustration)
+								? { illustration: tile.icon ?? tile.illustration }
 								: {})}
 							{...(tile.onClick ? { onClick: tile.onClick } : {})}
 						/>

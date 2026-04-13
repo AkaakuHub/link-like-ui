@@ -223,7 +223,7 @@ export function LayoutSheet({
 	return (
 		<LayoutPanelBase
 			className={cn(
-				"absolute inset-x-3.5 top-[12.7rem] bottom-[3.45rem] z-20 rounded-[1.45rem] border border-ll-white/62 bg-ll-white/18 p-2.5 shadow-[0_12px_34px_color-mix(in_srgb,var(--color-ll-gray)_16%,transparent)] backdrop-blur-[18px] transition-[opacity,transform] duration-200 ease-out",
+				"absolute top-[12.7rem] bottom-[3.45rem] left-1/2 z-20 w-[calc(100%-4rem)] max-w-120 rounded-[1.45rem] border border-ll-white/62 bg-ll-white/18 p-2.5 shadow-[0_12px_34px_color-mix(in_srgb,var(--color-ll-gray)_16%,transparent)] backdrop-blur-[18px] transition-[opacity,transform] duration-200 ease-out",
 				className,
 			)}
 			{...props}
@@ -274,7 +274,7 @@ export function LayoutGrid({
 }: HTMLAttributes<HTMLDivElement>) {
 	return (
 		<LayoutGridBase
-			className={cn("grid grid-cols-4 gap-2", className)}
+			className={cn("grid grid-cols-4 gap-2.5", className)}
 			{...props}
 		/>
 	);
@@ -295,7 +295,7 @@ export function LayoutTile({
 	return (
 		<LayoutButtonBase
 			className={cn(
-				"relative overflow-hidden rounded-[0.95rem] border border-ll-white/62 bg-ll-white/88 p-2.5 text-left shadow-[0_6px_14px_color-mix(in_srgb,var(--color-ll-gray)_13%,transparent)] transition-transform duration-150 ease-out hover:-translate-y-px focus-visible:outline-3 focus-visible:outline-ll-label",
+				"relative overflow-hidden rounded-[0.72rem] border border-ll-white/62 bg-ll-white/92 p-2.5 text-left shadow-[0_6px_14px_color-mix(in_srgb,var(--color-ll-gray)_13%,transparent)] transition-transform duration-150 ease-out hover:-translate-y-px focus-visible:outline-3 focus-visible:outline-ll-label",
 				layoutTileColumnClassMap[colSpan],
 				layoutTileRowClassMap[rowSpan],
 				className,
@@ -426,7 +426,7 @@ export function LayoutDockGlyphLine({
 	return (
 		<span
 			className={cn(
-				"absolute top-1/2 left-1/2 block h-[0.1em] w-[1.04em] -translate-x-1/2 -translate-y-1/2 bg-linear-to-r from-ll-system-left to-ll-system-right rounded-full transition-transform duration-200 ease-out",
+				"absolute top-1/2 left-1/2 block h-[0.1em] w-[1.04em] -translate-x-1/2 -translate-y-1/2 bg-linear-to-r from-ll-system-left to-ll-system-right rounded-full transition-transform duration-300 ease-out",
 				className,
 			)}
 			{...props}

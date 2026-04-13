@@ -1,5 +1,5 @@
 import { useId } from "react";
-import type { LayoutBatteryState } from "./use-battery-state";
+import type { LayoutBatteryState } from "./useBatteryState";
 
 interface LayoutBatteryIndicatorProps {
 	battery: LayoutBatteryState;
@@ -26,8 +26,6 @@ export function LayoutBatteryIndicator({
 }: LayoutBatteryIndicatorProps) {
 	const gradientId = useId();
 	const segmentCount = getBatterySegmentCount(battery.level);
-
-	battery.charging = true;
 
 	return (
 		<svg
