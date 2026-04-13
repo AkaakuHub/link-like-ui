@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 80" fill="none">
+  <defs>
+    <linearGradient id="batteryGradient" x1="22" y1="40" x2="100" y2="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#65defc"/>
+      <stop offset="1" stop-color="#938aff"/>
+    </linearGradient>
+  </defs>
+  <rect x="12" y="12" width="100" height="56" rx="14" stroke="#9A9A9A" stroke-width="4" fill="none"/>
+  <path d="M112 29C117.5 31 120 35.2 120 40C120 44.8 117.5 49 112 51V29Z" fill="#9A9A9A"/>
+  <rect x="22" y="24" width="16" height="32" rx="2" fill="url(#batteryGradient)"/>
+  <rect x="42" y="24" width="16" height="32" rx="2" fill="url(#batteryGradient)"/>
+  <rect x="62" y="24" width="16" height="32" rx="2" fill="url(#batteryGradient)"/>
+  <rect x="82" y="24" width="16" height="32" rx="2" fill="#F2F2F2"/>
+</svg>

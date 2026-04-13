@@ -29,6 +29,7 @@ import {
 	ListRoot,
 } from "../../src/System/List";
 import { LoadingOverlay } from "../../src/System/Loading";
+import { Layout } from "../../src/Home/Layout";
 import {
 	ModalTabList,
 	ModalTabPanel,
@@ -69,6 +70,7 @@ import {
 	TableRoot,
 	TableRow,
 } from "../../src/System/Table";
+import type { LayoutTileDefinition } from "../../src/Home/Layout";
 
 const tabValues = ["tab-01", "tab-02", "tab-03", "tab-04", "tab-05"] as const;
 type ControlTabValue = (typeof tabValues)[number];
@@ -125,6 +127,67 @@ const rarityRateRows: Array<{ rarity: string; ratio: string }> = [
 	{ rarity: "VR", ratio: "3.00%" },
 	{ rarity: "UR", ratio: "18.00%" },
 	{ rarity: "R", ratio: "79.00%" },
+];
+
+const homeMenuTiles: LayoutTileDefinition[] = [
+	{
+		id: "tile-01",
+		label: "Mission",
+		caption: "Menu",
+		colSpan: 1,
+		rowSpan: 1,
+	},
+	{
+		id: "tile-02",
+		label: "Present",
+		caption: "Gift",
+		colSpan: 1,
+		rowSpan: 1,
+		badge: "7",
+	},
+	{
+		id: "tile-03",
+		label: "Shop",
+		caption: "Store",
+		colSpan: 1,
+		rowSpan: 1,
+	},
+	{
+		id: "tile-04",
+		label: "Collection",
+		caption: "Archive",
+		colSpan: 1,
+		rowSpan: 1,
+	},
+	{
+		id: "tile-05",
+		label: "Circle",
+		caption: "Group",
+		colSpan: 1,
+		rowSpan: 1,
+	},
+	{
+		id: "tile-06",
+		label: "News",
+		caption: "Update",
+		colSpan: 1,
+		rowSpan: 1,
+		badge: "1",
+	},
+	{
+		id: "tile-07",
+		label: "Event",
+		caption: "Open",
+		colSpan: 1,
+		rowSpan: 1,
+	},
+	{
+		id: "tile-08",
+		label: "Sound",
+		caption: "Voice",
+		colSpan: 1,
+		rowSpan: 1,
+	},
 ];
 
 const cardRateRowsByTab: Record<
@@ -492,6 +555,23 @@ export function App() {
 		currentNoticeView?.type === "detail"
 			? findNoticeItemById(currentNoticeView.itemId)
 			: null;
+	const pathname = globalThis.location.pathname;
+
+	if (pathname !== "/components") {
+		return (
+			<main className="h-dvh overflow-hidden bg-ll-white">
+				<Layout
+					dayHeading="Fan LV"
+					dayLabel="6"
+					defaultMenuOpen
+					menuTiles={homeMenuTiles}
+					nameHeading="NAME"
+					name="User"
+					variant="home"
+				/>
+			</main>
+		);
+	}
 
 	return (
 		<main className="grid min-h-screen place-items-center bg-ll-white p-6">

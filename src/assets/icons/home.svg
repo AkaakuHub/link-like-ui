@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 88" fill="none">
+  <defs>
+    <linearGradient id="homeGradient" x1="18" y1="44" x2="102" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#65defc"/>
+      <stop offset="1" stop-color="#938aff"/>
+    </linearGradient>
+  </defs>
+
+  <path
+    d="M20 72V33L60 4L100 33V72H71V44H49V72H20Z"
+    stroke="url(#homeGradient)"
+    stroke-width="7"
+    stroke-linecap="butt"
+    stroke-linejoin="miter"
+  />
+</svg>
