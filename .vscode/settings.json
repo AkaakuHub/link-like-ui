@@ -1,0 +1,7 @@
+{
+	"editor.codeActionsOnSave": {
+		"source.fixAll": "explicit"
+	},
+	"tailwindCSS.experimental.configFile": "src/styles/index.css",
+	"tailwindCSS.lint.suggestCanonicalClasses": "warning"
+}

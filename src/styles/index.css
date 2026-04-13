@@ -75,7 +75,7 @@
 	}
 }
 
-@keyframes ll-home-menu-enter {
+@keyframes llHomeMenuEnter {
 	from {
 		opacity: 0;
 		transform: translateX(-50%) translateY(100dvh) scale(0.8);
@@ -86,7 +86,7 @@
 	}
 }
 
-@keyframes ll-home-menu-exit {
+@keyframes llHomeMenuExit {
 	from {
 		opacity: 1;
 		transform: translateX(-50%) translateY(0) scale(1);
@@ -97,7 +97,7 @@
 	}
 }
 
-@keyframes ll-home-menu-scrim-in {
+@keyframes llHomeMenuScrimIn {
 	from {
 		opacity: 0;
 	}
@@ -106,7 +106,7 @@
 	}
 }
 
-@keyframes ll-home-menu-scrim-out {
+@keyframes llHomeMenuScrimOut {
 	from {
 		opacity: 1;
 	}

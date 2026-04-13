@@ -1,0 +1,129 @@
+import type {
+	ButtonHTMLAttributes,
+	ComponentPropsWithoutRef,
+	HTMLAttributes,
+} from "react";
+import { cn } from "../../../utils";
+import {
+	LayoutButtonBase,
+	LayoutGridBase,
+	LayoutPanelBase,
+} from "../primitives";
+
+export type LayoutTileColumnSpan = 1 | 2 | 4;
+export type LayoutTileRowSpan = 1 | 2;
+
+const layoutTileColumnClassMap: Record<LayoutTileColumnSpan, string> = {
+	1: "col-span-1",
+	2: "col-span-2",
+	4: "col-span-4",
+};
+
+const layoutTileRowClassMap: Record<LayoutTileRowSpan, string> = {
+	1: "row-span-1 min-h-[4.35rem]",
+	2: "row-span-2 min-h-[9rem]",
+};
+
+export function LayoutSheet({
+	className,
+	...props
+}: ComponentPropsWithoutRef<typeof LayoutPanelBase>) {
+	return (
+		<LayoutPanelBase
+			className={cn(
+				"absolute top-[12.7rem] bottom-[3.45rem] left-1/2 z-20 w-[calc(100%-4rem)] max-w-120 rounded-[1.45rem] border border-ll-white/62 bg-ll-white/18 p-2.5 shadow-[0_12px_34px_color-mix(in_srgb,var(--color-ll-gray)_16%,transparent)] backdrop-blur-[18px] transition-[opacity,transform] duration-200 ease-out",
+				className,
+			)}
+			{...props}
+		/>
+	);
+}
+
+export function LayoutSheetStack({
+	className,
+	...props
+}: HTMLAttributes<HTMLDivElement>) {
+	return <div className={cn("space-y-2.5", className)} {...props} />;
+}
+
+export function LayoutHeroCard({
+	className,
+	...props
+}: HTMLAttributes<HTMLDivElement>) {
+	return (
+		<div
+			className={cn(
+				"overflow-hidden rounded-[1.15rem] border border-ll-white/48 bg-linear-to-r from-ll-orange/58 via-ll-pink/58 to-ll-system-right/68 p-3 text-ll-white shadow-[0_8px_18px_color-mix(in_srgb,var(--color-ll-gray)_18%,transparent)]",
+				className,
+			)}
+			{...props}
+		/>
+	);
+}
+
+export function LayoutBannerCard({
+	className,
+	...props
+}: HTMLAttributes<HTMLDivElement>) {
+	return (
+		<div
+			className={cn(
+				"overflow-hidden rounded-[1rem] border border-ll-white/50 bg-linear-to-r from-ll-system-left/66 via-ll-white/24 to-ll-system-right/60 px-3 py-2.5 text-ll-white shadow-[0_7px_16px_color-mix(in_srgb,var(--color-ll-gray)_16%,transparent)]",
+				className,
+			)}
+			{...props}
+		/>
+	);
+}
+
+export function LayoutGrid({
+	className,
+	...props
+}: HTMLAttributes<HTMLDivElement>) {
+	return (
+		<LayoutGridBase
+			className={cn("grid grid-cols-4 gap-2.5", className)}
+			{...props}
+		/>
+	);
+}
+
+export interface LayoutTileProps
+	extends ButtonHTMLAttributes<HTMLButtonElement> {
+	colSpan?: LayoutTileColumnSpan;
+	rowSpan?: LayoutTileRowSpan;
+}
+
+export function LayoutTile({
+	className,
+	colSpan = 1,
+	rowSpan = 1,
+	...props
+}: LayoutTileProps) {
+	return (
+		<LayoutButtonBase
+			className={cn(
+				"relative overflow-hidden rounded-[0.72rem] border border-ll-white/62 bg-ll-white/92 p-2.5 text-left shadow-[0_6px_14px_color-mix(in_srgb,var(--color-ll-gray)_13%,transparent)] transition-transform duration-150 ease-out hover:-translate-y-px focus-visible:outline-3 focus-visible:outline-ll-label",
+				layoutTileColumnClassMap[colSpan],
+				layoutTileRowClassMap[rowSpan],
+				className,
+			)}
+			{...props}
+		/>
+	);
+}
+
+export function LayoutTileBadge({
+	className,
+	...props
+}: HTMLAttributes<HTMLSpanElement>) {
+	return (
+		<span
+			className={cn(
+				"inline-flex rounded-full bg-ll-red px-2 py-1 text-[0.58rem] leading-none font-semibold text-ll-white",
+				className,
+			)}
+			{...props}
+		/>
+	);
+}

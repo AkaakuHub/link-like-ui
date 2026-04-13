@@ -1,15 +1,15 @@
 import { type ButtonHTMLAttributes, useEffect, useState } from "react";
-import { HomeLayoutDock } from "./dock";
-import { HomeLayoutHeader } from "./header";
-import { formatLocalClock } from "./helpers";
-import { HomeLayoutSheet, type LayoutTileDefinition } from "./sheet";
+import { HomeLayoutDock } from "./Dock/content";
+import { HomeLayoutHeader } from "./Header/content";
+import { formatLocalClock } from "./Header/helpers";
+import { useBatteryState } from "./Header/useBatteryState";
+import { HomeLayoutSheet, type LayoutTileDefinition } from "./Sheet/content";
 import {
 	LayoutBackground,
 	LayoutRoot,
 	LayoutScenery,
 	LayoutScrim,
 } from "./structure";
-import { useBatteryState } from "./useBatteryState";
 
 export interface LayoutAction {
 	ariaLabel: string;
@@ -18,7 +18,7 @@ export interface LayoutAction {
 }
 
 export type LayoutVariant = "home";
-export type { LayoutTileDefinition } from "./sheet";
+export type { LayoutTileDefinition } from "./Sheet/content";
 
 export interface LayoutProps {
 	actions?: LayoutAction[];
@@ -116,8 +116,8 @@ function HomeLayout({
 					aria-label="Close menu"
 					className={
 						isMenuOpen
-							? "animate-[ll-home-menu-scrim-in_220ms_ease-out_both]"
-							: "animate-[ll-home-menu-scrim-out_220ms_ease-out_both]"
+							? "animate-[llHomeMenuScrimIn_220ms_ease-out_both]"
+							: "animate-[llHomeMenuScrimOut_220ms_ease-out_both]"
 					}
 					onClick={() => {
 						setIsMenuOpen(false);

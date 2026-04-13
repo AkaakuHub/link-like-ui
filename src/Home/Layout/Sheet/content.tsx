@@ -1,5 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
-import { LayoutQuickTile } from "./quick-tile";
+import { LayoutQuickTile } from "./quickTile";
 import {
 	LayoutBannerCard,
 	LayoutGrid,
@@ -44,8 +44,8 @@ export function HomeLayoutSheet({
 			aria-hidden={!isMenuOpen}
 			className={
 				isMenuOpen
-					? "animate-[ll-home-menu-enter_220ms_cubic-bezier(0.2,0.8,0.2,1)_both]"
-					: "pointer-events-none animate-[ll-home-menu-exit_220ms_cubic-bezier(0.4,0,0.2,1)_both]"
+					? "animate-[llHomeMenuEnter_220ms_cubic-bezier(0.2,0.8,0.2,1)_both]"
+					: "pointer-events-none animate-[llHomeMenuExit_220ms_cubic-bezier(0.4,0,0.2,1)_both]"
 			}
 		>
 			<LayoutSheetStack>

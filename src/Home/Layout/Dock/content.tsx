@@ -1,5 +1,5 @@
 import type { ButtonHTMLAttributes } from "react";
-import { BackIcon, HomeIcon } from "../../assets/icons";
+import { BackIcon, HomeIcon } from "../../../assets/icons";
 import {
 	LayoutDock,
 	LayoutDockButton,

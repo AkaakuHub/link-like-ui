@@ -1,5 +1,5 @@
 import type { ButtonHTMLAttributes } from "react";
-import { PlusIcon } from "../../assets/icons";
+import { PlusIcon } from "../../../assets/icons";
 import { LayoutBatteryIndicator } from "./battery";
 import type { LayoutClockState } from "./helpers";
 import {
