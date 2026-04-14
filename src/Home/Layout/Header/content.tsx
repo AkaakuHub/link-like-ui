@@ -1,39 +1,26 @@
-import type { ButtonHTMLAttributes } from "react";
-import { PlusIcon } from "../../../assets/icons";
+import type { ReactNode } from "react";
 import { LayoutBatteryIndicator } from "./battery";
 import type { LayoutClockState } from "./helpers";
 import {
 	LayoutClock,
-	LayoutGlassPanel,
 	LayoutHeader,
 	LayoutHeaderCluster,
-	LayoutHeaderCounter,
 	LayoutHeaderMeta,
-	LayoutHeaderPrimary,
-	LayoutRoundButton,
 } from "./structure";
 import type { LayoutBatteryState } from "./useBatteryState";
 
 interface HomeLayoutHeaderProps {
 	battery: LayoutBatteryState;
+	centerContent?: ReactNode;
 	clock: LayoutClockState;
-	dayHeading: string;
-	dayLabel: string;
-	nameHeading: string;
-	name: string;
-	resourceCount: number;
-	onAddClick?: ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
+	rightContent?: ReactNode;
 }
 
 export function HomeLayoutHeader({
 	battery,
+	centerContent,
 	clock,
-	dayHeading,
-	dayLabel,
-	nameHeading,
-	name,
-	resourceCount,
-	onAddClick,
+	rightContent,
 }: HomeLayoutHeaderProps) {
 	return (
 		<>
@@ -47,44 +34,16 @@ export function HomeLayoutHeader({
 						className="h-[1.25rem] w-[2rem]"
 					/>
 				</LayoutHeaderCluster>
-				<LayoutGlassPanel className="pointer-events-auto absolute left-1/2 top-[0.55rem] flex h-[2.1rem] w-[9.65rem] -translate-x-1/2 items-center gap-[0.45rem] rounded-[0.7rem] px-[0.42rem] py-[0.18rem]">
-					<div className="grid h-[1.45rem] w-[1.45rem] place-items-center rounded-[0.3rem] bg-linear-to-b from-ll-system-left to-ll-system-right text-ll-white">
-						<div className="relative h-[0.78rem] w-[0.78rem]">
-							<span className="absolute left-0 top-0 h-[0.78rem] w-[0.08rem] rounded-full bg-current/95" />
-							<span className="absolute left-[0.24rem] top-[0.16rem] h-[0.46rem] w-[0.08rem] rounded-full bg-current/95" />
-							<span className="absolute left-[0.48rem] top-[0.06rem] h-[0.64rem] w-[0.08rem] rounded-full bg-current/95" />
-							<span className="absolute right-0 top-[0.2rem] h-[0.38rem] w-[0.08rem] rounded-full bg-current/95" />
-						</div>
+				{centerContent ? (
+					<div className="pointer-events-auto absolute left-1/2 top-[0.55rem] -translate-x-1/2">
+						{centerContent}
 					</div>
-					<div className="space-y-[0.02rem]">
-						<LayoutHeaderMeta className="text-[0.35rem] leading-none tracking-[0.02em] text-ll-system-right/78">
-							{dayHeading}
-						</LayoutHeaderMeta>
-						<LayoutHeaderPrimary className="text-[0.92rem] leading-none font-normal text-ll-gray/92">
-							{dayLabel}
-						</LayoutHeaderPrimary>
+				) : null}
+				{rightContent ? (
+					<div className="pointer-events-auto relative z-10">
+						{rightContent}
 					</div>
-					<div className="space-y-[0.02rem] pl-[0.16rem]">
-						<LayoutHeaderMeta className="text-[0.35rem] leading-none tracking-[0.02em] text-ll-system-right/78">
-							{nameHeading}
-						</LayoutHeaderMeta>
-						<LayoutHeaderPrimary className="text-[0.95rem] leading-none font-semibold text-ll-gray/92">
-							{name}
-						</LayoutHeaderPrimary>
-					</div>
-				</LayoutGlassPanel>
-				<LayoutHeaderCluster className="relative z-10 items-start gap-[0.22rem] pt-[0.1rem]">
-					<LayoutHeaderCounter className="min-w-0 border-none bg-transparent px-0 py-0 text-[0.92rem] shadow-none">
-						{resourceCount}
-					</LayoutHeaderCounter>
-					<LayoutRoundButton
-						aria-label="Add"
-						className="h-[2rem] w-[2rem] rounded-full border border-ll-disabled/12 bg-ll-white text-[0.95rem] text-ll-system-right/74 shadow-[0_1px_4px_color-mix(in_srgb,var(--color-ll-gray)_7%,transparent)]"
-						onClick={onAddClick}
-					>
-						<PlusIcon className="h-[0.82rem] w-[0.82rem]" />
-					</LayoutRoundButton>
-				</LayoutHeaderCluster>
+				) : null}
 			</LayoutHeader>
 			<LayoutClock>
 				<p className="text-[4.9rem] leading-[0.8] font-light tracking-[-0.1em]">

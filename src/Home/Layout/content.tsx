@@ -1,4 +1,9 @@
-import { type ButtonHTMLAttributes, useEffect, useState } from "react";
+import {
+	type ButtonHTMLAttributes,
+	type ReactNode,
+	useEffect,
+	useState,
+} from "react";
 import { HomeLayoutDock } from "./Dock/content";
 import { HomeLayoutHeader } from "./Header/content";
 import { formatLocalClock } from "./Header/helpers";
@@ -22,15 +27,12 @@ export type { LayoutTileDefinition } from "./Sheet/content";
 
 export interface LayoutProps {
 	actions?: LayoutAction[];
+	centerContent?: ReactNode;
 	dateLabel?: string;
-	dayHeading: string;
-	dayLabel: string;
 	defaultMenuOpen?: boolean;
 	homeAction?: LayoutAction;
 	menuTiles: LayoutTileDefinition[];
-	nameHeading: string;
-	name: string;
-	resourceCount?: number;
+	rightContent?: ReactNode;
 	statusLabel?: string;
 	timeLabel?: string;
 	variant?: LayoutVariant;
@@ -39,14 +41,11 @@ export interface LayoutProps {
 const layoutMenuAnimationDurationMs = 220;
 
 function HomeLayout({
-	dayHeading,
-	dayLabel,
+	centerContent,
 	defaultMenuOpen = false,
 	homeAction = { ariaLabel: "Home", label: "Home" },
 	menuTiles,
-	nameHeading,
-	name,
-	resourceCount = 0,
+	rightContent,
 }: Omit<LayoutProps, "variant">) {
 	const [isMenuOpen, setIsMenuOpen] = useState<boolean>(defaultMenuOpen);
 	const [isMenuVisible, setIsMenuVisible] = useState<boolean>(defaultMenuOpen);
@@ -104,12 +103,9 @@ function HomeLayout({
 			</LayoutScenery>
 			<HomeLayoutHeader
 				battery={battery}
+				centerContent={centerContent}
 				clock={clock}
-				dayHeading={dayHeading}
-				dayLabel={dayLabel}
-				name={name}
-				nameHeading={nameHeading}
-				resourceCount={resourceCount}
+				rightContent={rightContent}
 			/>
 			{isMenuVisible ? (
 				<LayoutScrim

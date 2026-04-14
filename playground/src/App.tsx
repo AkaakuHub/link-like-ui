@@ -571,12 +571,8 @@ export function App() {
 		return (
 			<main className="h-dvh overflow-hidden bg-ll-white">
 				<Layout
-					dayHeading="Fan LV"
-					dayLabel="6"
 					defaultMenuOpen
 					menuTiles={homeMenuTiles}
-					nameHeading="NAME"
-					name="User"
 					variant="home"
 				/>
 			</main>
