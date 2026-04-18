@@ -16,11 +16,73 @@ type IconBaseElementProps = {
 
 export interface GradientIconProps
 	extends Omit<HTMLAttributes<HTMLSpanElement>, "children"> {
+	fitToSquare?: boolean;
 	icon: IconType;
 	paint?: GradientIconPaint;
 	size?: number | string;
 	svgClassName?: string;
 	title?: string;
+}
+
+function parseViewBox(viewBox: string | undefined): {
+	minX: number;
+	minY: number;
+	width: number;
+	height: number;
+} | null {
+	if (!viewBox) {
+		return null;
+	}
+
+	const parts = viewBox.trim().split(/\s+/);
+
+	if (parts.length !== 4) {
+		return null;
+	}
+
+	const minX = Number(parts[0]);
+	const minY = Number(parts[1]);
+	const width = Number(parts[2]);
+	const height = Number(parts[3]);
+
+	if (
+		Number.isNaN(minX) ||
+		Number.isNaN(minY) ||
+		Number.isNaN(width) ||
+		Number.isNaN(height) ||
+		width <= 0 ||
+		height <= 0
+	) {
+		return null;
+	}
+
+	return { minX, minY, width, height };
+}
+
+function resolveFittedViewBox(
+	viewBox: string | undefined,
+	fitToSquare: boolean,
+): string | undefined {
+	if (!fitToSquare) {
+		return viewBox;
+	}
+
+	const parsed = parseViewBox(viewBox);
+
+	if (!parsed) {
+		return viewBox;
+	}
+
+	const side = Math.max(parsed.width, parsed.height);
+
+	if (parsed.width === parsed.height) {
+		return viewBox;
+	}
+
+	const nextMinX = parsed.minX - (side - parsed.width) / 2;
+	const nextMinY = parsed.minY - (side - parsed.height) / 2;
+
+	return `${nextMinX} ${nextMinY} ${side} ${side}`;
 }
 
 function resolveGradientPaint(
@@ -60,6 +122,7 @@ function resolveGradientPaint(
 
 export function GradientIcon({
 	className,
+	fitToSquare = true,
 	icon,
 	paint = "auto",
 	size = "100%",
@@ -77,6 +140,7 @@ export function GradientIcon({
 
 	const resolvedPaint = resolveGradientPaint(iconBaseElement.props.attr, paint);
 	const attr = iconBaseElement.props.attr;
+	const fittedViewBox = resolveFittedViewBox(attr?.viewBox, fitToSquare);
 
 	return (
 		<GradientIconRoot
@@ -97,6 +161,7 @@ export function GradientIcon({
 				}
 				focusable="false"
 				height={size}
+				preserveAspectRatio="xMidYMid meet"
 				stroke={
 					resolvedPaint === "fill"
 						? attr?.stroke
@@ -104,6 +169,7 @@ export function GradientIcon({
 							? "none"
 							: `url(#${gradientId})`
 				}
+				viewBox={fittedViewBox}
 				width={size}
 				xmlns="http://www.w3.org/2000/svg"
 			>
