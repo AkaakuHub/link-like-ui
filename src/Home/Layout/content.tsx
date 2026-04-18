@@ -1,9 +1,18 @@
 import {
 	type ButtonHTMLAttributes,
+	type CSSProperties,
 	type ReactNode,
 	useEffect,
 	useState,
 } from "react";
+import {
+	homeMenuCloseAnimationDurationCssVar,
+	homeMenuCloseAnimationDurationMs,
+	homeMenuOpenAnimationDurationCssVar,
+	homeMenuOpenAnimationDurationMs,
+	homeMenuScrimInAnimationClass,
+	homeMenuScrimOutAnimationClass,
+} from "./animation";
 import { HomeLayoutDock } from "./Dock/content";
 import { HomeLayoutHeader } from "./Header/content";
 import { formatLocalClock } from "./Header/helpers";
@@ -46,8 +55,6 @@ export interface LayoutProps {
 	variant?: LayoutVariant;
 }
 
-const layoutMenuAnimationDurationMs = 220;
-
 function HomeLayout({
 	centerContent,
 	defaultMenuOpen = false,
@@ -60,6 +67,10 @@ function HomeLayout({
 	const [isMenuVisible, setIsMenuVisible] = useState<boolean>(defaultMenuOpen);
 	const [clock, setClock] = useState(() => formatLocalClock(new Date()));
 	const battery = useBatteryState();
+	const layoutRootStyle = {
+		[homeMenuOpenAnimationDurationCssVar]: `${homeMenuOpenAnimationDurationMs}ms`,
+		[homeMenuCloseAnimationDurationCssVar]: `${homeMenuCloseAnimationDurationMs}ms`,
+	} as CSSProperties;
 
 	useEffect(() => {
 		const timerId = globalThis.setInterval(() => {
@@ -79,7 +90,7 @@ function HomeLayout({
 
 		const timeoutId = globalThis.setTimeout(() => {
 			setIsMenuVisible(false);
-		}, layoutMenuAnimationDurationMs);
+		}, homeMenuCloseAnimationDurationMs);
 
 		return () => {
 			globalThis.clearTimeout(timeoutId);
@@ -105,7 +116,7 @@ function HomeLayout({
 	}, [isMenuOpen]);
 
 	return (
-		<LayoutRoot>
+		<LayoutRoot style={layoutRootStyle}>
 			<LayoutBackground />
 			<LayoutScenery aria-hidden="true">
 				<div className="absolute inset-0 bg-linear-to-b from-ll-system-left/10 via-ll-white/6 to-ll-orange/18" />
@@ -121,8 +132,8 @@ function HomeLayout({
 					aria-label="Close menu"
 					className={
 						isMenuOpen
-							? "animate-[llHomeMenuScrimIn_220ms_ease-out_both]"
-							: "animate-[llHomeMenuScrimOut_220ms_ease-out_both]"
+							? homeMenuScrimInAnimationClass
+							: homeMenuScrimOutAnimationClass
 					}
 					onClick={() => {
 						setIsMenuOpen(false);

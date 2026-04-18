@@ -1,4 +1,8 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import {
+	homeMenuEnterAnimationClass,
+	homeMenuExitAnimationClass,
+} from "../animation";
 import { LayoutQuickTile } from "./quickTile";
 import {
 	LayoutGrid,
@@ -54,8 +58,8 @@ export function HomeLayoutSheet({
 			aria-hidden={!isMenuOpen}
 			className={
 				isMenuOpen
-					? "animate-[llHomeMenuEnter_220ms_cubic-bezier(0.2,0.8,0.2,1)_both]"
-					: "pointer-events-none animate-[llHomeMenuExit_220ms_cubic-bezier(0.4,0,0.2,1)_both]"
+					? homeMenuEnterAnimationClass
+					: `pointer-events-none ${homeMenuExitAnimationClass}`
 			}
 		>
 			<LayoutSheetStack>
