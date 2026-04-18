@@ -84,7 +84,7 @@ export function LayoutImageBanner({
 	return (
 		<LayoutButtonBase
 			className={cn(
-				"relative block aspect-[4/1] w-full overflow-visible rounded-[1rem] bg-ll-white/24 shadow-[0_0_8px_6px_color-mix(in_srgb,var(--color-ll-gray)_10%,transparent)] focus-visible:outline-3 focus-visible:outline-ll-label",
+				"relative block aspect-[4/1] w-full cursor-pointer overflow-visible rounded-[1rem] bg-ll-white/24 shadow-[0_0_8px_6px_color-mix(in_srgb,var(--color-ll-gray)_10%,transparent)] transition-[filter,transform,background-color,color,border-color] duration-150 ease-out hover:brightness-80 disabled:cursor-not-allowed disabled:hover:brightness-100 focus-visible:outline-3 focus-visible:outline-ll-label",
 				className,
 			)}
 			{...props}
@@ -136,7 +136,7 @@ export function LayoutTile({
 	return (
 		<LayoutButtonBase
 			className={cn(
-				"relative cursor-pointer overflow-visible rounded-[0.92rem] border border-ll-white/62 bg-ll-white/92 p-2 text-left shadow-[0_6px_14px_color-mix(in_srgb,var(--color-ll-gray)_13%,transparent)] transition-transform duration-150 ease-out focus-visible:outline-3 focus-visible:outline-ll-label",
+				"relative cursor-pointer overflow-visible rounded-[0.92rem] border border-ll-white/62 bg-ll-white/92 p-2 text-left shadow-[0_6px_14px_color-mix(in_srgb,var(--color-ll-gray)_13%,transparent)] transition-[filter,transform,background-color,color,border-color] duration-150 ease-out hover:brightness-80 disabled:cursor-not-allowed disabled:hover:brightness-100 focus-visible:outline-3 focus-visible:outline-ll-label",
 				layoutTileColumnClassMap[colSpan],
 				layoutTileRowClassMap[rowSpan],
 				className,
