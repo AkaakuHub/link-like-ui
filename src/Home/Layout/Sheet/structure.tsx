@@ -147,6 +147,7 @@ export function LayoutTile({
 }
 
 export function LayoutTileBadge({
+	children,
 	className,
 	variant = "pill",
 	...props
@@ -154,16 +155,18 @@ export function LayoutTileBadge({
 	variant?: "pill" | "circle";
 }) {
 	const sizeClassName =
-		variant === "circle" ? "h-[1.5rem] w-[1.5rem] p-2" : "px-1.5 py-1";
+		variant === "circle" ? "h-[1.5rem] w-[1.5rem] p-0" : "px-1.5 py-1";
 
 	return (
 		<span
 			className={cn(
-				"inline-flex shrink-0 items-center justify-center rounded-full bg-linear-to-tr from-ll-badge-orange to-ll-badge-red text-center leading-none font-semibold tabular-nums text-ll-white",
+				"inline-flex shrink-0 items-center justify-center rounded-full bg-linear-to-tr from-ll-badge-orange to-ll-badge-red text-center leading-[1] font-semibold tabular-nums text-ll-white",
 				sizeClassName,
 				className,
 			)}
 			{...props}
-		/>
+		>
+			<span>{children}</span>
+		</span>
 	);
 }
