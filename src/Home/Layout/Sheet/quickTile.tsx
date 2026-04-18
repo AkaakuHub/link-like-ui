@@ -23,8 +23,8 @@ export function LayoutQuickTile({
 		>
 			{badge ? (
 				<LayoutTileBadge
-					className="absolute top-[0.25rem] right-[0.25rem] z-10 h-[0.88rem] w-[0.88rem] p-0 text-[0.48rem]"
-					size="compact"
+					className="absolute top-[0.25rem] right-[0.25rem] z-10"
+					variant="circle"
 				>
 					{badge}
 				</LayoutTileBadge>

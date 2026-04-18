@@ -145,18 +145,18 @@ export function LayoutTile({
 
 export function LayoutTileBadge({
 	className,
-	size = "default",
+	variant = "pill",
 	...props
-}: HTMLAttributes<HTMLSpanElement> & { size?: "default" | "compact" }) {
+}: HTMLAttributes<HTMLSpanElement> & {
+	variant?: "pill" | "circle";
+}) {
 	const sizeClassName =
-		size === "compact"
-			? "px-1.5 py-0.5 text-[0.5rem]"
-			: "px-2 py-1 text-[0.58rem]";
+		variant === "circle" ? "h-[1.5rem] w-[1.5rem] p-2" : "px-1.5 py-1";
 
 	return (
 		<span
 			className={cn(
-				"inline-flex items-center justify-center rounded-full bg-linear-to-tr from-ll-badge-orange to-ll-badge-red text-center leading-none font-semibold tabular-nums text-ll-white",
+				"inline-flex shrink-0 items-center justify-center rounded-full bg-linear-to-tr from-ll-badge-orange to-ll-badge-red text-center leading-none font-semibold tabular-nums text-ll-white",
 				sizeClassName,
 				className,
 			)}
