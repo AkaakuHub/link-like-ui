@@ -1,5 +1,15 @@
 import { useState } from "react";
 import {
+	LuBadgeCheck,
+	LuCalendarDays,
+	LuCircle,
+	LuGift,
+	LuLayoutGrid,
+	LuNewspaper,
+	LuShoppingCart,
+	LuVolume2,
+} from "react-icons/lu";
+import {
 	noticeTabValues,
 	type NoticeTabValue,
 	useNoticeModalStore,
@@ -31,19 +41,10 @@ import {
 import { LoadingOverlay } from "../../src/System/Loading";
 import { Layout } from "../../src/Home/Layout";
 import {
-	HomeMenuCircleIcon,
-	HomeMenuCollectionIcon,
-	HomeMenuEventIcon,
-	HomeMenuMissionIcon,
-	HomeMenuNewsIcon,
-	HomeMenuPresentIcon,
-	HomeMenuShopIcon,
-	HomeMenuSoundIcon,
-} from "../../src/assets/icons";
-import type {
-	LayoutBannerDefinition,
-	LayoutTileDefinition,
+	type LayoutBannerDefinition,
+	type LayoutTileDefinition,
 } from "../../src/Home/Layout";
+import { GradientIcon } from "../../src/System/Icon";
 import homeBannerImage from "../assets/images/600x150.png";
 import {
 	ModalTabList,
@@ -148,14 +149,14 @@ const homeMenuTiles: LayoutTileDefinition[] = [
 		id: "tile-01",
 		label: "Mission",
 		colSpan: 1,
-		icon: <HomeMenuMissionIcon className="h-full w-full" />,
+		icon: <GradientIcon icon={LuBadgeCheck} />,
 		rowSpan: 1,
 	},
 	{
 		id: "tile-02",
 		label: "Present",
 		colSpan: 1,
-		icon: <HomeMenuPresentIcon className="h-full w-full" />,
+		icon: <GradientIcon icon={LuGift} />,
 		rowSpan: 1,
 		badge: "7",
 	},
@@ -163,28 +164,28 @@ const homeMenuTiles: LayoutTileDefinition[] = [
 		id: "tile-03",
 		label: "Shop",
 		colSpan: 1,
-		icon: <HomeMenuShopIcon className="h-full w-full" />,
+		icon: <GradientIcon icon={LuShoppingCart} />,
 		rowSpan: 1,
 	},
 	{
 		id: "tile-04",
 		label: "Collection",
 		colSpan: 1,
-		icon: <HomeMenuCollectionIcon className="h-full w-full" />,
+		icon: <GradientIcon icon={LuLayoutGrid} />,
 		rowSpan: 1,
 	},
 	{
 		id: "tile-05",
 		label: "Circle",
 		colSpan: 1,
-		icon: <HomeMenuCircleIcon className="h-full w-full" />,
+		icon: <GradientIcon icon={LuCircle} />,
 		rowSpan: 1,
 	},
 	{
 		id: "tile-06",
 		label: "News",
 		colSpan: 1,
-		icon: <HomeMenuNewsIcon className="h-full w-full" />,
+		icon: <GradientIcon icon={LuNewspaper} />,
 		rowSpan: 1,
 		badge: "1",
 	},
@@ -192,14 +193,14 @@ const homeMenuTiles: LayoutTileDefinition[] = [
 		id: "tile-07",
 		label: "Event",
 		colSpan: 1,
-		icon: <HomeMenuEventIcon className="h-full w-full" />,
+		icon: <GradientIcon icon={LuCalendarDays} />,
 		rowSpan: 1,
 	},
 	{
 		id: "tile-08",
 		label: "Sound",
 		colSpan: 1,
-		icon: <HomeMenuSoundIcon className="h-full w-full" />,
+		icon: <GradientIcon icon={LuVolume2} />,
 		rowSpan: 1,
 	},
 ];
