@@ -32,7 +32,7 @@ export function LayoutSheet({
 	return (
 		<LayoutPanelBase
 			className={cn(
-				"absolute top-[12.7rem] bottom-[3.45rem] left-1/2 z-20 w-[calc(100%-4rem)] max-w-120 rounded-[1.45rem] border border-ll-white/62 bg-ll-white/18 p-2.5 shadow-[0_12px_34px_color-mix(in_srgb,var(--color-ll-gray)_16%,transparent)] backdrop-blur-[18px] transition-[opacity,transform] duration-200 ease-out",
+				"absolute bottom-[calc(var(--ll-home-dock-height)+var(--ll-home-sheet-gap))] left-1/2 z-20 max-h-[calc(100dvh-var(--ll-home-sheet-top-safe)-var(--ll-home-dock-height)-var(--ll-home-sheet-gap))] w-[calc(100%-4rem)] max-w-100 overflow-y-auto rounded-[1.45rem] border border-ll-white/62 bg-ll-white/18 p-4 shadow-[0_12px_34px_color-mix(in_srgb,var(--color-ll-gray)_16%,transparent)] backdrop-blur-[18px] transition-[opacity,transform] duration-200 ease-out",
 				className,
 			)}
 			{...props}
@@ -44,7 +44,7 @@ export function LayoutSheetStack({
 	className,
 	...props
 }: HTMLAttributes<HTMLDivElement>) {
-	return <div className={cn("space-y-4", className)} {...props} />;
+	return <div className={cn("space-y-6", className)} {...props} />;
 }
 
 export function LayoutHeroCard({
@@ -115,7 +115,7 @@ export function LayoutGrid({
 }: HTMLAttributes<HTMLDivElement>) {
 	return (
 		<LayoutGridBase
-			className={cn("grid grid-cols-4 gap-4", className)}
+			className={cn("grid grid-cols-4 gap-6", className)}
 			{...props}
 		/>
 	);
@@ -136,7 +136,7 @@ export function LayoutTile({
 	return (
 		<LayoutButtonBase
 			className={cn(
-				"relative overflow-visible rounded-[0.92rem] border border-ll-white/62 bg-ll-white/92 p-2 text-left shadow-[0_6px_14px_color-mix(in_srgb,var(--color-ll-gray)_13%,transparent)] transition-transform duration-150 ease-out hover:-translate-y-px focus-visible:outline-3 focus-visible:outline-ll-label",
+				"relative cursor-pointer overflow-visible rounded-[0.92rem] border border-ll-white/62 bg-ll-white/92 p-2 text-left shadow-[0_6px_14px_color-mix(in_srgb,var(--color-ll-gray)_13%,transparent)] transition-transform duration-150 ease-out focus-visible:outline-3 focus-visible:outline-ll-label",
 				layoutTileColumnClassMap[colSpan],
 				layoutTileRowClassMap[rowSpan],
 				className,

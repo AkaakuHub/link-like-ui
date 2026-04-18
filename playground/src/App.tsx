@@ -222,6 +222,11 @@ const homeTopBanners: LayoutBannerDefinition[] = [
 		alt: "Banner sample 03",
 		badge: "New",
 	},
+	{
+		id: "banner-04",
+		src: homeBannerImage,
+		alt: "Banner sample 04",
+	},
 ];
 
 const cardRateRowsByTab: Record<

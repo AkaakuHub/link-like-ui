@@ -8,7 +8,10 @@ export function LayoutDock({
 }: HTMLAttributes<HTMLDivElement>) {
 	return (
 		<div
-			className={cn("absolute inset-x-0 bottom-0 z-30 px-0 pb-0", className)}
+			className={cn(
+				"absolute inset-x-0 bottom-0 z-30 h-[var(--ll-home-dock-height)] px-0 pb-0",
+				className,
+			)}
 			{...props}
 		/>
 	);

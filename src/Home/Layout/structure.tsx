@@ -17,7 +17,7 @@ export function LayoutRoot({
 	return (
 		<LayoutRootBase
 			className={cn(
-				"relative isolate h-dvh w-full overflow-hidden bg-linear-to-b from-ll-white via-ll-system-left/14 to-ll-orange/18",
+				"relative isolate h-dvh w-full overflow-hidden [--ll-home-dock-height:4rem] [--ll-home-sheet-gap:1.5rem] [--ll-home-sheet-top-safe:2rem] bg-linear-to-b from-ll-white via-ll-system-left/14 to-ll-orange/18",
 				className,
 			)}
 			{...props}
