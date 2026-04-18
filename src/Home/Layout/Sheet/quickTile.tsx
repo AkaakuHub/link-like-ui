@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { cn } from "../../../utils";
-import { LayoutTile, type LayoutTileProps } from "./structure";
+import { LayoutTile, LayoutTileBadge, type LayoutTileProps } from "./structure";
 
 export interface LayoutQuickTileProps
 	extends Omit<LayoutTileProps, "children"> {
@@ -22,9 +22,12 @@ export function LayoutQuickTile({
 			{...props}
 		>
 			{badge ? (
-				<span className="absolute top-[0.25rem] right-[0.25rem] z-10 grid h-[0.88rem] w-[0.88rem] place-items-center rounded-full bg-[color-mix(in_srgb,var(--color-ll-red)_58%,var(--color-ll-orange))] text-[0.48rem] leading-none font-semibold text-ll-white">
+				<LayoutTileBadge
+					className="absolute top-[0.25rem] right-[0.25rem] z-10 h-[0.88rem] w-[0.88rem] p-0 text-[0.48rem]"
+					size="compact"
+				>
 					{badge}
-				</span>
+				</LayoutTileBadge>
 			) : null}
 			<div className="flex h-full flex-col items-center justify-center gap-[0.34rem] pt-[0.14rem]">
 				{illustration ? (
