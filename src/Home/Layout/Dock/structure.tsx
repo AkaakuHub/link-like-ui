@@ -24,7 +24,7 @@ export function LayoutDockSurface({
 	return (
 		<div
 			className={cn(
-				"grid grid-cols-3 overflow-hidden rounded-t-[1.15rem] border border-b-0 border-ll-white/78 bg-ll-white shadow-[0_8px_18px_color-mix(in_srgb,var(--color-ll-gray)_14%,transparent)]",
+				"grid grid-cols-3 overflow-hidden rounded-t-[1.15rem] border border-b-0 border-ll-white/78 bg-ll-white shadow-[0_0_12px_3px_color-mix(in_srgb,var(--color-ll-gray)_12%,transparent)]",
 				className,
 			)}
 			{...props}
