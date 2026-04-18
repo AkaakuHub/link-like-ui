@@ -84,7 +84,7 @@ export function LayoutImageBanner({
 	return (
 		<LayoutButtonBase
 			className={cn(
-				"relative block aspect-[5/1] w-full overflow-hidden rounded-[1rem] border border-ll-white/50 bg-ll-white/24 shadow-[0_7px_16px_color-mix(in_srgb,var(--color-ll-gray)_16%,transparent)] focus-visible:outline-3 focus-visible:outline-ll-label",
+				"relative block aspect-[5/1] w-full overflow-visible rounded-[1rem] border border-ll-white/50 bg-ll-white/24 shadow-[0_7px_16px_color-mix(in_srgb,var(--color-ll-gray)_16%,transparent)] focus-visible:outline-3 focus-visible:outline-ll-label",
 				className,
 			)}
 			{...props}
@@ -100,7 +100,10 @@ export function LayoutImageBannerMedia({
 	return (
 		<img
 			alt={alt}
-			className={cn("block h-full w-full object-cover", className)}
+			className={cn(
+				"block h-full w-full rounded-[inherit] object-cover",
+				className,
+			)}
 			{...props}
 		/>
 	);
@@ -133,7 +136,7 @@ export function LayoutTile({
 	return (
 		<LayoutButtonBase
 			className={cn(
-				"relative overflow-hidden rounded-[0.72rem] border border-ll-white/62 bg-ll-white/92 p-2.5 text-left shadow-[0_6px_14px_color-mix(in_srgb,var(--color-ll-gray)_13%,transparent)] transition-transform duration-150 ease-out hover:-translate-y-px focus-visible:outline-3 focus-visible:outline-ll-label",
+				"relative overflow-visible rounded-[0.72rem] border border-ll-white/62 bg-ll-white/92 p-2.5 text-left shadow-[0_6px_14px_color-mix(in_srgb,var(--color-ll-gray)_13%,transparent)] transition-transform duration-150 ease-out hover:-translate-y-px focus-visible:outline-3 focus-visible:outline-ll-label",
 				layoutTileColumnClassMap[colSpan],
 				layoutTileRowClassMap[rowSpan],
 				className,

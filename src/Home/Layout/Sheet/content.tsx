@@ -67,7 +67,7 @@ export function HomeLayoutSheet({
 					>
 						<LayoutImageBannerMedia alt={banner.alt} src={banner.src} />
 						{banner.badge ? (
-							<div className="pointer-events-none absolute inset-x-0 top-0 flex justify-end p-1.5">
+							<div className="pointer-events-none absolute -top-3 right-0 z-10">
 								<LayoutTileBadge>{banner.badge}</LayoutTileBadge>
 							</div>
 						) : null}

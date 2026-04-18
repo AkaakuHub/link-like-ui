@@ -23,7 +23,7 @@ export function LayoutQuickTile({
 		>
 			{badge ? (
 				<LayoutTileBadge
-					className="absolute top-[0.25rem] right-[0.25rem] z-10"
+					className="absolute -top-1 -right-1 z-10"
 					variant="circle"
 				>
 					{badge}
