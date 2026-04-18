@@ -44,7 +44,7 @@ export function LayoutSheetStack({
 	className,
 	...props
 }: HTMLAttributes<HTMLDivElement>) {
-	return <div className={cn("space-y-2.5", className)} {...props} />;
+	return <div className={cn("space-y-4", className)} {...props} />;
 }
 
 export function LayoutHeroCard({
@@ -115,7 +115,7 @@ export function LayoutGrid({
 }: HTMLAttributes<HTMLDivElement>) {
 	return (
 		<LayoutGridBase
-			className={cn("grid grid-cols-4 gap-2.5", className)}
+			className={cn("grid grid-cols-4 gap-4", className)}
 			{...props}
 		/>
 	);
@@ -136,7 +136,7 @@ export function LayoutTile({
 	return (
 		<LayoutButtonBase
 			className={cn(
-				"relative overflow-visible rounded-[0.72rem] border border-ll-white/62 bg-ll-white/92 p-2.5 text-left shadow-[0_6px_14px_color-mix(in_srgb,var(--color-ll-gray)_13%,transparent)] transition-transform duration-150 ease-out hover:-translate-y-px focus-visible:outline-3 focus-visible:outline-ll-label",
+				"relative overflow-visible rounded-[0.92rem] border border-ll-white/62 bg-ll-white/92 p-2 text-left shadow-[0_6px_14px_color-mix(in_srgb,var(--color-ll-gray)_13%,transparent)] transition-transform duration-150 ease-out hover:-translate-y-px focus-visible:outline-3 focus-visible:outline-ll-label",
 				layoutTileColumnClassMap[colSpan],
 				layoutTileRowClassMap[rowSpan],
 				className,

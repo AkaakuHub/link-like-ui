@@ -18,7 +18,10 @@ export function LayoutQuickTile({
 }: LayoutQuickTileProps) {
 	return (
 		<LayoutTile
-			className={cn("aspect-square min-h-0 p-1.5 text-center", className)}
+			className={cn(
+				"aspect-square min-h-0 w-[calc(100%-0.35rem)] justify-self-center self-center p-1.25 text-center",
+				className,
+			)}
 			{...props}
 		>
 			{badge ? (
@@ -29,13 +32,13 @@ export function LayoutQuickTile({
 					{badge}
 				</LayoutTileBadge>
 			) : null}
-			<div className="flex h-full flex-col items-center justify-center gap-[0.34rem] pt-[0.14rem]">
+			<div className="flex h-full flex-col items-center justify-center gap-[0.2rem] pt-[0.1rem]">
 				{illustration ? (
-					<div className="grid h-[1.38rem] w-[1.38rem] place-items-center text-ll-label">
+					<div className="grid h-[2rem] w-[2rem] place-items-center text-ll-label">
 						{illustration}
 					</div>
 				) : null}
-				<p className="text-[0.54rem] leading-none font-semibold text-ll-gray">
+				<p className="w-full truncate text-center bg-linear-to-r from-ll-system-left to-ll-system-right bg-clip-text [font-size:0.8em] leading-none font-medium text-transparent">
 					{label}
 				</p>
 			</div>
