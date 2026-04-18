@@ -141,6 +141,12 @@ export function GradientIcon({
 	const resolvedPaint = resolveGradientPaint(iconBaseElement.props.attr, paint);
 	const attr = iconBaseElement.props.attr;
 	const fittedViewBox = resolveFittedViewBox(attr?.viewBox, fitToSquare);
+	const parsedFittedViewBox = parseViewBox(fittedViewBox);
+	const gradientX1 = parsedFittedViewBox ? parsedFittedViewBox.minX : 0;
+	const gradientX2 = parsedFittedViewBox
+		? parsedFittedViewBox.minX + parsedFittedViewBox.width
+		: 1;
+	const gradientY = parsedFittedViewBox ? parsedFittedViewBox.minY : 0;
 
 	return (
 		<GradientIconRoot
@@ -175,7 +181,14 @@ export function GradientIcon({
 			>
 				<title>{resolvedTitle}</title>
 				<defs>
-					<linearGradient id={gradientId} x1="0%" x2="100%" y1="0%" y2="100%">
+					<linearGradient
+						gradientUnits="userSpaceOnUse"
+						id={gradientId}
+						x1={gradientX1}
+						x2={gradientX2}
+						y1={gradientY}
+						y2={gradientY}
+					>
 						<stop offset="0%" stopColor="var(--color-ll-system-left)" />
 						<stop offset="100%" stopColor="var(--color-ll-system-right)" />
 					</linearGradient>
