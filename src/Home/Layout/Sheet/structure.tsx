@@ -84,7 +84,7 @@ export function LayoutImageBanner({
 	return (
 		<LayoutButtonBase
 			className={cn(
-				"relative block aspect-[5/1] w-full overflow-visible rounded-[1rem] border border-ll-white/50 bg-ll-white/24 shadow-[0_7px_16px_color-mix(in_srgb,var(--color-ll-gray)_16%,transparent)] focus-visible:outline-3 focus-visible:outline-ll-label",
+				"relative block aspect-[4/1] w-full overflow-visible rounded-[1rem] border border-ll-white/50 bg-ll-white/24 shadow-[0_7px_16px_color-mix(in_srgb,var(--color-ll-gray)_16%,transparent)] focus-visible:outline-3 focus-visible:outline-ll-label",
 				className,
 			)}
 			{...props}

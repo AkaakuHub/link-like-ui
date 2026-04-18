@@ -44,7 +44,7 @@ import type {
 	LayoutBannerDefinition,
 	LayoutTileDefinition,
 } from "../../src/Home/Layout";
-import homeBannerImage from "../assets/images/750x150.png";
+import homeBannerImage from "../assets/images/600x150.png";
 import {
 	ModalTabList,
 	ModalTabPanel,
