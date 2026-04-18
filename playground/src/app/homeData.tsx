@@ -1,13 +1,12 @@
-import {
-	LuBadgeCheck,
-	LuCalendarDays,
-	LuCircle,
-	LuGift,
-	LuLayoutGrid,
-	LuNewspaper,
-	LuShoppingCart,
-	LuVolume2,
-} from "react-icons/lu";
+import { FaAward } from "react-icons/fa";
+import { LuGift } from "react-icons/lu";
+import { LuShoppingCart } from "react-icons/lu";
+import { LuNotebook } from "react-icons/lu";
+import { MdPeopleAlt } from "react-icons/md";
+import { LuNewspaper } from "react-icons/lu";
+import { FaHandshake } from "react-icons/fa6";
+import { LuSettings } from "react-icons/lu";
+
 import type {
 	LayoutBannerDefinition,
 	LayoutTileDefinition,
@@ -20,7 +19,7 @@ export const homeMenuTiles: LayoutTileDefinition[] = [
 		id: "tile-01",
 		label: "Mission",
 		colSpan: 1,
-		icon: <GradientIcon icon={LuBadgeCheck} />,
+		icon: <GradientIcon icon={FaAward} />,
 		rowSpan: 1,
 	},
 	{
@@ -42,14 +41,14 @@ export const homeMenuTiles: LayoutTileDefinition[] = [
 		id: "tile-04",
 		label: "Collection",
 		colSpan: 1,
-		icon: <GradientIcon icon={LuLayoutGrid} />,
+		icon: <GradientIcon icon={LuNotebook} />,
 		rowSpan: 1,
 	},
 	{
 		id: "tile-05",
 		label: "Circle",
 		colSpan: 1,
-		icon: <GradientIcon icon={LuCircle} />,
+		icon: <GradientIcon icon={MdPeopleAlt} />,
 		rowSpan: 1,
 	},
 	{
@@ -62,16 +61,16 @@ export const homeMenuTiles: LayoutTileDefinition[] = [
 	},
 	{
 		id: "tile-07",
-		label: "Event",
+		label: "Friend",
 		colSpan: 1,
-		icon: <GradientIcon icon={LuCalendarDays} />,
+		icon: <GradientIcon icon={FaHandshake} />,
 		rowSpan: 1,
 	},
 	{
 		id: "tile-08",
-		label: "Sound",
+		label: "Settings",
 		colSpan: 1,
-		icon: <GradientIcon icon={LuVolume2} />,
+		icon: <GradientIcon icon={LuSettings} />,
 		rowSpan: 1,
 	},
 ];
