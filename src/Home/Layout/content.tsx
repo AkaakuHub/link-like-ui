@@ -8,7 +8,11 @@ import { HomeLayoutDock } from "./Dock/content";
 import { HomeLayoutHeader } from "./Header/content";
 import { formatLocalClock } from "./Header/helpers";
 import { useBatteryState } from "./Header/useBatteryState";
-import { HomeLayoutSheet, type LayoutTileDefinition } from "./Sheet/content";
+import {
+	HomeLayoutSheet,
+	type LayoutBannerDefinition,
+	type LayoutTileDefinition,
+} from "./Sheet/content";
 import {
 	LayoutBackground,
 	LayoutRoot,
@@ -23,7 +27,10 @@ export interface LayoutAction {
 }
 
 export type LayoutVariant = "home";
-export type { LayoutTileDefinition } from "./Sheet/content";
+export type {
+	LayoutBannerDefinition,
+	LayoutTileDefinition,
+} from "./Sheet/content";
 
 export interface LayoutProps {
 	actions?: LayoutAction[];
@@ -32,6 +39,7 @@ export interface LayoutProps {
 	defaultMenuOpen?: boolean;
 	homeAction?: LayoutAction;
 	menuTiles: LayoutTileDefinition[];
+	topBanners: LayoutBannerDefinition[];
 	rightContent?: ReactNode;
 	statusLabel?: string;
 	timeLabel?: string;
@@ -46,6 +54,7 @@ function HomeLayout({
 	homeAction = { ariaLabel: "Home", label: "Home" },
 	menuTiles,
 	rightContent,
+	topBanners,
 }: Omit<LayoutProps, "variant">) {
 	const [isMenuOpen, setIsMenuOpen] = useState<boolean>(defaultMenuOpen);
 	const [isMenuVisible, setIsMenuVisible] = useState<boolean>(defaultMenuOpen);
@@ -124,6 +133,7 @@ function HomeLayout({
 				isMenuOpen={isMenuOpen}
 				isMenuVisible={isMenuVisible}
 				menuTiles={menuTiles}
+				topBanners={topBanners}
 			/>
 			<HomeLayoutDock
 				homeAction={homeAction}

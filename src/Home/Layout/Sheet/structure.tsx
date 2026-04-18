@@ -2,6 +2,7 @@ import type {
 	ButtonHTMLAttributes,
 	ComponentPropsWithoutRef,
 	HTMLAttributes,
+	ImgHTMLAttributes,
 } from "react";
 import { cn } from "../../../utils";
 import {
@@ -71,6 +72,35 @@ export function LayoutBannerCard({
 				"overflow-hidden rounded-[1rem] border border-ll-white/50 bg-linear-to-r from-ll-system-left/66 via-ll-white/24 to-ll-system-right/60 px-3 py-2.5 text-ll-white shadow-[0_7px_16px_color-mix(in_srgb,var(--color-ll-gray)_16%,transparent)]",
 				className,
 			)}
+			{...props}
+		/>
+	);
+}
+
+export function LayoutImageBanner({
+	className,
+	...props
+}: ButtonHTMLAttributes<HTMLButtonElement>) {
+	return (
+		<LayoutButtonBase
+			className={cn(
+				"relative block aspect-[5/1] w-full overflow-hidden rounded-[1rem] border border-ll-white/50 bg-ll-white/24 shadow-[0_7px_16px_color-mix(in_srgb,var(--color-ll-gray)_16%,transparent)] focus-visible:outline-3 focus-visible:outline-ll-label",
+				className,
+			)}
+			{...props}
+		/>
+	);
+}
+
+export function LayoutImageBannerMedia({
+	alt,
+	className,
+	...props
+}: ImgHTMLAttributes<HTMLImageElement> & { alt: string }) {
+	return (
+		<img
+			alt={alt}
+			className={cn("block h-full w-full object-cover", className)}
 			{...props}
 		/>
 	);

@@ -40,6 +40,11 @@ import {
 	HomeMenuShopIcon,
 	HomeMenuSoundIcon,
 } from "../../src/assets/icons";
+import type {
+	LayoutBannerDefinition,
+	LayoutTileDefinition,
+} from "../../src/Home/Layout";
+import homeBannerImage from "../assets/images/750x150.png";
 import {
 	ModalTabList,
 	ModalTabPanel,
@@ -80,7 +85,6 @@ import {
 	TableRoot,
 	TableRow,
 } from "../../src/System/Table";
-import type { LayoutTileDefinition } from "../../src/Home/Layout";
 
 const tabValues = ["tab-01", "tab-02", "tab-03", "tab-04", "tab-05"] as const;
 type ControlTabValue = (typeof tabValues)[number];
@@ -197,6 +201,26 @@ const homeMenuTiles: LayoutTileDefinition[] = [
 		colSpan: 1,
 		icon: <HomeMenuSoundIcon className="h-full w-full" />,
 		rowSpan: 1,
+	},
+];
+
+const homeTopBanners: LayoutBannerDefinition[] = [
+	{
+		id: "banner-01",
+		src: homeBannerImage,
+		alt: "Banner sample 01",
+		badge: "New",
+	},
+	{
+		id: "banner-02",
+		src: homeBannerImage,
+		alt: "Banner sample 02",
+	},
+	{
+		id: "banner-03",
+		src: homeBannerImage,
+		alt: "Banner sample 03",
+		badge: "New",
 	},
 ];
 
@@ -573,6 +597,7 @@ export function App() {
 				<Layout
 					defaultMenuOpen
 					menuTiles={homeMenuTiles}
+					topBanners={homeTopBanners}
 					variant="home"
 				/>
 			</main>
