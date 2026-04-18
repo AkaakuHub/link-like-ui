@@ -32,7 +32,7 @@ export function LayoutSheet({
 	return (
 		<LayoutPanelBase
 			className={cn(
-				"absolute bottom-[calc(var(--ll-home-dock-height)+var(--ll-home-sheet-gap))] left-1/2 z-20 max-h-[calc(100dvh-var(--ll-home-sheet-top-safe)-var(--ll-home-dock-height)-var(--ll-home-sheet-gap))] w-[calc(100%-4rem)] max-w-100 overflow-y-auto rounded-[1.45rem] border border-ll-white/62 bg-ll-white/18 p-4 shadow-[0_12px_34px_color-mix(in_srgb,var(--color-ll-gray)_16%,transparent)] backdrop-blur-[18px] transition-[opacity,transform] duration-200 ease-out",
+				"absolute bottom-[calc(var(--ll-home-dock-height)+var(--ll-home-sheet-gap))] left-1/2 z-20 max-h-[calc(100dvh-var(--ll-home-sheet-top-safe)-var(--ll-home-dock-height)-var(--ll-home-sheet-gap))] w-[calc(100%-4rem)] max-w-100 overflow-y-auto rounded-[1.45rem] bg-ll-white/18 p-4 shadow-[0_0_12px_3px_color-mix(in_srgb,var(--color-ll-gray)_12%,transparent)] backdrop-blur-3xl transition-[opacity,transform] duration-200 ease-out",
 				className,
 			)}
 			{...props}
@@ -84,7 +84,7 @@ export function LayoutImageBanner({
 	return (
 		<LayoutButtonBase
 			className={cn(
-				"relative block aspect-[4/1] w-full overflow-visible rounded-[1rem] border border-ll-white/50 bg-ll-white/24 shadow-[0_7px_16px_color-mix(in_srgb,var(--color-ll-gray)_16%,transparent)] focus-visible:outline-3 focus-visible:outline-ll-label",
+				"relative block aspect-[4/1] w-full overflow-visible rounded-[1rem] bg-ll-white/24 shadow-[0_0_8px_6px_color-mix(in_srgb,var(--color-ll-gray)_10%,transparent)] focus-visible:outline-3 focus-visible:outline-ll-label",
 				className,
 			)}
 			{...props}
