@@ -5,6 +5,16 @@ import {
 	useEffect,
 	useState,
 } from "react";
+import type {
+	GradientIconClusterItems,
+	GradientIconDefinition,
+} from "../../System/Icon";
+import {
+	SystemModal,
+	SystemModalBody,
+	SystemModalContent,
+	SystemModalTitle,
+} from "../../System/SystemModal";
 import {
 	homeMenuCloseAnimationDurationCssVar,
 	homeMenuCloseAnimationDurationMs,
@@ -13,6 +23,9 @@ import {
 	homeMenuScrimInAnimationClass,
 	homeMenuScrimOutAnimationClass,
 } from "./animation";
+
+const submenuModalAnimationDurationMs = 180;
+
 import { HomeLayoutDock } from "./Dock/content";
 import { HomeLayoutHeader } from "./Header/content";
 import { formatLocalClock } from "./Header/helpers";
@@ -22,6 +35,8 @@ import {
 	type LayoutBannerDefinition,
 	type LayoutTileDefinition,
 } from "./Sheet/content";
+import { LayoutQuickTile } from "./Sheet/quickTile";
+import { LayoutGrid } from "./Sheet/structure";
 import {
 	LayoutBackground,
 	LayoutRoot,
@@ -33,6 +48,26 @@ export interface LayoutAction {
 	ariaLabel: string;
 	label: string;
 	onClick?: ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
+}
+
+export type LayoutTileIllustrationDefinition =
+	| {
+			icon: GradientIconDefinition;
+			kind: "single";
+	  }
+	| {
+			items: GradientIconClusterItems;
+			kind: "cluster";
+	  };
+
+interface LayoutTileSubmenuDefinition {
+	items: readonly {
+		icon: GradientIconDefinition;
+		id: string;
+		label: string;
+		onClick?: ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
+	}[];
+	title: string;
 }
 
 export type LayoutVariant = "home";
@@ -67,12 +102,12 @@ export interface HomeScreenBannerInput {
 export interface HomeScreenMenuItemInput {
 	badge?: string;
 	colSpan?: LayoutTileDefinition["colSpan"];
-	icon?: ReactNode;
 	id?: string;
-	illustration?: ReactNode;
+	illustration?: LayoutTileIllustrationDefinition;
 	label: string;
 	onClick?: ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
 	rowSpan?: LayoutTileDefinition["rowSpan"];
+	submenu?: LayoutTileSubmenuDefinition;
 }
 
 export interface HomeScreenProps
@@ -124,6 +159,10 @@ function HomeLayout({
 }: Omit<LayoutProps, "variant">) {
 	const [isMenuOpen, setIsMenuOpen] = useState<boolean>(defaultMenuOpen);
 	const [isMenuVisible, setIsMenuVisible] = useState<boolean>(defaultMenuOpen);
+	const [activeSubmenuTileId, setActiveSubmenuTileId] = useState<string | null>(
+		null,
+	);
+	const [isSubmenuModalOpen, setIsSubmenuModalOpen] = useState<boolean>(false);
 	const [clock, setClock] = useState(() => formatLocalClock(new Date()));
 	const battery = useBatteryState();
 	const layoutRootStyle = {
@@ -158,6 +197,8 @@ function HomeLayout({
 
 	useEffect(() => {
 		if (!isMenuOpen) {
+			setIsSubmenuModalOpen(false);
+			setActiveSubmenuTileId(null);
 			return;
 		}
 
@@ -173,6 +214,25 @@ function HomeLayout({
 			globalThis.removeEventListener("keydown", handleKeyDown);
 		};
 	}, [isMenuOpen]);
+
+	useEffect(() => {
+		if (isSubmenuModalOpen || activeSubmenuTileId === null) {
+			return;
+		}
+
+		const timeoutId = globalThis.setTimeout(() => {
+			setActiveSubmenuTileId(null);
+		}, submenuModalAnimationDurationMs);
+
+		return () => {
+			globalThis.clearTimeout(timeoutId);
+		};
+	}, [activeSubmenuTileId, isSubmenuModalOpen]);
+
+	const activeSubmenuTile =
+		activeSubmenuTileId === null
+			? null
+			: (menuTiles.find((tile) => tile.id === activeSubmenuTileId) ?? null);
 
 	return (
 		<LayoutRoot style={layoutRootStyle}>
@@ -203,8 +263,50 @@ function HomeLayout({
 				isMenuOpen={isMenuOpen}
 				isMenuVisible={isMenuVisible}
 				menuTiles={menuTiles}
+				onOpenSubmenu={(tileId) => {
+					setActiveSubmenuTileId(tileId);
+					setIsSubmenuModalOpen(true);
+				}}
 				topBanners={topBanners}
 			/>
+			{activeSubmenuTile?.submenu ? (
+				<SystemModal
+					open={isSubmenuModalOpen}
+					onOpenChange={(nextOpen) => {
+						setIsSubmenuModalOpen(nextOpen);
+					}}
+				>
+					<SystemModalContent
+						aria-describedby={undefined}
+						bodyClassName="bg-ll-white/18 backdrop-blur-3xl"
+						className="[--ll-home-tile-gap:clamp(0.54rem,2.15vw,1.5rem)] [--ll-submenu-padding:2rem] [--ll-submenu-tile-size:4.35rem] w-[calc((var(--ll-submenu-tile-size)*2)+var(--ll-home-tile-gap)+(var(--ll-submenu-padding)*2))] max-w-none"
+						width="sm"
+					>
+						<SystemModalBody padding="none">
+							<SystemModalTitle className="sr-only">
+								{activeSubmenuTile.submenu.title}
+							</SystemModalTitle>
+							<LayoutGrid
+								columns={2}
+								className="grid-cols-[repeat(2,var(--ll-submenu-tile-size))] w-fit p-(--ll-submenu-padding)"
+							>
+								{activeSubmenuTile.submenu.items.map((item) => (
+									<LayoutQuickTile
+										key={item.id}
+										className="h-(--ll-submenu-tile-size) w-(--ll-submenu-tile-size)"
+										illustration={{
+											icon: item.icon,
+											kind: "single",
+										}}
+										label={item.label}
+										onClick={item.onClick}
+									/>
+								))}
+							</LayoutGrid>
+						</SystemModalBody>
+					</SystemModalContent>
+				</SystemModal>
+			) : null}
 			<HomeLayoutDock
 				homeAction={homeAction}
 				hasMenuNotification={hasMenuNotification}

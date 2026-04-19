@@ -1,54 +1,68 @@
 import { FaAward } from "react-icons/fa";
 import { LuGift } from "react-icons/lu";
-import { LuShoppingCart } from "react-icons/lu";
 import { LuNotebook } from "react-icons/lu";
-import { MdPeopleAlt } from "react-icons/md";
 import { LuNewspaper } from "react-icons/lu";
+import { LuShoppingCart } from "react-icons/lu";
 import { FaHandshake } from "react-icons/fa6";
-import { LuSettings } from "react-icons/lu";
+import { MdPeopleAlt } from "react-icons/md";
+import type { IconType } from "react-icons";
 
 import type {
 	HomeScreenBannerInput,
 	HomeScreenMenuItemInput,
 } from "../../../src/Home/Layout";
-import { GradientIcon } from "../../../src/System/Icon";
+import { systemSubmenuDefinition, systemTileIllustration } from "./systemMenuData";
 
 const homeBannerImageSrc = "/assets/images/600x150.png";
+
+function createSingleIllustration(
+	icon: IconType,
+	title: string,
+): NonNullable<HomeScreenMenuItemInput["illustration"]> {
+	return {
+		icon: {
+			icon,
+			title,
+		},
+		kind: "single",
+	};
+}
 
 export const homeMenuItems: HomeScreenMenuItemInput[] = [
 	{
 		label: "Mission",
-		icon: <GradientIcon icon={FaAward} />,
+		illustration: createSingleIllustration(FaAward, "Mission"),
 	},
 	{
 		label: "Present",
-		icon: <GradientIcon icon={LuGift} />,
+		illustration: createSingleIllustration(LuGift, "Present"),
 		badge: "7",
 	},
 	{
 		label: "Shop",
-		icon: <GradientIcon icon={LuShoppingCart} />,
+		illustration: createSingleIllustration(LuShoppingCart, "Shop"),
 	},
 	{
 		label: "Collection",
-		icon: <GradientIcon icon={LuNotebook} />,
+		illustration: createSingleIllustration(LuNotebook, "Collection"),
 	},
 	{
 		label: "Circle",
-		icon: <GradientIcon icon={MdPeopleAlt} />,
+		illustration: createSingleIllustration(MdPeopleAlt, "Circle"),
 	},
 	{
 		label: "News",
-		icon: <GradientIcon icon={LuNewspaper} />,
+		illustration: createSingleIllustration(LuNewspaper, "News"),
 		badge: "1",
 	},
 	{
 		label: "Friend",
-		icon: <GradientIcon icon={FaHandshake} />,
+		illustration: createSingleIllustration(FaHandshake, "Friend"),
 	},
 	{
-		label: "Settings",
-		icon: <GradientIcon icon={LuSettings} />,
+		illustration: systemTileIllustration,
+		label: "System",
+		submenu: systemSubmenuDefinition,
 	},
 ];
 

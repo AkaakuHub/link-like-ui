@@ -19,3 +19,9 @@ approval_mode = "approve"
 
 [mcp_servers.playwright.tools.browser_close]
 approval_mode = "approve"
+
+[mcp_servers.playwright.tools.browser_click]
+approval_mode = "approve"
+
+[mcp_servers.playwright.tools.browser_press_key]
+approval_mode = "approve"

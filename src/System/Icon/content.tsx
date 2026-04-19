@@ -24,6 +24,27 @@ export interface GradientIconProps
 	title?: string;
 }
 
+export interface GradientIconDefinition {
+	fitToSquare?: boolean;
+	icon: IconType;
+	paint?: GradientIconPaint;
+	title: string;
+}
+
+export type GradientIconClusterItems = readonly [
+	GradientIconDefinition,
+	GradientIconDefinition,
+	GradientIconDefinition,
+	GradientIconDefinition,
+];
+
+export interface GradientIconClusterProps
+	extends Omit<HTMLAttributes<HTMLSpanElement>, "children"> {
+	iconClassName?: string;
+	items: GradientIconClusterItems;
+	itemClassName?: string;
+}
+
 function parseViewBox(viewBox: string | undefined): {
 	minX: number;
 	minY: number;
@@ -199,6 +220,45 @@ export function GradientIcon({
 					resolvedPaint,
 				)}
 			</svg>
+		</GradientIconRoot>
+	);
+}
+
+export function GradientIconCluster({
+	className,
+	iconClassName,
+	items,
+	itemClassName,
+	...props
+}: GradientIconClusterProps) {
+	return (
+		<GradientIconRoot
+			aria-hidden="true"
+			className={cn(
+				"grid h-full w-full grid-cols-2 grid-rows-2 place-items-center gap-[8%] p-[4%]",
+				className,
+			)}
+			{...props}
+		>
+			{items.map((item) => (
+				<span
+					key={item.title}
+					className={cn(
+						"grid aspect-square h-auto w-full max-w-full place-items-center self-center rounded-[26%] bg-ll-white shadow-[0_4px_12px_color-mix(in_srgb,var(--color-ll-gray)_10%,transparent)]",
+						itemClassName,
+					)}
+				>
+					<GradientIcon
+						className={cn("h-[56%] w-[56%]", iconClassName)}
+						icon={item.icon}
+						title={item.title}
+						{...(item.fitToSquare !== undefined
+							? { fitToSquare: item.fitToSquare }
+							: {})}
+						{...(item.paint !== undefined ? { paint: item.paint } : {})}
+					/>
+				</span>
+			))}
 		</GradientIconRoot>
 	);
 }

@@ -1,9 +1,10 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes } from "react";
 import {
 	homeMenuEnterAnimationClass,
 	homeMenuExitAnimationClass,
 } from "../animation";
 import { LayoutTileBadge } from "../Badge";
+import type { LayoutTileIllustrationDefinition } from "../content";
 import { LayoutQuickTile } from "./quickTile";
 import {
 	LayoutGrid,
@@ -26,18 +27,31 @@ export interface LayoutBannerDefinition {
 export interface LayoutTileDefinition {
 	badge?: string;
 	colSpan: LayoutTileColumnSpan;
-	icon?: ReactNode;
 	id: string;
-	illustration?: ReactNode;
+	illustration?: LayoutTileIllustrationDefinition;
 	label: string;
 	onClick?: ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
 	rowSpan: LayoutTileRowSpan;
+	submenu?: LayoutTileSubmenuDefinition;
+}
+
+interface LayoutTileSubmenuItemDefinition {
+	icon: import("../../../System/Icon").GradientIconDefinition;
+	id: string;
+	label: string;
+	onClick?: ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
+}
+
+interface LayoutTileSubmenuDefinition {
+	items: readonly LayoutTileSubmenuItemDefinition[];
+	title: string;
 }
 
 interface HomeLayoutSheetProps {
 	isMenuOpen: boolean;
 	isMenuVisible: boolean;
 	menuTiles: LayoutTileDefinition[];
+	onOpenSubmenu: (tileId: string) => void;
 	topBanners: LayoutBannerDefinition[];
 }
 
@@ -45,6 +59,7 @@ export function HomeLayoutSheet({
 	isMenuOpen,
 	isMenuVisible,
 	menuTiles,
+	onOpenSubmenu,
 	topBanners,
 }: HomeLayoutSheetProps) {
 	if (!isMenuVisible) {
@@ -82,13 +97,35 @@ export function HomeLayoutSheet({
 						<LayoutQuickTile
 							key={tile.id}
 							colSpan={tile.colSpan}
+							hideLabel={tile.illustration?.kind === "cluster"}
 							label={tile.label}
 							rowSpan={tile.rowSpan}
 							{...(tile.badge ? { badge: tile.badge } : {})}
-							{...((tile.icon ?? tile.illustration)
-								? { illustration: tile.icon ?? tile.illustration }
+							{...(tile.illustration?.kind === "cluster"
+								? {
+										className:
+											"border-ll-white/48 bg-ll-white/18 p-[0.16rem] shadow-[0_0_12px_3px_color-mix(in_srgb,var(--color-ll-gray)_10%,transparent)] backdrop-blur-3xl",
+										clusterClassName:
+											"aspect-square h-full w-full place-self-center gap-[5%] p-[6%]",
+										clusterIconClassName: "h-[76%] w-[76%]",
+										clusterItemClassName:
+											"rounded-[22%] bg-ll-white/92 shadow-[0_4px_12px_color-mix(in_srgb,var(--color-ll-gray)_10%,transparent)]",
+										contentClassName: "h-full w-full justify-center gap-0 pt-0",
+										illustrationFrameClassName:
+											"aspect-square h-full w-full max-h-full max-w-full place-self-center",
+									}
 								: {})}
-							{...(tile.onClick ? { onClick: tile.onClick } : {})}
+							{...(tile.illustration
+								? { illustration: tile.illustration }
+								: {})}
+							onClick={(event) => {
+								if (tile.submenu) {
+									onOpenSubmenu(tile.id);
+									return;
+								}
+
+								tile.onClick?.(event);
+							}}
 						/>
 					))}
 				</LayoutGrid>

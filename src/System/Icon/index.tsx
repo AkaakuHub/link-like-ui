@@ -1,1 +1,8 @@
-export { GradientIcon, type GradientIconProps } from "./content";
+export {
+	GradientIcon,
+	GradientIconCluster,
+	type GradientIconClusterItems,
+	type GradientIconClusterProps,
+	type GradientIconDefinition,
+	type GradientIconProps,
+} from "./content";

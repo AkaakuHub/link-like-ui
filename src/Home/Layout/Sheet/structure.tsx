@@ -13,6 +13,7 @@ import {
 
 export type LayoutTileColumnSpan = 1 | 2 | 4;
 export type LayoutTileRowSpan = 1 | 2;
+type LayoutGridColumns = 2 | 4;
 
 const layoutTileColumnClassMap: Record<LayoutTileColumnSpan, string> = {
 	1: "col-span-1",
@@ -25,6 +26,11 @@ const layoutTileRowClassMap: Record<LayoutTileRowSpan, string> = {
 	2: "row-span-2 min-h-[9rem]",
 };
 
+const layoutGridColumnClassMap: Record<LayoutGridColumns, string> = {
+	2: "grid-cols-2",
+	4: "grid-cols-4",
+};
+
 export function LayoutSheet({
 	className,
 	...props
@@ -32,7 +38,7 @@ export function LayoutSheet({
 	return (
 		<LayoutPanelBase
 			className={cn(
-				"absolute bottom-[calc(var(--ll-home-dock-height)+var(--ll-home-sheet-gap))] left-1/2 z-20 max-h-[calc(100dvh-var(--ll-home-sheet-top-safe)-var(--ll-home-dock-height)-var(--ll-home-sheet-gap))] w-[calc(100%-4rem)] max-w-100 overflow-y-auto rounded-[1.45rem] bg-ll-white/18 p-4 shadow-[0_0_12px_3px_color-mix(in_srgb,var(--color-ll-gray)_12%,transparent)] backdrop-blur-3xl transition-[opacity,transform] duration-200 ease-out [--ll-home-tile-gap:clamp(0.54rem,2.15vw,1.5rem)] [--ll-home-tile-icon-size:clamp(1.9rem,6.9vw,2.4rem)] [--ll-home-tile-label-line-height:1.18] [--ll-home-tile-stack-gap:clamp(0.01rem,0.2vw,0.08rem)] max-[360px]:[--ll-home-tile-gap:0.42rem] max-[360px]:[--ll-home-tile-icon-size:1.66rem] max-[360px]:[--ll-home-tile-stack-gap:0rem]",
+				"absolute bottom-[calc(var(--ll-home-dock-height)+var(--ll-home-sheet-gap))] left-1/2 z-20 max-h-[calc(100dvh-var(--ll-home-sheet-top-safe)-var(--ll-home-dock-height)-var(--ll-home-sheet-gap))] w-[calc(100%-4rem)] max-w-100 overflow-y-auto rounded-[1.45rem] bg-ll-white/18 p-4 shadow-[0_0_12px_3px_color-mix(in_srgb,var(--color-ll-gray)_12%,transparent)] backdrop-blur-3xl transition-[opacity,transform] duration-200 ease-out",
 				className,
 			)}
 			{...props}
@@ -111,11 +117,16 @@ export function LayoutImageBannerMedia({
 
 export function LayoutGrid({
 	className,
+	columns = 4,
 	...props
-}: HTMLAttributes<HTMLDivElement>) {
+}: HTMLAttributes<HTMLDivElement> & { columns?: LayoutGridColumns }) {
 	return (
 		<LayoutGridBase
-			className={cn("grid grid-cols-4 gap-(--ll-home-tile-gap)", className)}
+			className={cn(
+				"grid gap-(--ll-home-tile-gap) [--ll-home-tile-gap:clamp(0.54rem,2.15vw,1.5rem)] [--ll-home-tile-icon-size:clamp(1.9rem,6.9vw,2.4rem)] [--ll-home-tile-label-line-height:1.18] [--ll-home-tile-stack-gap:clamp(0.01rem,0.2vw,0.08rem)] max-[360px]:[--ll-home-tile-gap:0.42rem] max-[360px]:[--ll-home-tile-icon-size:1.66rem] max-[360px]:[--ll-home-tile-stack-gap:0rem]",
+				layoutGridColumnClassMap[columns],
+				className,
+			)}
 			{...props}
 		/>
 	);
@@ -136,7 +147,7 @@ export function LayoutTile({
 	return (
 		<LayoutButtonBase
 			className={cn(
-				"relative cursor-pointer overflow-visible rounded-[0.92rem] border border-ll-white/62 bg-ll-white/92 p-2 text-left shadow-[0_6px_14px_color-mix(in_srgb,var(--color-ll-gray)_13%,transparent)] transition-[filter,transform,background-color,color,border-color] duration-150 ease-out hover:brightness-80 disabled:cursor-not-allowed disabled:hover:brightness-100 focus-visible:outline-3 focus-visible:outline-ll-label",
+				"relative cursor-pointer overflow-visible rounded-[0.92rem] border border-ll-white/62 bg-ll-white/92 text-left shadow-[0_6px_14px_color-mix(in_srgb,var(--color-ll-gray)_13%,transparent)] transition-[filter,transform,background-color,color,border-color] duration-150 ease-out hover:brightness-80 disabled:cursor-not-allowed disabled:hover:brightness-100 focus-visible:outline-3 focus-visible:outline-ll-label",
 				layoutTileColumnClassMap[colSpan],
 				layoutTileRowClassMap[rowSpan],
 				className,
