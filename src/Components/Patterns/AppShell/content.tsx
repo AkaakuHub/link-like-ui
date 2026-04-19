@@ -45,7 +45,7 @@ import { useHomeLayoutState } from "./useHomeLayoutState";
 export interface LayoutAction {
 	ariaLabel: string;
 	label: string;
-	onClick?: ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
+	onClick?: () => void;
 }
 
 export type LayoutTileIllustrationDefinition =
@@ -84,12 +84,16 @@ export interface LayoutPageDefinition {
 
 export interface LayoutProps {
 	actions?: LayoutAction[];
+	backAction?: LayoutAction;
+	canGoBackToPage?: boolean;
 	centerContent?: ReactNode;
+	currentPageId?: string;
 	dateLabel?: string;
 	defaultMenuOpen?: boolean;
 	hasMenuNotification?: boolean;
 	homeAction?: LayoutAction;
 	menuTiles: LayoutTileDefinition[];
+	onNavigate?: (pageId: string) => void;
 	overlayContent?: ReactNode;
 	pageDefinitions?: LayoutPageDefinition[];
 	topBanners: LayoutBannerDefinition[];
@@ -163,11 +167,15 @@ function toLayoutTileDefinitions(
 }
 
 function HomeLayout({
+	backAction,
+	canGoBackToPage = false,
 	centerContent,
+	currentPageId = "home",
 	defaultMenuOpen = false,
 	hasMenuNotification = false,
 	homeAction = { ariaLabel: "Home", label: "Home" },
 	menuTiles,
+	onNavigate,
 	overlayContent,
 	pageDefinitions = [],
 	rightContent,
@@ -178,11 +186,8 @@ function HomeLayout({
 		back,
 		canGoBack,
 		closeMenu,
-		currentPageId,
-		goToHome,
 		isMenuOpen,
 		isSubmenuModalOpen,
-		goToPage,
 		openSubmenu,
 		setSubmenuModalOpen,
 		toggleMenu,
@@ -234,6 +239,7 @@ function HomeLayout({
 		activePageDefinition?.centerContent ?? centerContent;
 	const headerRightContent = activePageDefinition?.rightContent ?? rightContent;
 	const showClock = activePageDefinition?.showClock ?? currentPageId === "home";
+	const canGoBackInLayout = canGoBack || canGoBackToPage;
 
 	return (
 		<LayoutRoot style={layoutRootStyle}>
@@ -267,7 +273,8 @@ function HomeLayout({
 				isMenuVisible={isMenuVisible}
 				menuTiles={menuTiles}
 				onGoToPage={(pageId) => {
-					goToPage(pageId);
+					closeMenu();
+					onNavigate?.(pageId);
 				}}
 				onOpenSubmenu={(tileId) => {
 					openSubmenu(tileId);
@@ -312,18 +319,27 @@ function HomeLayout({
 			) : null}
 			{overlayContent}
 			<HomeLayoutDock
-				canGoBack={canGoBack}
+				canGoBack={canGoBackInLayout}
 				homeAction={homeAction}
 				hasMenuNotification={hasMenuNotification}
 				isMenuOpen={isMenuOpen}
 				onBack={() => {
-					back();
+					if (canGoBack) {
+						back();
+						return;
+					}
+
+					backAction?.onClick?.();
 				}}
 				onToggleMenu={() => {
 					toggleMenu();
 				}}
 				onGoHome={() => {
-					goToHome();
+					if (currentPageId === "home" && !canGoBack) {
+						return;
+					}
+
+					homeAction.onClick?.();
 				}}
 			/>
 		</LayoutRoot>

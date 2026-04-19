@@ -1,18 +1,14 @@
 import { createStore } from "zustand/vanilla";
 
-type HomeLayoutPageId = "home" | string;
 type HomeLayoutOverlay = { type: "menu" } | { tileId: string; type: "submenu" };
 
 interface HomeLayoutState {
 	overlayHistory: HomeLayoutOverlay[];
-	pageHistory: HomeLayoutPageId[];
 }
 
 interface HomeLayoutActions {
 	back: () => void;
 	closeMenu: () => void;
-	goToPage: (pageId: HomeLayoutPageId) => void;
-	goToHome: () => void;
 	openMenu: () => void;
 	openSubmenu: (tileId: string) => void;
 	setSubmenuModalOpen: (nextOpen: boolean) => void;
@@ -26,14 +22,7 @@ function createInitialHomeLayoutState(
 ): HomeLayoutState {
 	return {
 		overlayHistory: defaultMenuOpen ? [{ type: "menu" }] : [],
-		pageHistory: ["home"],
 	};
-}
-
-function selectCurrentPageIdInternal(state: HomeLayoutState): HomeLayoutPageId {
-	const pageHistory = state.pageHistory ?? ["home"];
-
-	return pageHistory[pageHistory.length - 1] ?? "home";
 }
 
 function selectCurrentOverlay(
@@ -45,14 +34,7 @@ function selectCurrentOverlay(
 }
 
 export function selectCanGoBack(state: HomeLayoutState): boolean {
-	const overlayHistory = state.overlayHistory ?? [];
-	const pageHistory = state.pageHistory ?? ["home"];
-
-	return overlayHistory.length > 0 || pageHistory.length > 1;
-}
-
-export function selectCurrentPageId(state: HomeLayoutState): HomeLayoutPageId {
-	return selectCurrentPageIdInternal(state);
+	return (state.overlayHistory ?? []).length > 0;
 }
 
 export function selectIsMenuOpen(state: HomeLayoutState): boolean {
@@ -77,62 +59,13 @@ export function createHomeLayoutStore(defaultMenuOpen: boolean) {
 						overlayHistory: state.overlayHistory.slice(0, -1),
 					};
 				}
-
-				if (state.pageHistory.length <= 1) {
-					return state;
-				}
-
-				return {
-					pageHistory: state.pageHistory.slice(0, -1),
-				};
+				return state;
 			});
 		},
 		closeMenu: () => {
-			set((state) => {
-				if (state.overlayHistory.length === 0) {
-					return state;
-				}
-
-				return {
-					overlayHistory: [],
-				};
-			});
-		},
-		goToPage: (pageId) => {
-			set((state) => {
-				const currentPageId = selectCurrentPageIdInternal(state);
-
-				if (currentPageId === pageId) {
-					if (state.overlayHistory.length === 0) {
-						return state;
-					}
-
-					return {
-						overlayHistory: [],
-					};
-				}
-
-				return {
-					overlayHistory: [],
-					pageHistory: [...state.pageHistory, pageId],
-				};
-			});
-		},
-		goToHome: () => {
-			set((state) => {
-				if (
-					state.overlayHistory.length === 0 &&
-					selectCurrentPageIdInternal(state) === "home" &&
-					state.pageHistory.length === 1
-				) {
-					return state;
-				}
-
-				return {
-					overlayHistory: [],
-					pageHistory: ["home"],
-				};
-			});
+			set((state) =>
+				state.overlayHistory.length === 0 ? state : { overlayHistory: [] },
+			);
 		},
 		openMenu: () => {
 			set((state) => {
