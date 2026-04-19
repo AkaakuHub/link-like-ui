@@ -126,6 +126,13 @@ export function LayoutQuickTile({
 					<LockIconIcon className="h-6 w-6" />
 				</div>
 			) : null}
+			{disabledState === "not-implemented" ? (
+				<div className="pointer-events-none absolute inset-x-0 top-1/2 z-10 -translate-y-1/2 bg-ll-tab-active/88 p-1">
+					<p className="text-center text-[0.8rem] leading-none font-semibold text-ll-white">
+						Coming Soon
+					</p>
+				</div>
+			) : null}
 			{disabledState !== "none" ? (
 				<div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-ll-gray/60" />
 			) : null}
