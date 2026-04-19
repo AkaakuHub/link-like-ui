@@ -56,22 +56,21 @@ function DisabledOverlay({
 				<div
 					className={cn(
 						"pointer-events-none absolute inset-x-0 top-1/2 z-10 -translate-y-1/2 bg-ll-tab-active/88",
-						isCluster ? "px-[0.063rem] py-[0.0875rem]" : "px-[0.18rem] py-1",
+						isCluster ? "px-[0.063rem] py-[0.0875rem]" : "px-[0.18rem] py-0.75",
 						className,
 					)}
 				>
 					<p
 						className={cn(
-							"text-center leading-none font-semibold text-ll-white",
-							isCluster ? "text-[0.28rem]" : "text-[0.8rem]",
+							isCluster ? "text-[0.3rem]" : "text-[0.8rem]",
+							"text-center font-semibold text-ll-white leading-[0.9]",
 						)}
 					>
 						{isCluster ? (
-							<>
-								Coming
-								<br />
-								Soon
-							</>
+							<span className="flex flex-col items-center">
+								<span>Coming</span>
+								<span>Soon</span>
+							</span>
 						) : (
 							"Coming Soon"
 						)}
