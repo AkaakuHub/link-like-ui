@@ -12,7 +12,8 @@ import type {
 	HomeScreenMenuItemInput,
 } from "../../../src/Home/Layout";
 import { GradientIcon } from "../../../src/System/Icon";
-import homeBannerImage from "../../assets/images/600x150.png";
+
+const homeBannerImageSrc = "/assets/images/600x150.png";
 
 export const homeMenuItems: HomeScreenMenuItemInput[] = [
 	{
@@ -53,21 +54,21 @@ export const homeMenuItems: HomeScreenMenuItemInput[] = [
 
 export const homeTopBanners: HomeScreenBannerInput[] = [
 	{
-		src: homeBannerImage,
+		src: homeBannerImageSrc,
 		alt: "Banner sample 01",
 		badge: "New",
 	},
 	{
-		src: homeBannerImage,
+		src: homeBannerImageSrc,
 		alt: "Banner sample 02",
 	},
 	{
-		src: homeBannerImage,
+		src: homeBannerImageSrc,
 		alt: "Banner sample 03",
 		badge: "New",
 	},
 	{
-		src: homeBannerImage,
+		src: homeBannerImageSrc,
 		alt: "Banner sample 04",
 	},
 ];
