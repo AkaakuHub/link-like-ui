@@ -278,7 +278,7 @@ function HomeLayout({
 				>
 					<SystemModalContent
 						aria-describedby={undefined}
-						bodyClassName="bg-ll-white/18 backdrop-blur-3xl"
+						bodyClassName="bg-ll-white/36 backdrop-blur-3xl"
 						className="[--ll-home-tile-gap:clamp(0.54rem,2.15vw,1.5rem)] [--ll-submenu-padding:2rem] [--ll-submenu-tile-size:4.35rem] w-[calc((var(--ll-submenu-tile-size)*2)+var(--ll-home-tile-gap)+(var(--ll-submenu-padding)*2))] max-w-none"
 						width="sm"
 					>

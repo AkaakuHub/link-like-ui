@@ -38,7 +38,7 @@ export function LayoutSheet({
 	return (
 		<LayoutPanelBase
 			className={cn(
-				"absolute bottom-[calc(var(--ll-home-dock-height)+var(--ll-home-sheet-gap))] left-1/2 z-20 max-h-[calc(100dvh-var(--ll-home-sheet-top-safe)-var(--ll-home-dock-height)-var(--ll-home-sheet-gap))] w-[calc(100%-4rem)] max-w-100 overflow-y-auto rounded-[1.45rem] bg-ll-white/18 p-4 shadow-[0_0_12px_3px_color-mix(in_srgb,var(--color-ll-gray)_12%,transparent)] backdrop-blur-3xl transition-[opacity,transform] duration-200 ease-out",
+				"absolute bottom-[calc(var(--ll-home-dock-height)+var(--ll-home-sheet-gap))] left-1/2 z-20 max-h-[calc(100dvh-var(--ll-home-sheet-top-safe)-var(--ll-home-dock-height)-var(--ll-home-sheet-gap))] w-[calc(100%-4rem)] max-w-100 overflow-y-auto rounded-[1.45rem] bg-ll-white/36 p-4 shadow-[0_0_12px_3px_color-mix(in_srgb,var(--color-ll-gray)_12%,transparent)] backdrop-blur-3xl transition-[opacity,transform] duration-200 ease-out",
 				className,
 			)}
 			{...props}
