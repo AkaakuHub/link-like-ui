@@ -14,6 +14,10 @@ import {
 
 export type LayoutTileColumnSpan = 1 | 2 | 4;
 export type LayoutTileRowSpan = 1 | 2;
+export type LayoutTileDisabledState =
+	| "none"
+	| "not-available"
+	| "not-implemented";
 type LayoutGridColumns = 2 | 4;
 
 const layoutTileColumnClassMap: Record<LayoutTileColumnSpan, string> = {
@@ -144,23 +148,26 @@ export function LayoutGrid({
 export interface LayoutTileProps
 	extends ButtonHTMLAttributes<HTMLButtonElement> {
 	colSpan?: LayoutTileColumnSpan;
+	disabledState?: LayoutTileDisabledState;
 	rowSpan?: LayoutTileRowSpan;
 }
 
 export function LayoutTile({
 	className,
 	colSpan = 1,
+	disabledState = "none",
 	rowSpan = 1,
 	...props
 }: LayoutTileProps) {
 	return (
 		<LayoutButtonBase
 			className={cn(
-				"ll-interactive-filter relative cursor-pointer overflow-visible rounded-[0.92rem] border border-ll-white/62 bg-ll-white/92 text-left shadow-[0_6px_14px_color-mix(in_srgb,var(--color-ll-gray)_13%,transparent)] focus-visible:outline-3 focus-visible:outline-ll-label",
+				"ll-interactive-filter relative overflow-visible rounded-[0.92rem] border border-ll-white/62 bg-ll-white/92 text-left shadow-[0_6px_14px_color-mix(in_srgb,var(--color-ll-gray)_13%,transparent)] focus-visible:outline-3 focus-visible:outline-ll-label",
 				layoutTileColumnClassMap[colSpan],
 				layoutTileRowClassMap[rowSpan],
 				className,
 			)}
+			disabled={disabledState !== "none"}
 			{...props}
 		/>
 	);

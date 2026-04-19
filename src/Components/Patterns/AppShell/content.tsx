@@ -114,6 +114,7 @@ export interface HomeScreenBannerInput {
 export interface HomeScreenMenuItemInput {
 	badge?: string;
 	colSpan?: LayoutTileDefinition["colSpan"];
+	disabledState?: LayoutTileDefinition["disabledState"];
 	id?: string;
 	illustration?: LayoutTileIllustrationDefinition;
 	label: string;

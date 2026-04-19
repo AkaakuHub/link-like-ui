@@ -53,10 +53,12 @@ export function homeMenuItems({
 		{
 			label: "Collection",
 			illustration: createSingleIllustration(LuNotebook, "Collection"),
+			disabledState: "not-implemented",
 		},
 		{
 			label: "Circle",
 			illustration: createSingleIllustration(MdPeopleAlt, "Circle"),
+			disabledState: "not-available",
 		},
 		{
 			label: "News",

@@ -2,6 +2,7 @@ import { cn } from "../../../../utils";
 import { GradientIcon, GradientIconCluster } from "../../../System/Icon";
 import { LayoutTileBadge } from "../Badge";
 import type { LayoutTileIllustrationDefinition } from "../content";
+import type { LayoutTileDisabledState } from "./structure";
 import { LayoutTile, type LayoutTileProps } from "./structure";
 
 export interface LayoutQuickTileProps
@@ -11,6 +12,7 @@ export interface LayoutQuickTileProps
 	clusterIconClassName?: string;
 	clusterItemClassName?: string;
 	contentClassName?: string;
+	disabledState?: LayoutTileDisabledState;
 	hideLabel?: boolean;
 	illustrationFrameClassName?: string;
 	illustration?: LayoutTileIllustrationDefinition;
@@ -61,6 +63,7 @@ export function LayoutQuickTile({
 	clusterIconClassName,
 	clusterItemClassName,
 	contentClassName,
+	disabledState = "none",
 	hideLabel = false,
 	illustrationFrameClassName,
 	illustration,
@@ -73,6 +76,7 @@ export function LayoutQuickTile({
 				"aspect-square min-h-0 w-[calc(100%-0.08rem)] justify-self-center self-center p-1 text-center",
 				className,
 			)}
+			disabledState={disabledState}
 			{...props}
 		>
 			{badge ? (
@@ -108,7 +112,14 @@ export function LayoutQuickTile({
 				) : null}
 				{hideLabel ? null : (
 					<div className="mt-[0.08rem] w-full min-w-0 overflow-x-hidden overflow-y-visible px-[0.01rem] pb-[0.02rem]">
-						<p className="ll-bg-system-gradient block overflow-visible text-center whitespace-nowrap bg-clip-text text-[0.86rem] leading-[1.18] font-medium text-transparent text-ellipsis max-[420px]:text-[0.78rem] max-[380px]:text-[0.7rem] max-[360px]:text-[0.63rem]">
+						<p
+							className={cn(
+								"block overflow-visible text-center whitespace-nowrap text-[0.86rem] leading-[1.18] font-medium text-ellipsis max-[420px]:text-[0.78rem] max-[380px]:text-[0.7rem] max-[360px]:text-[0.63rem]",
+								disabledState === "none"
+									? "ll-bg-system-gradient bg-clip-text text-transparent"
+									: "text-ll-label/52",
+							)}
+						>
 							<span className="inline-block max-w-full overflow-hidden align-top text-ellipsis whitespace-nowrap pb-[0.08rem]">
 								{label}
 							</span>

@@ -13,6 +13,7 @@ import {
 	LayoutSheet,
 	LayoutSheetStack,
 	type LayoutTileColumnSpan,
+	type LayoutTileDisabledState,
 	type LayoutTileRowSpan,
 } from "./structure";
 
@@ -27,6 +28,7 @@ export interface LayoutBannerDefinition {
 export interface LayoutTileDefinition {
 	badge?: string;
 	colSpan: LayoutTileColumnSpan;
+	disabledState?: LayoutTileDisabledState | undefined;
 	id: string;
 	illustration?: LayoutTileIllustrationDefinition;
 	label: string;
@@ -103,6 +105,7 @@ export function HomeLayoutSheet({
 							hideLabel={tile.illustration?.kind === "cluster"}
 							label={tile.label}
 							rowSpan={tile.rowSpan}
+							disabledState={tile.disabledState ?? "none"}
 							{...(tile.badge ? { badge: tile.badge } : {})}
 							{...(tile.illustration?.kind === "cluster"
 								? {
