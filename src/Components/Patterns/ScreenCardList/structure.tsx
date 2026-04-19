@@ -29,7 +29,7 @@ export function ScreenCardListItem({
 	return (
 		<ScreenCardListItemBase
 			className={cn(
-				"grid grid-cols-[3.55rem_minmax(0,1fr)_4.3rem] items-start gap-x-2.5 rounded-[0.82rem] border border-ll-disabled/10 bg-ll-white px-2.5 py-2 shadow-[0_0_8px_color-mix(in_srgb,var(--color-ll-gray)_10%,transparent)]",
+				"grid grid-cols-[3.55rem_minmax(0,1fr)_4.3rem] items-start gap-x-2.5 rounded-[0.82rem] border border-ll-disabled/10 bg-ll-white px-2.5 py-2 shadow-[0_0_8px_color-mix(in_srgb,var(--color-ll-gray)_10%,transparent)] max-[380px]:grid-cols-[3.1rem_minmax(0,1fr)_4rem] max-[380px]:gap-x-2",
 				className,
 			)}
 			{...props}
@@ -138,7 +138,7 @@ export function ScreenCardListMetaRow({
 	return (
 		<div
 			className={cn(
-				"flex items-center gap-1.5 text-[0.66rem] leading-none",
+				"grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-x-1.5 text-[0.66rem] leading-none max-[380px]:gap-x-1 max-[380px]:text-[0.62rem]",
 				className,
 			)}
 			{...props}
@@ -153,7 +153,7 @@ export function ScreenCardListMetaLabel({
 	return (
 		<span
 			className={cn(
-				"ll-font-ja rounded-full bg-ll-modal-tab-gray px-1.5 py-[0.18rem] font-medium text-ll-gray/76",
+				"ll-font-ja shrink-0 whitespace-nowrap rounded-full bg-ll-modal-tab-gray px-1.5 py-[0.18rem] font-medium text-ll-gray/76",
 				className,
 			)}
 			{...props}
@@ -167,7 +167,10 @@ export function ScreenCardListMetaText({
 }: HTMLAttributes<HTMLSpanElement>) {
 	return (
 		<span
-			className={cn("ll-font-ja font-medium text-ll-gray/74", className)}
+			className={cn(
+				"ll-font-ja min-w-0 truncate whitespace-nowrap font-medium text-ll-gray/74",
+				className,
+			)}
 			{...props}
 		/>
 	);
@@ -180,7 +183,7 @@ export function ScreenCardListStatus({
 	return (
 		<span
 			className={cn(
-				"ll-font-ja rounded-full bg-ll-pink px-1.5 py-[0.18rem] font-semibold text-ll-white",
+				"ll-font-ja shrink-0 whitespace-nowrap rounded-full bg-ll-pink px-1.5 py-[0.18rem] font-semibold text-ll-white",
 				className,
 			)}
 			{...props}

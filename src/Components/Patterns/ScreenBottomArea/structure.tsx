@@ -9,7 +9,7 @@ export function ScreenBottomArea({
 	return (
 		<ScreenBottomAreaBase
 			className={cn(
-				"grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-3 border-t border-ll-disabled/16 bg-ll-white px-3 pt-3 pb-[calc(var(--ll-home-dock-height)+1rem)] shadow-[0_-8px_14px_-10px_color-mix(in_srgb,var(--color-ll-gray)_36%,transparent)]",
+				"grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-3 border-t border-ll-disabled/16 bg-ll-white px-3 pt-3 pb-[calc(var(--ll-home-dock-height)+1rem)] shadow-[0_-8px_14px_-10px_color-mix(in_srgb,var(--color-ll-gray)_36%,transparent)] max-[380px]:grid-cols-1 max-[380px]:items-start max-[380px]:gap-y-3",
 				className,
 			)}
 			{...props}
@@ -38,7 +38,12 @@ export function ScreenBottomNoteLine({
 }: HTMLAttributes<HTMLSpanElement> & {
 	isAccent?: boolean;
 }) {
-	return <span className={isAccent ? "text-ll-pink" : undefined} {...props} />;
+	return (
+		<span
+			className={cn("block", isAccent ? "text-ll-pink" : undefined)}
+			{...props}
+		/>
+	);
 }
 
 export function ScreenBottomActions({
@@ -47,7 +52,10 @@ export function ScreenBottomActions({
 }: HTMLAttributes<HTMLDivElement>) {
 	return (
 		<div
-			className={cn("grid grid-cols-[7.55rem_9.25rem] gap-2", className)}
+			className={cn(
+				"grid w-auto grid-cols-[7.55rem_9.25rem] gap-2 max-[380px]:w-full max-[380px]:grid-cols-2",
+				className,
+			)}
 			{...props}
 		/>
 	);
