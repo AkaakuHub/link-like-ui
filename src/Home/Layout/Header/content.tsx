@@ -57,18 +57,31 @@ function ClockTimeLabel({
 	return (
 		<div
 			className={cn(
-				"grid w-[2.55rem] grid-cols-[1fr_1fr_auto_1fr_1fr] items-center justify-items-center text-[1rem] leading-none font-normal text-ll-gray/82",
+				"grid w-[2.34rem] grid-cols-[0.55rem_0.55rem_0.4rem_0.55rem_0.55rem] items-center justify-items-center text-[1rem] leading-none font-normal text-ll-gray/82 tabular-nums",
 				clockTextClassName(),
 			)}
 		>
-			{timeParts.map((part) => (
-				<span
-					key={part.key}
-					className={part.value === ":" ? "w-[0.24rem]" : "w-[0.52rem]"}
-				>
-					{part.value}
-				</span>
-			))}
+			{timeParts.map((part) => {
+				if (part.value === ":") {
+					return (
+						<span
+							key={part.key}
+							className="relative -top-[0.03rem] left-[0.06rem] w-[0.4rem] text-center tracking-0"
+						>
+							{part.value}
+						</span>
+					);
+				}
+
+				return (
+					<span
+						key={part.key}
+						className="w-[0.55rem] text-center tracking-[-0.01em]"
+					>
+						{part.value}
+					</span>
+				);
+			})}
 		</div>
 	);
 }
