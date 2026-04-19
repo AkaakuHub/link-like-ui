@@ -59,7 +59,7 @@ function MenuGlyphWithBadge({
 				<LayoutTileBadge
 					aria-label="通知あり"
 					className={cn(
-						"pointer-events-none absolute top-0 left-1/2 h-4.5 w-4.5 translate-x-[0.45rem] -translate-y-[0.18rem] transition-opacity duration-100 ease-out",
+						"pointer-events-none absolute top-0 left-1/2 h-4.5 w-4.5 translate-x-6 -translate-y-2 transition-opacity duration-100 ease-out",
 						isMenuOpen ? "opacity-0" : "opacity-100",
 					)}
 					variant="circle"
