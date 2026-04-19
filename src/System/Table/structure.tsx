@@ -62,7 +62,7 @@ export function TableHeaderCell({
 	return (
 		<TableHeaderCellBase
 			className={cn(
-				"relative border border-ll-table px-2 py-1 text-[0.76rem] leading-tight font-bold text-ll-white [&:not(:first-child)]:before:absolute [&:not(:first-child)]:before:top-1 [&:not(:first-child)]:before:bottom-1 [&:not(:first-child)]:before:left-0 [&:not(:first-child)]:before:w-px [&:not(:first-child)]:before:bg-ll-white [&:not(:first-child)]:before:content-['']",
+				"relative border border-ll-table px-2 py-1 text-[0.76rem] leading-tight font-bold text-ll-white not-first:before:absolute not-first:before:top-1 not-first:before:bottom-1 not-first:before:left-0 not-first:before:w-px not-first:before:bg-ll-white not-first:before:content-['']",
 				tableCellAlignClassMap[align],
 				className,
 			)}

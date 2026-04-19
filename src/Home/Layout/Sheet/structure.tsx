@@ -69,7 +69,7 @@ export function LayoutBannerCard({
 	return (
 		<div
 			className={cn(
-				"overflow-hidden rounded-[1rem] border border-ll-white/50 bg-linear-to-r from-ll-system-left/66 via-ll-white/24 to-ll-system-right/60 px-3 py-2.5 text-ll-white shadow-[0_7px_16px_color-mix(in_srgb,var(--color-ll-gray)_16%,transparent)]",
+				"overflow-hidden rounded-2xl border border-ll-white/50 bg-linear-to-r from-ll-system-left/66 via-ll-white/24 to-ll-system-right/60 px-3 py-2.5 text-ll-white shadow-[0_7px_16px_color-mix(in_srgb,var(--color-ll-gray)_16%,transparent)]",
 				className,
 			)}
 			{...props}
@@ -84,7 +84,7 @@ export function LayoutImageBanner({
 	return (
 		<LayoutButtonBase
 			className={cn(
-				"relative block aspect-[4/1] w-full cursor-pointer overflow-visible rounded-[1rem] bg-ll-white/24 shadow-[0_0_8px_6px_color-mix(in_srgb,var(--color-ll-gray)_10%,transparent)] transition-[filter,transform,background-color,color,border-color] duration-150 ease-out hover:brightness-80 disabled:cursor-not-allowed disabled:hover:brightness-100 focus-visible:outline-3 focus-visible:outline-ll-label",
+				"relative block aspect-4/1 w-full cursor-pointer overflow-visible rounded-2xl bg-ll-white/24 shadow-[0_0_8px_6px_color-mix(in_srgb,var(--color-ll-gray)_10%,transparent)] transition-[filter,transform,background-color,color,border-color] duration-150 ease-out hover:brightness-80 disabled:cursor-not-allowed disabled:hover:brightness-100 focus-visible:outline-3 focus-visible:outline-ll-label",
 				className,
 			)}
 			{...props}
@@ -160,7 +160,7 @@ export function LayoutTileBadge({
 	return (
 		<span
 			className={cn(
-				"inline-flex shrink-0 items-center justify-center rounded-full bg-linear-to-tr from-ll-badge-orange to-ll-badge-red text-center leading-[1] font-semibold tabular-nums text-ll-white",
+				"inline-flex shrink-0 items-center justify-center rounded-full bg-linear-to-tr from-ll-badge-orange to-ll-badge-red text-center leading-none font-semibold tabular-nums text-ll-white",
 				sizeClassName,
 				className,
 			)}

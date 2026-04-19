@@ -38,7 +38,7 @@ export const FormTextareaPrimitive = forwardRef<
 			ref={ref}
 			className={cn(
 				formControlBaseClassName,
-				"min-h-[10.5rem] py-3 resize-none",
+				"min-h-42 py-3 resize-none",
 				className,
 			)}
 			{...props}

@@ -107,7 +107,7 @@ export function LayoutClock({
 	return (
 		<div
 			className={cn(
-				"absolute top-[4.95rem] right-[2rem] z-10 text-right text-ll-white",
+				"absolute top-[4.95rem] right-8 z-10 text-right text-ll-white",
 				className,
 			)}
 			{...props}

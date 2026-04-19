@@ -12,7 +12,7 @@ export function LoadingRoot({
 	return (
 		<LoadingRootBase
 			className={cn(
-				"pointer-events-none fixed inset-0 z-[2147483647] grid place-items-center",
+				"pointer-events-none fixed inset-0 z-2147483647 grid place-items-center",
 				className,
 			)}
 			{...props}
@@ -41,7 +41,7 @@ export function LoadingText({
 		<svg
 			aria-label={props.children as string}
 			role="img"
-			className={cn("block h-[2.2rem] w-[15rem] overflow-visible", className)}
+			className={cn("block h-[2.2rem] w-60 overflow-visible", className)}
 			style={style}
 		>
 			<text

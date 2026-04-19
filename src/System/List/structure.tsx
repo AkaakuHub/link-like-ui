@@ -133,7 +133,7 @@ export function ListDetailBody({
 	return (
 		<div
 			className={cn(
-				"space-y-3 rounded-[0.6rem] bg-ll-white p-3 text-[0.86rem] leading-[1.5] text-ll-gray",
+				"space-y-3 rounded-[0.6rem] bg-ll-white p-3 text-[0.86rem] leading-normal text-ll-gray",
 				className,
 			)}
 			{...props}
@@ -159,7 +159,7 @@ export function ListDetailImage({
 			<img
 				alt={alt}
 				src={src}
-				className={cn("h-24 w-full rounded-[0.5rem] object-cover", className)}
+				className={cn("h-24 w-full rounded-lg object-cover", className)}
 				{...props}
 			/>
 		);
@@ -168,7 +168,7 @@ export function ListDetailImage({
 	return (
 		<div
 			className={cn(
-				"grid h-24 w-full place-items-center rounded-[0.5rem] bg-ll-modal-tab-gray text-[0.75rem] text-ll-gray",
+				"grid h-24 w-full place-items-center rounded-lg bg-ll-modal-tab-gray text-[0.75rem] text-ll-gray",
 				className,
 			)}
 		>

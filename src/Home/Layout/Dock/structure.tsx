@@ -9,7 +9,7 @@ export function LayoutDock({
 	return (
 		<div
 			className={cn(
-				"absolute inset-x-0 bottom-0 z-30 h-[var(--ll-home-dock-height)] px-0 pb-0",
+				"absolute inset-x-0 bottom-0 z-30 h-(--ll-home-dock-height) px-0 pb-0",
 				className,
 			)}
 			{...props}
@@ -39,7 +39,7 @@ export function LayoutDockButton({
 	return (
 		<LayoutButtonBase
 			className={cn(
-				"pointer-events-auto relative flex h-[4rem] items-center justify-center text-[2.22rem] text-ll-label transition-colors hover:text-ll-system-right focus-visible:outline-3 focus-visible:outline-ll-label",
+				"pointer-events-auto relative flex h-16 items-center justify-center text-[2.22rem] text-ll-label transition-colors hover:text-ll-system-right focus-visible:outline-3 focus-visible:outline-ll-label",
 				className,
 			)}
 			{...props}

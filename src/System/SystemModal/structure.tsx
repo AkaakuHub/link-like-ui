@@ -165,7 +165,7 @@ export const SystemModalTitle = forwardRef<
 		<SystemModalTitlePrimitive
 			ref={ref}
 			className={cn(
-				'relative z-[1] font-["Noto_Sans_JP","Segoe_UI",sans-serif] text-[1.32rem] leading-none tracking-[0.03em] text-ll-white',
+				'relative z-1 font-["Noto_Sans_JP","Segoe_UI",sans-serif] text-[1.32rem] leading-none tracking-[0.03em] text-ll-white',
 				className,
 			)}
 			{...props}

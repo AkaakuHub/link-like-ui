@@ -31,7 +31,7 @@ function ClockDigitRow({ value }: ClockDigitRowProps) {
 				<span
 					key={digitEntry.key}
 					className={cn(
-						"flex h-[6.2rem] items-center justify-center text-[7.5rem] leading-[1] font-extralight text-ll-white",
+						"flex h-[6.2rem] items-center justify-center text-[7.5rem] leading-none font-extralight text-ll-white",
 						clockTextClassName(),
 					)}
 				>
@@ -93,10 +93,7 @@ export function HomeLayoutHeader({
 					<LayoutHeaderMeta>
 						<ClockTimeLabel hours={clock.hours} minutes={clock.minutes} />
 					</LayoutHeaderMeta>
-					<LayoutBatteryIndicator
-						battery={battery}
-						className="h-[1.25rem] w-[2rem]"
-					/>
+					<LayoutBatteryIndicator battery={battery} className="h-5 w-8" />
 				</LayoutHeaderCluster>
 				{centerContent ? (
 					<div className="pointer-events-auto absolute left-1/2 top-[0.55rem] -translate-x-1/2">
@@ -110,14 +107,14 @@ export function HomeLayoutHeader({
 				) : null}
 			</LayoutHeader>
 			<LayoutClock>
-				<div className="w-[9rem]">
+				<div className="w-36">
 					<ClockDigitRow value={clock.hours} />
-					<div className="mt-[0.5rem]">
+					<div className="mt-2">
 						<ClockDigitRow value={clock.minutes} />
 					</div>
 					<p
 						className={cn(
-							"mt-[0.5rem] block w-full text-center text-[1.44rem] leading-none font-normal tracking-[0.12em] text-ll-white/78",
+							"mt-2 block w-full text-center text-[1.44rem] leading-none font-normal tracking-[0.12em] text-ll-white/78",
 							clockTextClassName(),
 						)}
 					>
