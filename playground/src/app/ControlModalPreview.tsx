@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Button } from "../../../src/System/Button";
-import { SliderToggleRow } from "../../../src/System/Slider";
+import { Button } from "../../../src/Components/System/Button";
+import { SliderToggleRow } from "../../../src/Components/System/Slider";
 import {
 	SystemModal,
 	SystemModalActions,
@@ -10,8 +10,8 @@ import {
 	SystemModalHeader,
 	SystemModalTitle,
 	SystemModalTrigger,
-} from "../../../src/System/SystemModal";
-import { TabList, TabPanel, TabRoot, TabTrigger } from "../../../src/System/Tab";
+} from "../../../src/Components/System/SystemModal";
+import { TabList, TabPanel, TabRoot, TabTrigger } from "../../../src/Components/System/Tab";
 import {
 	createInitialMap,
 	createInitialToggleMap,

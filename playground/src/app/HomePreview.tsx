@@ -1,5 +1,5 @@
-import { HomeScreen } from "../../../src/Home/Layout";
-import { TapEffect } from "../../../src/System/TapEffect";
+import { HomeScreen } from "../../../src/Components/Patterns/AppShell";
+import { TapEffect } from "../../../src/Components/System/TapEffect";
 import { homeMenuItems, homeTopBanners } from "./homeData";
 import { countNoticeItems } from "./noticeData";
 import { presentPageDefinition } from "./presentData";

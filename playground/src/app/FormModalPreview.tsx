@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button } from "../../../src/System/Button";
+import { Button } from "../../../src/Components/System/Button";
 import {
 	FormInputField,
 	FormNote,
@@ -7,7 +7,7 @@ import {
 	FormStack,
 	FormSubmitActions,
 	FormTextareaField,
-} from "../../../src/System/Form";
+} from "../../../src/Components/System/Form";
 import {
 	SystemModal,
 	SystemModalActions,
@@ -18,7 +18,7 @@ import {
 	SystemModalHeader,
 	SystemModalTitle,
 	SystemModalTrigger,
-} from "../../../src/System/SystemModal";
+} from "../../../src/Components/System/SystemModal";
 
 const destinationOptions = [
 	{ label: "Option 01", value: "option-01" },

@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Button } from "../../../src/System/Button";
+import { Button } from "../../../src/Components/System/Button";
 import {
 	ModalTabList,
 	ModalTabPanel,
 	ModalTabRoot,
 	ModalTabTrigger,
-} from "../../../src/System/ModalTab";
+} from "../../../src/Components/System/ModalTab";
 import {
 	SystemModal,
 	SystemModalActions,
@@ -18,7 +18,7 @@ import {
 	SystemModalStack,
 	SystemModalTitle,
 	SystemModalTrigger,
-} from "../../../src/System/SystemModal";
+} from "../../../src/Components/System/SystemModal";
 import {
 	TableBody,
 	TableCell,
@@ -26,7 +26,7 @@ import {
 	TableHeaderCell,
 	TableRoot,
 	TableRow,
-} from "../../../src/System/Table";
+} from "../../../src/Components/System/Table";
 import {
 	cardRateRowsByTab,
 	detailTabs,

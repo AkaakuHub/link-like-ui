@@ -1,4 +1,4 @@
-import { Button } from "../../../src/System/Button";
+import { Button } from "../../../src/Components/System/Button";
 
 interface PreviewToolbarProps {
 	isLoadingVisible: boolean;

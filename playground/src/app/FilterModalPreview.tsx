@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Button } from "../../../src/System/Button";
-import { RadioField, RadioFieldRow } from "../../../src/System/Radio";
+import { Button } from "../../../src/Components/System/Button";
+import { RadioField, RadioFieldRow } from "../../../src/Components/System/Radio";
 import {
 	SystemModal,
 	SystemModalActionGrid,
@@ -13,7 +13,7 @@ import {
 	SystemModalPanel,
 	SystemModalTitle,
 	SystemModalTrigger,
-} from "../../../src/System/SystemModal";
+} from "../../../src/Components/System/SystemModal";
 import {
 	createInitialPerformerFilters,
 	filterAfterOptions,

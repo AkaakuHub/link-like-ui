@@ -1,4 +1,4 @@
-import { Button } from "../../../src/System/Button";
+import { Button } from "../../../src/Components/System/Button";
 import {
 	SystemModal,
 	SystemModalActions,
@@ -10,7 +10,7 @@ import {
 	SystemModalTitle,
 	SystemModalTrigger,
 	SystemModalWarning,
-} from "../../../src/System/SystemModal";
+} from "../../../src/Components/System/SystemModal";
 
 export function InfoModalPreview() {
 	return (

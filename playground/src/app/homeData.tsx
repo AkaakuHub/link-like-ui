@@ -10,7 +10,7 @@ import type { IconType } from "react-icons";
 import type {
 	HomeScreenBannerInput,
 	HomeScreenMenuItemInput,
-} from "../../../src/Home/Layout";
+} from "../../../src/Components/Patterns/AppShell";
 import { systemSubmenuDefinition, systemTileIllustration } from "./systemMenuData";
 
 const homeBannerImageSrc = "/assets/images/600x150.png";

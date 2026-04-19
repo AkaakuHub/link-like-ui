@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LoadingOverlay } from "../../../src/System/Loading";
+import { LoadingOverlay } from "../../../src/Components/System/Loading";
 import { ControlModalPreview } from "./ControlModalPreview";
 import { FilterModalPreview } from "./FilterModalPreview";
 import { FormModalPreview } from "./FormModalPreview";

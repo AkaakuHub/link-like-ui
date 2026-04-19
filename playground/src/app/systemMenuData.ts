@@ -1,6 +1,6 @@
 import { LuBriefcaseBusiness, LuMenu, LuSettings2, LuVolume2 } from "react-icons/lu";
-import type { HomeScreenMenuItemInput } from "../../../src/Home/Layout";
-import type { GradientIconClusterItems } from "../../../src/System/Icon";
+import type { HomeScreenMenuItemInput } from "../../../src/Components/Patterns/AppShell";
+import type { GradientIconClusterItems } from "../../../src/Components/System/Icon";
 
 interface SystemSubmenuDefinition {
 	items: readonly {

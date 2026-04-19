@@ -1,18 +1,18 @@
-import { Button } from "../../../src/System/Button";
+import { Button } from "../../../src/Components/System/Button";
 import {
 	ScreenPageBody,
 	ScreenPageCenter,
 	ScreenPageContent,
 	ScreenPageEmptyState,
 	ScreenPageRoot,
-} from "../../../src/Home/ScreenPage";
-import { ScreenTitleBar } from "../../../src/Home/ScreenTitleBar";
+} from "../../../src/Components/Patterns/ScreenPage";
+import { ScreenTitleBar } from "../../../src/Components/Patterns/ScreenTitleBar";
 import {
 	ScreenBottomActions,
 	ScreenBottomArea,
 	ScreenBottomNote,
 	ScreenBottomNoteLine,
-} from "../../../src/Home/ScreenBottomArea";
+} from "../../../src/Components/Patterns/ScreenBottomArea";
 
 export function PresentPagePreview() {
 	const notes = [

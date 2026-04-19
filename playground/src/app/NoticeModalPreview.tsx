@@ -4,7 +4,7 @@ import {
 	selectCurrentNoticeView,
 	useNoticeModalStore,
 } from "../stores/useNoticeModalStore";
-import { Button } from "../../../src/System/Button";
+import { Button } from "../../../src/Components/System/Button";
 import {
 	ListActionButton,
 	ListCard,
@@ -19,14 +19,14 @@ import {
 	ListItems,
 	ListNoticeCard,
 	ListRoot,
-} from "../../../src/System/List";
+} from "../../../src/Components/System/List";
 import {
 	ModalTabList,
 	ModalTabPanel,
 	ModalTabRoot,
 	ModalTabTrigger,
-} from "../../../src/System/ModalTab";
-import { Separator } from "../../../src/System/Separator";
+} from "../../../src/Components/System/ModalTab";
+import { Separator } from "../../../src/Components/System/Separator";
 import {
 	SystemModal,
 	SystemModalActions,
@@ -38,7 +38,7 @@ import {
 	SystemModalStack,
 	SystemModalTitle,
 	SystemModalTrigger,
-} from "../../../src/System/SystemModal";
+} from "../../../src/Components/System/SystemModal";
 import {
 	findNoticeItemById,
 	isNoticeTabValue,

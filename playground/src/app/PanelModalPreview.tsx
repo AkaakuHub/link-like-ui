@@ -1,4 +1,4 @@
-import { Button } from "../../../src/System/Button";
+import { Button } from "../../../src/Components/System/Button";
 import {
 	SystemModal,
 	SystemModalActions,
@@ -12,7 +12,7 @@ import {
 	SystemModalHeadingGrid,
 	SystemModalTitle,
 	SystemModalTrigger,
-} from "../../../src/System/SystemModal";
+} from "../../../src/Components/System/SystemModal";
 import { accountItems, supportItems } from "./controlData";
 
 export function PanelModalPreview() {
