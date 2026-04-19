@@ -107,7 +107,7 @@ export function LayoutClock({
 	return (
 		<div
 			className={cn(
-				"absolute top-[4.95rem] right-[0.55rem] z-10 text-right text-ll-white/78 drop-shadow-[0_1px_2px_color-mix(in_srgb,var(--color-ll-gray)_10%,transparent)]",
+				"absolute top-[4.95rem] right-[2rem] z-10 text-right text-ll-white",
 				className,
 			)}
 			{...props}

@@ -11,17 +11,17 @@ export function formatLocalClock(now: Date): LayoutClockState {
 		month: "2-digit",
 		weekday: "short",
 	});
-	const timeFormatter = new Intl.DateTimeFormat("en-GB", {
-		hour: "2-digit",
-		minute: "2-digit",
-		hour12: false,
-	});
-	const parts = timeFormatter.formatToParts(now);
-	const hours = parts.find((part) => part.type === "hour")?.value ?? "00";
-	const minutes = parts.find((part) => part.type === "minute")?.value ?? "00";
+	const dateParts = dateFormatter.formatToParts(now);
+	const hours = String(now.getHours()).padStart(2, "0");
+	const minutes = String(now.getMinutes()).padStart(2, "0");
+	const month = dateParts.find((part) => part.type === "month")?.value ?? "00";
+	const day = dateParts.find((part) => part.type === "day")?.value ?? "00";
+	const weekday =
+		dateParts.find((part) => part.type === "weekday")?.value.toUpperCase() ??
+		"---";
 
 	return {
-		dateLabel: dateFormatter.format(now).replace(",", "").toUpperCase(),
+		dateLabel: `${month}/${day} ${weekday}`,
 		hours,
 		minutes,
 		timeLabel: `${hours}:${minutes}`,

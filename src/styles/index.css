@@ -5,6 +5,14 @@
 
 @font-face {
 	font-family: "Poppins";
+	src: url("../assets/fonts/Poppins-ExtraLight.ttf") format("truetype");
+	font-style: normal;
+	font-weight: 200;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Poppins";
 	src: url("../assets/fonts/Poppins-Regular.ttf") format("truetype");
 	font-style: normal;
 	font-weight: 400;
@@ -38,6 +46,7 @@
 	--color-ll-prism-6: #a3a7fb;
 	--color-ll-badge-orange: #fc9060;
 	--color-ll-badge-red: #fa575e;
+	--color-ll-true-white: #ffffff;
 }
 
 @keyframes ll-system-modal-open {

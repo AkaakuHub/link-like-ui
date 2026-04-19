@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { tv } from "tailwind-variants";
+import { cn } from "../../../utils";
 import { LayoutBatteryIndicator } from "./battery";
 import type { LayoutClockState } from "./helpers";
 import {
@@ -8,6 +10,68 @@ import {
 	LayoutHeaderMeta,
 } from "./structure";
 import type { LayoutBatteryState } from "./useBatteryState";
+
+interface ClockDigitRowProps {
+	value: string;
+}
+
+const clockTextClassName = tv({
+	base: '[font-family:"Poppins","Segoe_UI",sans-serif] [text-shadow:0_0_6px_color-mix(in_srgb,var(--color-ll-gray)_40%,transparent)]',
+});
+
+function ClockDigitRow({ value }: ClockDigitRowProps) {
+	const digitEntries = [
+		{ key: "tens", value: value[0] ?? "" },
+		{ key: "ones", value: value[1] ?? "" },
+	];
+
+	return (
+		<div className="grid w-full grid-cols-2 gap-[0.08rem]">
+			{digitEntries.map((digitEntry) => (
+				<span
+					key={digitEntry.key}
+					className={cn(
+						"flex h-[6.2rem] items-center justify-center text-[7.5rem] leading-[1] font-extralight text-ll-white",
+						clockTextClassName(),
+					)}
+				>
+					{digitEntry.value}
+				</span>
+			))}
+		</div>
+	);
+}
+
+function ClockTimeLabel({
+	hours,
+	minutes,
+}: Pick<LayoutClockState, "hours" | "minutes">) {
+	const timeParts = [
+		{ key: "hourTens", value: hours[0] ?? "" },
+		{ key: "hourOnes", value: hours[1] ?? "" },
+		{ key: "separator", value: ":" },
+		{ key: "minuteTens", value: minutes[0] ?? "" },
+		{ key: "minuteOnes", value: minutes[1] ?? "" },
+	];
+
+	return (
+		<div
+			className={cn(
+				"grid w-[2.55rem] grid-cols-[1fr_1fr_auto_1fr_1fr] items-center justify-items-center text-[1rem] leading-none font-normal text-ll-gray/82",
+				clockTextClassName(),
+			)}
+		>
+			{timeParts.map((part) => (
+				<span
+					key={part.key}
+					className={part.value === ":" ? "w-[0.24rem]" : "w-[0.52rem]"}
+				>
+					{part.value}
+				</span>
+			))}
+		</div>
+	);
+}
 
 interface HomeLayoutHeaderProps {
 	battery: LayoutBatteryState;
@@ -26,8 +90,8 @@ export function HomeLayoutHeader({
 		<>
 			<LayoutHeader>
 				<LayoutHeaderCluster className="relative z-10 h-[2.1rem] items-center gap-1.5">
-					<LayoutHeaderMeta className="w-[2.55rem] text-[1rem] leading-none font-normal text-ll-gray/82 tabular-nums">
-						{clock.timeLabel}
+					<LayoutHeaderMeta>
+						<ClockTimeLabel hours={clock.hours} minutes={clock.minutes} />
 					</LayoutHeaderMeta>
 					<LayoutBatteryIndicator
 						battery={battery}
@@ -46,15 +110,20 @@ export function HomeLayoutHeader({
 				) : null}
 			</LayoutHeader>
 			<LayoutClock>
-				<p className="text-[4.9rem] leading-[0.8] font-light tracking-[-0.1em]">
-					{clock.hours}
-				</p>
-				<p className="mt-[-0.42rem] text-[4.9rem] leading-[0.8] font-light tracking-[-0.1em]">
-					{clock.minutes}
-				</p>
-				<p className="mt-[0.1rem] pr-[0.15rem] text-[0.72rem] leading-none tracking-[0.18em] text-ll-white/72">
-					{clock.dateLabel}
-				</p>
+				<div className="w-[9rem]">
+					<ClockDigitRow value={clock.hours} />
+					<div className="mt-[0.5rem]">
+						<ClockDigitRow value={clock.minutes} />
+					</div>
+					<p
+						className={cn(
+							"mt-[0.5rem] block w-full text-center text-[1.44rem] leading-none font-normal tracking-[0.12em] text-ll-white/78",
+							clockTextClassName(),
+						)}
+					>
+						{clock.dateLabel}
+					</p>
+				</div>
 			</LayoutClock>
 		</>
 	);
