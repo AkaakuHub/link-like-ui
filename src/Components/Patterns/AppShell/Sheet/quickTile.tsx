@@ -1,8 +1,11 @@
 import { LockIconIcon } from "../../../../assets/icons";
 import { cn } from "../../../../utils";
-import { GradientIcon, GradientIconCluster } from "../../../System/Icon";
+import { GradientIcon } from "../../../System/Icon";
 import { LayoutTileBadge } from "../Badge";
-import type { LayoutTileIllustrationDefinition } from "../content";
+import type {
+	LayoutTileClusterItemDefinition,
+	LayoutTileIllustrationDefinition,
+} from "../content";
 import type { LayoutTileDisabledState } from "./structure";
 import { LayoutTile, type LayoutTileProps } from "./structure";
 
@@ -18,6 +21,71 @@ export interface LayoutQuickTileProps
 	illustrationFrameClassName?: string;
 	illustration?: LayoutTileIllustrationDefinition;
 	label: string;
+}
+
+function DisabledOverlay({
+	className,
+	disabledState,
+	size,
+}: {
+	className?: string;
+	disabledState: LayoutTileDisabledState;
+	size: "cluster" | "default";
+}) {
+	if (disabledState === "none") {
+		return null;
+	}
+
+	const isCluster = size === "cluster";
+
+	return (
+		<>
+			{disabledState === "not-available" ? (
+				<div
+					className={cn(
+						"pointer-events-none absolute inset-0 z-10 grid place-items-center",
+						className,
+					)}
+				>
+					<LockIconIcon
+						className={isCluster ? "h-[0.525rem] w-[0.525rem]" : "h-6 w-6"}
+					/>
+				</div>
+			) : null}
+			{disabledState === "not-implemented" ? (
+				<div
+					className={cn(
+						"pointer-events-none absolute inset-x-0 top-1/2 z-10 -translate-y-1/2 bg-ll-tab-active/88",
+						isCluster ? "px-[0.063rem] py-[0.0875rem]" : "px-[0.18rem] py-1",
+						className,
+					)}
+				>
+					<p
+						className={cn(
+							"text-center leading-none font-semibold text-ll-white",
+							isCluster ? "text-[0.28rem]" : "text-[0.8rem]",
+						)}
+					>
+						{isCluster ? (
+							<>
+								Coming
+								<br />
+								Soon
+							</>
+						) : (
+							"Coming Soon"
+						)}
+					</p>
+				</div>
+			) : null}
+			<div
+				className={cn(
+					"pointer-events-none absolute inset-0 rounded-[inherit] bg-ll-gray/60",
+					className,
+				)}
+			/>
+		</>
+	);
 }
 
 function TileIllustration({
@@ -48,12 +116,54 @@ function TileIllustration({
 	}
 
 	return (
-		<GradientIconCluster
-			items={illustration.items}
-			{...(clusterClassName ? { className: clusterClassName } : {})}
-			{...(clusterIconClassName ? { iconClassName: clusterIconClassName } : {})}
-			{...(clusterItemClassName ? { itemClassName: clusterItemClassName } : {})}
-		/>
+		<span
+			className={cn(
+				"grid h-full w-full grid-cols-2 grid-rows-2 place-items-center gap-[8%] p-[4%]",
+				clusterClassName,
+			)}
+		>
+			{illustration.items.map((item) => (
+				<ClusterTileItem
+					key={item.title}
+					clusterIconClassName={clusterIconClassName}
+					clusterItemClassName={clusterItemClassName}
+					item={item}
+				/>
+			))}
+		</span>
+	);
+}
+
+function ClusterTileItem({
+	clusterIconClassName,
+	clusterItemClassName,
+	item,
+}: {
+	clusterIconClassName?: string | undefined;
+	clusterItemClassName?: string | undefined;
+	item: LayoutTileClusterItemDefinition;
+}) {
+	return (
+		<span
+			className={cn(
+				"ll-shadow-icon-tile relative grid aspect-square h-auto w-full max-w-full place-items-center self-center rounded-[26%] bg-ll-white",
+				clusterItemClassName,
+			)}
+		>
+			<GradientIcon
+				className={cn("h-[56%] w-[56%]", clusterIconClassName)}
+				icon={item.icon}
+				title={item.title}
+				{...(item.fitToSquare !== undefined
+					? { fitToSquare: item.fitToSquare }
+					: {})}
+				{...(item.paint !== undefined ? { paint: item.paint } : {})}
+			/>
+			<DisabledOverlay
+				disabledState={item.disabledState ?? "none"}
+				size="cluster"
+			/>
+		</span>
 	);
 }
 
@@ -121,21 +231,7 @@ export function LayoutQuickTile({
 					</div>
 				)}
 			</div>
-			{disabledState === "not-available" ? (
-				<div className="pointer-events-none absolute inset-0 z-10 grid place-items-center">
-					<LockIconIcon className="h-6 w-6" />
-				</div>
-			) : null}
-			{disabledState === "not-implemented" ? (
-				<div className="pointer-events-none absolute inset-x-0 top-1/2 z-10 -translate-y-1/2 bg-ll-tab-active/88 p-1">
-					<p className="text-center text-[0.8rem] leading-none font-semibold text-ll-white">
-						Coming Soon
-					</p>
-				</div>
-			) : null}
-			{disabledState !== "none" ? (
-				<div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-ll-gray/60" />
-			) : null}
+			<DisabledOverlay disabledState={disabledState} size="default" />
 		</LayoutTile>
 	);
 }

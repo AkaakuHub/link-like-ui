@@ -5,10 +5,7 @@ import {
 	useEffect,
 	useState,
 } from "react";
-import type {
-	GradientIconClusterItems,
-	GradientIconDefinition,
-} from "../../System/Icon";
+import type { GradientIconDefinition } from "../../System/Icon";
 import {
 	homeMenuCloseAnimationDurationCssVar,
 	homeMenuCloseAnimationDurationMs,
@@ -27,6 +24,7 @@ import {
 	type LayoutTileDefinition,
 } from "./Sheet/content";
 import { LayoutQuickTile } from "./Sheet/quickTile";
+import type { LayoutTileDisabledState } from "./Sheet/structure";
 import { LayoutGrid } from "./Sheet/structure";
 import {
 	AppShellSubmenuModal,
@@ -54,17 +52,30 @@ export type LayoutTileIllustrationDefinition =
 			kind: "single";
 	  }
 	| {
-			items: GradientIconClusterItems;
+			items: readonly [
+				LayoutTileClusterItemDefinition,
+				LayoutTileClusterItemDefinition,
+				LayoutTileClusterItemDefinition,
+				LayoutTileClusterItemDefinition,
+			];
 			kind: "cluster";
 	  };
 
-interface LayoutTileSubmenuDefinition {
-	items: readonly {
-		icon: GradientIconDefinition;
-		id: string;
-		label: string;
-		onClick?: ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
-	}[];
+export interface LayoutTileClusterItemDefinition
+	extends GradientIconDefinition {
+	disabledState?: LayoutTileDisabledState | undefined;
+}
+
+export interface LayoutTileSubmenuItemDefinition {
+	disabledState?: LayoutTileDisabledState | undefined;
+	icon: GradientIconDefinition;
+	id: string;
+	label: string;
+	onClick?: ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
+}
+
+export interface LayoutTileSubmenuDefinition {
+	items: readonly LayoutTileSubmenuItemDefinition[];
 	title: string;
 }
 
@@ -305,6 +316,7 @@ function HomeLayout({
 									<LayoutQuickTile
 										key={item.id}
 										className="h-(--ll-submenu-tile-size) w-(--ll-submenu-tile-size)"
+										disabledState={item.disabledState ?? "none"}
 										illustration={{
 											icon: item.icon,
 											kind: "single",

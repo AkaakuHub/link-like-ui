@@ -4,7 +4,10 @@ import {
 	homeMenuExitAnimationClass,
 } from "../animation";
 import { LayoutTileBadge } from "../Badge";
-import type { LayoutTileIllustrationDefinition } from "../content";
+import type {
+	LayoutTileIllustrationDefinition,
+	LayoutTileSubmenuDefinition,
+} from "../content";
 import { LayoutQuickTile } from "./quickTile";
 import {
 	LayoutGrid,
@@ -36,18 +39,6 @@ export interface LayoutTileDefinition {
 	pageId?: string;
 	rowSpan: LayoutTileRowSpan;
 	submenu?: LayoutTileSubmenuDefinition;
-}
-
-interface LayoutTileSubmenuItemDefinition {
-	icon: import("../../../System/Icon").GradientIconDefinition;
-	id: string;
-	label: string;
-	onClick?: ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
-}
-
-interface LayoutTileSubmenuDefinition {
-	items: readonly LayoutTileSubmenuItemDefinition[];
-	title: string;
 }
 
 interface HomeLayoutSheetProps {

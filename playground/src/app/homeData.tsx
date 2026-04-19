@@ -39,6 +39,7 @@ export function homeMenuItems({
 		{
 			label: "Mission",
 			illustration: createSingleIllustration(FaAward, "Mission"),
+			disabledState: "not-implemented",
 		},
 		{
 			label: "Present",
@@ -49,6 +50,7 @@ export function homeMenuItems({
 		{
 			label: "Shop",
 			illustration: createSingleIllustration(LuShoppingCart, "Shop"),
+			disabledState: "not-implemented",
 		},
 		{
 			label: "Collection",
@@ -64,10 +66,12 @@ export function homeMenuItems({
 			label: "News",
 			illustration: createSingleIllustration(LuNewspaper, "News"),
 			badge: "1",
+			disabledState: "not-implemented",
 		},
 		{
 			label: "Friend",
 			illustration: createSingleIllustration(FaHandshake, "Friend"),
+			disabledState: "not-implemented",
 		},
 		{
 			illustration: systemTileIllustration,

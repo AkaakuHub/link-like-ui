@@ -8,6 +8,9 @@ export {
 	type LayoutBannerDefinition,
 	type LayoutPageDefinition,
 	type LayoutProps,
+	type LayoutTileClusterItemDefinition,
 	type LayoutTileDefinition,
+	type LayoutTileSubmenuDefinition,
+	type LayoutTileSubmenuItemDefinition,
 	type LayoutVariant,
 } from "./content";

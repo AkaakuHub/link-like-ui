@@ -1,26 +1,104 @@
-import { LuBriefcaseBusiness, LuMenu, LuSettings2, LuVolume2 } from "react-icons/lu";
-import type { HomeScreenMenuItemInput } from "../../../src/Components/Patterns/AppShell";
-import type { GradientIconClusterItems } from "../../../src/Components/System/Icon";
+import {
+	LuBriefcaseBusiness,
+	LuMenu,
+	LuSettings2,
+	LuVolume2,
+} from "react-icons/lu";
+import type {
+	HomeScreenMenuItemInput,
+	LayoutTileClusterItemDefinition,
+	LayoutTileSubmenuDefinition,
+	LayoutTileSubmenuItemDefinition,
+} from "../../../src/Components/Patterns/AppShell";
 
-interface SystemSubmenuDefinition {
-	items: readonly {
-		icon: (typeof systemMenuIcons)[number];
-		id: string;
-		label: string;
-		onClick?: () => void;
-	}[];
-	title: string;
+type SystemMenuBaseItem = Readonly<{
+	disabledState?: LayoutTileClusterItemDefinition["disabledState"];
+	icon: {
+		icon: typeof LuBriefcaseBusiness;
+		title: "Item" | "Menu" | "Option" | "Sound";
+	};
+	id: string;
+	label: string;
+}>;
+
+const baseSystemMenuItems = [
+	{
+		disabledState: "not-implemented",
+		icon: { icon: LuBriefcaseBusiness, title: "Item" },
+		id: "system-item",
+		label: "Item",
+	},
+	{
+		disabledState: undefined,
+		icon: { icon: LuVolume2, title: "Sound" },
+		id: "system-sound",
+		label: "Sound",
+	},
+	{
+		disabledState: "not-implemented",
+		icon: { icon: LuSettings2, title: "Option" },
+		id: "system-option",
+		label: "Option",
+	},
+	{
+		disabledState: "not-implemented",
+		icon: { icon: LuMenu, title: "Menu" },
+		id: "system-menu",
+		label: "Menu",
+	},
+] as const satisfies readonly [
+	SystemMenuBaseItem,
+	SystemMenuBaseItem,
+	SystemMenuBaseItem,
+	SystemMenuBaseItem,
+];
+
+function toClusterItem(
+	item: (typeof baseSystemMenuItems)[number],
+): LayoutTileClusterItemDefinition {
+	return {
+		disabledState: item.disabledState,
+		icon: item.icon.icon,
+		title: item.icon.title,
+	};
 }
 
-const systemMenuIcons = [
-	{ icon: LuBriefcaseBusiness, title: "Item" },
-	{ icon: LuVolume2, title: "Sound" },
-	{ icon: LuSettings2, title: "Option" },
-	{ icon: LuMenu, title: "Menu" },
-] as const satisfies GradientIconClusterItems;
+function toClusterItems(
+	items: typeof baseSystemMenuItems,
+): readonly [
+	LayoutTileClusterItemDefinition,
+	LayoutTileClusterItemDefinition,
+	LayoutTileClusterItemDefinition,
+	LayoutTileClusterItemDefinition,
+] {
+	return [
+		toClusterItem(items[0]),
+		toClusterItem(items[1]),
+		toClusterItem(items[2]),
+		toClusterItem(items[3]),
+	];
+}
+
+function toSubmenuItem(
+	item: (typeof baseSystemMenuItems)[number],
+	onSoundOpen: () => void,
+): LayoutTileSubmenuItemDefinition {
+	return {
+		disabledState: item.disabledState,
+		icon: item.icon,
+		id: item.id,
+		label: item.label,
+		onClick:
+			item.id === "system-sound"
+				? () => {
+						onSoundOpen();
+					}
+				: undefined,
+	};
+}
 
 export const systemTileIllustration = {
-	items: systemMenuIcons,
+	items: toClusterItems(baseSystemMenuItems),
 	kind: "cluster",
 } as const satisfies NonNullable<HomeScreenMenuItemInput["illustration"]>;
 
@@ -30,21 +108,9 @@ interface SystemSubmenuDefinitionOptions {
 
 export function systemSubmenuDefinition({
 	onSoundOpen,
-}: SystemSubmenuDefinitionOptions): SystemSubmenuDefinition {
+}: SystemSubmenuDefinitionOptions): LayoutTileSubmenuDefinition {
 	return {
-		items: [
-			{ icon: systemMenuIcons[0], id: "system-item", label: "Item" },
-			{
-				icon: systemMenuIcons[1],
-				id: "system-sound",
-				label: "Sound",
-				onClick: () => {
-					onSoundOpen();
-				},
-			},
-			{ icon: systemMenuIcons[2], id: "system-option", label: "Option" },
-			{ icon: systemMenuIcons[3], id: "system-menu", label: "Menu" },
-		],
+		items: baseSystemMenuItems.map((item) => toSubmenuItem(item, onSoundOpen)),
 		title: "System",
 	};
 }
