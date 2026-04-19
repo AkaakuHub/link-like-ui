@@ -77,7 +77,7 @@ export function HomeLayoutSheet({
 						) : null}
 					</LayoutImageBanner>
 				))}
-				<LayoutGrid className="pt-2">
+				<LayoutGrid>
 					{menuTiles.map((tile) => (
 						<LayoutQuickTile
 							key={tile.id}

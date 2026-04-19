@@ -32,7 +32,7 @@ export function LayoutSheet({
 	return (
 		<LayoutPanelBase
 			className={cn(
-				"absolute bottom-[calc(var(--ll-home-dock-height)+var(--ll-home-sheet-gap))] left-1/2 z-20 max-h-[calc(100dvh-var(--ll-home-sheet-top-safe)-var(--ll-home-dock-height)-var(--ll-home-sheet-gap))] w-[calc(100%-4rem)] max-w-100 overflow-y-auto rounded-[1.45rem] bg-ll-white/18 p-4 shadow-[0_0_12px_3px_color-mix(in_srgb,var(--color-ll-gray)_12%,transparent)] backdrop-blur-3xl transition-[opacity,transform] duration-200 ease-out",
+				"absolute bottom-[calc(var(--ll-home-dock-height)+var(--ll-home-sheet-gap))] left-1/2 z-20 max-h-[calc(100dvh-var(--ll-home-sheet-top-safe)-var(--ll-home-dock-height)-var(--ll-home-sheet-gap))] w-[calc(100%-4rem)] max-w-100 overflow-y-auto rounded-[1.45rem] bg-ll-white/18 p-4 shadow-[0_0_12px_3px_color-mix(in_srgb,var(--color-ll-gray)_12%,transparent)] backdrop-blur-3xl transition-[opacity,transform] duration-200 ease-out [--ll-home-tile-gap:clamp(0.54rem,2.15vw,1.5rem)] [--ll-home-tile-icon-size:clamp(1.9rem,6.9vw,2.4rem)] [--ll-home-tile-label-line-height:1.18] [--ll-home-tile-stack-gap:clamp(0.01rem,0.2vw,0.08rem)] max-[360px]:[--ll-home-tile-gap:0.42rem] max-[360px]:[--ll-home-tile-icon-size:1.66rem] max-[360px]:[--ll-home-tile-stack-gap:0rem]",
 				className,
 			)}
 			{...props}
@@ -115,7 +115,10 @@ export function LayoutGrid({
 }: HTMLAttributes<HTMLDivElement>) {
 	return (
 		<LayoutGridBase
-			className={cn("grid grid-cols-4 gap-6", className)}
+			className={cn(
+				"grid grid-cols-4 gap-(--ll-home-tile-gap)",
+				className,
+			)}
 			{...props}
 		/>
 	);
