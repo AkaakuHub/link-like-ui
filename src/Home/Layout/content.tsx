@@ -279,18 +279,21 @@ function HomeLayout({
 					<SystemModalContent
 						aria-describedby={undefined}
 						bodyClassName="ll-glass-surface"
-						className="ll-home-submenu-shell"
+						className="[--ll-home-tile-gap:clamp(0.54rem,2.15vw,1.5rem)] [--ll-submenu-padding:2rem] [--ll-submenu-tile-size:4.35rem] w-[calc((var(--ll-submenu-tile-size)*2)+var(--ll-home-tile-gap)+(var(--ll-submenu-padding)*2))] max-w-none"
 						width="sm"
 					>
 						<SystemModalBody padding="none">
 							<SystemModalTitle className="sr-only">
 								{activeSubmenuTile.submenu.title}
 							</SystemModalTitle>
-							<LayoutGrid columns={2} className="ll-home-submenu-grid">
+							<LayoutGrid
+								columns={2}
+								className="grid-cols-[repeat(2,var(--ll-submenu-tile-size))] w-fit p-(--ll-submenu-padding)"
+							>
 								{activeSubmenuTile.submenu.items.map((item) => (
 									<LayoutQuickTile
 										key={item.id}
-										className="ll-home-submenu-tile"
+										className="h-(--ll-submenu-tile-size) w-(--ll-submenu-tile-size)"
 										illustration={{
 											icon: item.icon,
 											kind: "single",

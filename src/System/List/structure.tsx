@@ -7,6 +7,8 @@ import { tv } from "tailwind-variants";
 import { cn } from "../../utils";
 import { ListCardBase, ListItemsBase, ListRootBase } from "./primitives";
 
+const listWhiteCardClassName = "rounded-[0.6rem] bg-ll-white p-3";
+
 const listLabelVariants = tv({
 	base: "inline-flex min-w-16 items-center justify-center rounded-full px-3 py-0.5 text-[0.72rem] leading-none font-bold",
 	variants: {
@@ -45,7 +47,8 @@ export function ListCard({
 	return (
 		<ListCardBase
 			className={cn(
-				"rounded-[0.6rem] bg-ll-white p-3 shadow-[0_0_6px_color-mix(in_srgb,var(--color-ll-gray)_20%,transparent)]",
+				listWhiteCardClassName,
+				"shadow-[0_0_6px_color-mix(in_srgb,var(--color-ll-gray)_20%,transparent)]",
 				className,
 			)}
 			{...props}
@@ -132,7 +135,8 @@ export function ListDetailBody({
 	return (
 		<div
 			className={cn(
-				"space-y-3 rounded-[0.6rem] bg-ll-white p-3 text-[0.86rem] leading-normal text-ll-gray",
+				listWhiteCardClassName,
+				"space-y-3 text-[0.86rem] leading-normal text-ll-gray",
 				className,
 			)}
 			{...props}

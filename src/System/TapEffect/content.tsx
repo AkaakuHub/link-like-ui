@@ -24,12 +24,6 @@ const tapEffectAnimationClassMap = {
 		"animate-[ll-tap-effect_var(--ll-tap-effect-duration)_ease-out_forwards]",
 } as const;
 
-const tapEffectOuterRingClassName =
-	"border-8 border-ll-white/18 blur-[6px] mix-blend-screen shadow-[0_0_10px_4px_color-mix(in_srgb,var(--color-ll-true-white)_24%,transparent),0_0_20px_8px_color-mix(in_srgb,var(--color-ll-true-white)_12%,transparent)]";
-
-const tapEffectInnerRingClassName =
-	"border-[4.5px] border-ll-white/92 bg-[radial-gradient(circle,color-mix(in_srgb,var(--color-ll-true-white)_12%,transparent)_0%,color-mix(in_srgb,var(--color-ll-true-white)_6%,transparent)_46%,transparent_70%)] mix-blend-screen shadow-[inset_0_0_8px_color-mix(in_srgb,var(--color-ll-true-white)_20%,transparent),0_0_8px_2px_color-mix(in_srgb,var(--color-ll-true-white)_38%,transparent),0_0_16px_6px_color-mix(in_srgb,var(--color-ll-true-white)_16%,transparent)]";
-
 function isSamePointerPosition(
 	left: PointerPosition | null,
 	right: PointerPosition | null,
@@ -239,14 +233,14 @@ export function TapEffect({
 						<TapEffectRing
 							className={cn(
 								tapEffectAnimationClassMap[effect.kind],
-								tapEffectOuterRingClassName,
+								"border-8 border-ll-white/18 blur-[6px] mix-blend-screen shadow-[0_0_10px_4px_color-mix(in_srgb,var(--color-ll-true-white)_24%,transparent),0_0_20px_8px_color-mix(in_srgb,var(--color-ll-true-white)_12%,transparent)]",
 							)}
 							size={effect.size}
 						/>
 						<TapEffectRing
 							className={cn(
 								tapEffectAnimationClassMap[effect.kind],
-								tapEffectInnerRingClassName,
+								"border-[4.5px] border-ll-white/92 bg-[radial-gradient(circle,color-mix(in_srgb,var(--color-ll-true-white)_12%,transparent)_0%,color-mix(in_srgb,var(--color-ll-true-white)_6%,transparent)_46%,transparent_70%)] mix-blend-screen shadow-[inset_0_0_8px_color-mix(in_srgb,var(--color-ll-true-white)_20%,transparent),0_0_8px_2px_color-mix(in_srgb,var(--color-ll-true-white)_38%,transparent),0_0_16px_6px_color-mix(in_srgb,var(--color-ll-true-white)_16%,transparent)]",
 							)}
 							size={effect.size}
 						/>

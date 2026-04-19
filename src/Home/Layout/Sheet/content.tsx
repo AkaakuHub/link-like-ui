@@ -104,7 +104,7 @@ export function HomeLayoutSheet({
 							{...(tile.illustration?.kind === "cluster"
 								? {
 										className:
-											"ll-glass-surface ll-shadow-float-soft border-ll-white/48 p-[0.16rem]",
+											"ll-glass-surface border-ll-white/48 p-[0.16rem] shadow-[0_0_12px_3px_color-mix(in_srgb,var(--color-ll-gray)_10%,transparent)]",
 										clusterClassName:
 											"aspect-square h-full w-full place-self-center gap-[5%] p-[6%]",
 										clusterIconClassName: "h-[76%] w-[76%]",

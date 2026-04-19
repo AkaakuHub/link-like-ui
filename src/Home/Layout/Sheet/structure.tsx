@@ -90,7 +90,7 @@ export function LayoutImageBanner({
 	return (
 		<LayoutButtonBase
 			className={cn(
-				"relative block aspect-4/1 w-full cursor-pointer overflow-visible rounded-2xl bg-ll-white/24 shadow-[0_0_8px_6px_color-mix(in_srgb,var(--color-ll-gray)_10%,transparent)] transition-[filter,transform,background-color,color,border-color] duration-150 ease-out hover:brightness-80 disabled:cursor-not-allowed disabled:hover:brightness-100 focus-visible:outline-3 focus-visible:outline-ll-label",
+				"ll-interactive-filter relative block aspect-4/1 w-full cursor-pointer overflow-visible rounded-2xl bg-ll-white/24 shadow-[0_0_8px_6px_color-mix(in_srgb,var(--color-ll-gray)_10%,transparent)] focus-visible:outline-3 focus-visible:outline-ll-label",
 				className,
 			)}
 			{...props}
@@ -123,7 +123,7 @@ export function LayoutGrid({
 	return (
 		<LayoutGridBase
 			className={cn(
-				"ll-home-grid-vars grid gap-(--ll-home-tile-gap)",
+				"grid gap-(--ll-home-tile-gap) [--ll-home-tile-gap:clamp(0.54rem,2.15vw,1.5rem)] [--ll-home-tile-icon-size:clamp(1.9rem,6.9vw,2.4rem)] [--ll-home-tile-label-line-height:1.18] [--ll-home-tile-stack-gap:clamp(0.01rem,0.2vw,0.08rem)] max-[360px]:[--ll-home-tile-gap:0.42rem] max-[360px]:[--ll-home-tile-icon-size:1.66rem] max-[360px]:[--ll-home-tile-stack-gap:0rem]",
 				layoutGridColumnClassMap[columns],
 				className,
 			)}
@@ -147,7 +147,7 @@ export function LayoutTile({
 	return (
 		<LayoutButtonBase
 			className={cn(
-				"relative cursor-pointer overflow-visible rounded-[0.92rem] border border-ll-white/62 bg-ll-white/92 text-left shadow-[0_6px_14px_color-mix(in_srgb,var(--color-ll-gray)_13%,transparent)] transition-[filter,transform,background-color,color,border-color] duration-150 ease-out hover:brightness-80 disabled:cursor-not-allowed disabled:hover:brightness-100 focus-visible:outline-3 focus-visible:outline-ll-label",
+				"ll-interactive-filter relative cursor-pointer overflow-visible rounded-[0.92rem] border border-ll-white/62 bg-ll-white/92 text-left shadow-[0_6px_14px_color-mix(in_srgb,var(--color-ll-gray)_13%,transparent)] focus-visible:outline-3 focus-visible:outline-ll-label",
 				layoutTileColumnClassMap[colSpan],
 				layoutTileRowClassMap[rowSpan],
 				className,
