@@ -150,6 +150,13 @@ export const noticeRowsByTab: Record<
 	],
 };
 
+export function countNoticeItems() {
+	return Object.values(noticeRowsByTab).reduce(
+		(totalCount, tabItems) => totalCount + tabItems.length,
+		0,
+	);
+}
+
 export function isNoticeTabValue(value: string): value is NoticeTabValue {
 	return noticeTabValues.some((tabValue) => tabValue === value);
 }

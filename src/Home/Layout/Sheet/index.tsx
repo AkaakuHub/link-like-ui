@@ -1,3 +1,4 @@
+export { LayoutTileBadge } from "../Badge";
 export {
 	HomeLayoutSheet,
 	type LayoutBannerDefinition,
@@ -13,7 +14,6 @@ export {
 	LayoutSheet,
 	LayoutSheetStack,
 	LayoutTile,
-	LayoutTileBadge,
 	type LayoutTileColumnSpan,
 	type LayoutTileProps,
 	type LayoutTileRowSpan,

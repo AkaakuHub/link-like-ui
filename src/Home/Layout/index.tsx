@@ -1,4 +1,8 @@
 export {
+	HomeScreen,
+	type HomeScreenBannerInput,
+	type HomeScreenMenuItemInput,
+	type HomeScreenProps,
 	Layout,
 	type LayoutAction,
 	type LayoutBannerDefinition,

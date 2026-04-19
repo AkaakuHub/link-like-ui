@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { cn } from "../../../utils";
-import { LayoutTile, LayoutTileBadge, type LayoutTileProps } from "./structure";
+import { LayoutTileBadge } from "../Badge";
+import { LayoutTile, type LayoutTileProps } from "./structure";
 
 export interface LayoutQuickTileProps
 	extends Omit<LayoutTileProps, "children"> {

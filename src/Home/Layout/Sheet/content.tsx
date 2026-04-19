@@ -3,6 +3,7 @@ import {
 	homeMenuEnterAnimationClass,
 	homeMenuExitAnimationClass,
 } from "../animation";
+import { LayoutTileBadge } from "../Badge";
 import { LayoutQuickTile } from "./quickTile";
 import {
 	LayoutGrid,
@@ -10,7 +11,6 @@ import {
 	LayoutImageBannerMedia,
 	LayoutSheet,
 	LayoutSheetStack,
-	LayoutTileBadge,
 	type LayoutTileColumnSpan,
 	type LayoutTileRowSpan,
 } from "./structure";

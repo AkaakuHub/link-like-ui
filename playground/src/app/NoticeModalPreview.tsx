@@ -1,6 +1,7 @@
 import {
 	noticeTabValues,
 	type NoticeTabValue,
+	selectCurrentNoticeView,
 	useNoticeModalStore,
 } from "../stores/useNoticeModalStore";
 import { Button } from "../../../src/System/Button";
@@ -47,7 +48,7 @@ import {
 
 export function NoticeModalPreview() {
 	const activeNoticeTab = useNoticeModalStore((state) => state.activeTab);
-	const noticeHistory = useNoticeModalStore((state) => state.history);
+	const currentNoticeView = useNoticeModalStore(selectCurrentNoticeView);
 	const isListModalOpen = useNoticeModalStore((state) => state.isOpen);
 	const setNoticeTab = useNoticeModalStore((state) => state.setTab);
 	const openNoticeDetail = useNoticeModalStore((state) => state.openDetail);
@@ -64,7 +65,6 @@ export function NoticeModalPreview() {
 		setListModalOpen(nextOpen);
 	}
 
-	const currentNoticeView = noticeHistory[noticeHistory.length - 1];
 	const currentNoticeDetailItem =
 		currentNoticeView?.type === "detail"
 			? findNoticeItemById(currentNoticeView.itemId)

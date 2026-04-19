@@ -1,14 +1,15 @@
-import { Layout } from "../../../src/Home/Layout";
-import { homeMenuTiles, homeTopBanners } from "./homeData";
+import { HomeScreen } from "../../../src/Home/Layout";
+import { homeMenuItems, homeTopBanners } from "./homeData";
+import { countNoticeItems } from "./noticeData";
 
 export function HomePreview() {
 	return (
 		<main className="h-dvh overflow-hidden bg-ll-white">
-			<Layout
+			<HomeScreen
+				banners={homeTopBanners}
 				defaultMenuOpen
-				menuTiles={homeMenuTiles}
-				topBanners={homeTopBanners}
-				variant="home"
+				menuItems={homeMenuItems}
+				menuNotificationCount={countNoticeItems()}
 			/>
 		</main>
 	);

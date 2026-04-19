@@ -46,6 +46,7 @@ export interface LayoutProps {
 	centerContent?: ReactNode;
 	dateLabel?: string;
 	defaultMenuOpen?: boolean;
+	hasMenuNotification?: boolean;
 	homeAction?: LayoutAction;
 	menuTiles: LayoutTileDefinition[];
 	topBanners: LayoutBannerDefinition[];
@@ -55,9 +56,67 @@ export interface LayoutProps {
 	variant?: LayoutVariant;
 }
 
+export interface HomeScreenBannerInput {
+	alt: string;
+	badge?: string;
+	id?: string;
+	onClick?: ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
+	src: string;
+}
+
+export interface HomeScreenMenuItemInput {
+	badge?: string;
+	colSpan?: LayoutTileDefinition["colSpan"];
+	icon?: ReactNode;
+	id?: string;
+	illustration?: ReactNode;
+	label: string;
+	onClick?: ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
+	rowSpan?: LayoutTileDefinition["rowSpan"];
+}
+
+export interface HomeScreenProps
+	extends Omit<
+		LayoutProps,
+		"hasMenuNotification" | "menuTiles" | "topBanners" | "variant"
+	> {
+	banners: HomeScreenBannerInput[];
+	menuItems: HomeScreenMenuItemInput[];
+	menuNotificationCount?: number;
+}
+
+function resolveBannerId(banner: HomeScreenBannerInput, index: number) {
+	return banner.id ?? `banner-${index + 1}`;
+}
+
+function resolveMenuItemId(menuItem: HomeScreenMenuItemInput, index: number) {
+	return menuItem.id ?? `tile-${index + 1}`;
+}
+
+function toLayoutBannerDefinitions(
+	banners: HomeScreenBannerInput[],
+): LayoutBannerDefinition[] {
+	return banners.map((banner, index) => ({
+		...banner,
+		id: resolveBannerId(banner, index),
+	}));
+}
+
+function toLayoutTileDefinitions(
+	menuItems: HomeScreenMenuItemInput[],
+): LayoutTileDefinition[] {
+	return menuItems.map((menuItem, index) => ({
+		...menuItem,
+		colSpan: menuItem.colSpan ?? 1,
+		id: resolveMenuItemId(menuItem, index),
+		rowSpan: menuItem.rowSpan ?? 1,
+	}));
+}
+
 function HomeLayout({
 	centerContent,
 	defaultMenuOpen = false,
+	hasMenuNotification = false,
 	homeAction = { ariaLabel: "Home", label: "Home" },
 	menuTiles,
 	rightContent,
@@ -148,6 +207,7 @@ function HomeLayout({
 			/>
 			<HomeLayoutDock
 				homeAction={homeAction}
+				hasMenuNotification={hasMenuNotification}
 				isMenuOpen={isMenuOpen}
 				onToggleMenu={() => {
 					setIsMenuOpen((currentValue) => !currentValue);
@@ -163,4 +223,21 @@ export function Layout(props: LayoutProps) {
 	}
 
 	return null;
+}
+
+export function HomeScreen({
+	banners,
+	menuItems,
+	menuNotificationCount = 0,
+	...props
+}: HomeScreenProps) {
+	return (
+		<Layout
+			{...props}
+			hasMenuNotification={menuNotificationCount > 0}
+			menuTiles={toLayoutTileDefinitions(menuItems)}
+			topBanners={toLayoutBannerDefinitions(banners)}
+			variant="home"
+		/>
+	);
 }

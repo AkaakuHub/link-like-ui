@@ -1,5 +1,7 @@
 import type { ButtonHTMLAttributes } from "react";
 import { BackIcon, HomeIcon } from "../../../assets/icons";
+import { cn } from "../../../utils";
+import { LayoutTileBadge } from "../Badge";
 import {
 	LayoutDock,
 	LayoutDockButton,
@@ -15,6 +17,7 @@ interface HomeLayoutDockProps {
 		label: string;
 		onClick?: ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
 	};
+	hasMenuNotification: boolean;
 	isMenuOpen: boolean;
 	onToggleMenu: () => void;
 }
@@ -42,6 +45,7 @@ function MenuGlyph({ isMenuOpen }: { isMenuOpen: boolean }) {
 
 export function HomeLayoutDock({
 	homeAction,
+	hasMenuNotification,
 	isMenuOpen,
 	onToggleMenu,
 }: HomeLayoutDockProps) {
@@ -57,6 +61,18 @@ export function HomeLayoutDock({
 					aria-label={isMenuOpen ? "Close menu" : "Open menu"}
 					onClick={onToggleMenu}
 				>
+					{hasMenuNotification ? (
+						<LayoutTileBadge
+							aria-label="通知あり"
+							className={cn(
+								"pointer-events-none absolute top-[0.62rem] right-6 h-4.5 w-4.5 transition-opacity duration-100 ease-out",
+								isMenuOpen ? "opacity-0" : "opacity-100",
+							)}
+							variant="circle"
+						>
+							{""}
+						</LayoutTileBadge>
+					) : null}
 					<MenuGlyph isMenuOpen={isMenuOpen} />
 					<LayoutDockDivider />
 				</LayoutDockButton>
