@@ -86,6 +86,31 @@
 	}
 }
 
+@keyframes ll-tap-effect {
+	0% {
+		scale: 1;
+		opacity: 1;
+	}
+	20% {
+		opacity: 1;
+	}
+	100% {
+		scale: 0;
+		opacity: 0;
+	}
+}
+
+@keyframes ll-tap-effect-burst {
+	0% {
+		scale: 1;
+		opacity: 1;
+	}
+	100% {
+		scale: 2.2;
+		opacity: 0;
+	}
+}
+
 @keyframes llHomeMenuEnter {
 	from {
 		opacity: 0;
