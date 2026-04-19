@@ -10,12 +10,6 @@ import type {
 	GradientIconDefinition,
 } from "../../System/Icon";
 import {
-	SystemModal,
-	SystemModalBody,
-	SystemModalContent,
-	SystemModalTitle,
-} from "../../System/SystemModal";
-import {
 	homeMenuCloseAnimationDurationCssVar,
 	homeMenuCloseAnimationDurationMs,
 	homeMenuOpenAnimationDurationCssVar,
@@ -34,6 +28,12 @@ import {
 } from "./Sheet/content";
 import { LayoutQuickTile } from "./Sheet/quickTile";
 import { LayoutGrid } from "./Sheet/structure";
+import {
+	AppShellSubmenuModal,
+	AppShellSubmenuModalBody,
+	AppShellSubmenuModalContent,
+	AppShellSubmenuModalTitle,
+} from "./SubmenuModal";
 import {
 	LayoutBackground,
 	LayoutRoot,
@@ -275,22 +275,20 @@ function HomeLayout({
 				topBanners={topBanners}
 			/>
 			{activeSubmenuTile?.submenu ? (
-				<SystemModal
+				<AppShellSubmenuModal
 					open={isSubmenuModalOpen}
-					onOpenChange={(nextOpen) => {
+					onOpenChange={(nextOpen: boolean) => {
 						setSubmenuModalOpen(nextOpen);
 					}}
 				>
-					<SystemModalContent
+					<AppShellSubmenuModalContent
 						aria-describedby={undefined}
-						bodyClassName="ll-glass-surface"
-						className="[--ll-home-tile-gap:clamp(0.54rem,2.15vw,1.5rem)] [--ll-submenu-padding:2rem] [--ll-submenu-tile-size:4.35rem] w-[calc((var(--ll-submenu-tile-size)*2)+var(--ll-home-tile-gap)+(var(--ll-submenu-padding)*2))] max-w-none"
-						width="sm"
+						className="ll-glass-surface [--ll-home-tile-gap:clamp(0.54rem,2.15vw,1.5rem)] [--ll-submenu-padding:2rem] [--ll-submenu-tile-size:4.35rem] w-[calc((var(--ll-submenu-tile-size)*2)+var(--ll-home-tile-gap)+(var(--ll-submenu-padding)*2))]"
 					>
-						<SystemModalBody padding="none">
-							<SystemModalTitle className="sr-only">
+						<AppShellSubmenuModalBody>
+							<AppShellSubmenuModalTitle className="sr-only">
 								{activeSubmenuTile.submenu.title}
-							</SystemModalTitle>
+							</AppShellSubmenuModalTitle>
 							<LayoutGrid
 								columns={2}
 								className="grid-cols-[repeat(2,var(--ll-submenu-tile-size))] w-fit p-(--ll-submenu-padding)"
@@ -308,9 +306,9 @@ function HomeLayout({
 									/>
 								))}
 							</LayoutGrid>
-						</SystemModalBody>
-					</SystemModalContent>
-				</SystemModal>
+						</AppShellSubmenuModalBody>
+					</AppShellSubmenuModalContent>
+				</AppShellSubmenuModal>
 			) : null}
 			{overlayContent}
 			<HomeLayoutDock
