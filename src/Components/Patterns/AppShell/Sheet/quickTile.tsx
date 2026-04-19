@@ -1,3 +1,4 @@
+import { LockIconIcon } from "../../../../assets/icons";
 import { cn } from "../../../../utils";
 import { GradientIcon, GradientIconCluster } from "../../../System/Icon";
 import { LayoutTileBadge } from "../Badge";
@@ -120,6 +121,11 @@ export function LayoutQuickTile({
 					</div>
 				)}
 			</div>
+			{disabledState === "not-available" ? (
+				<div className="pointer-events-none absolute inset-0 z-10 grid place-items-center">
+					<LockIconIcon className="h-6 w-6" />
+				</div>
+			) : null}
 			{disabledState !== "none" ? (
 				<div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-ll-gray/60" />
 			) : null}
