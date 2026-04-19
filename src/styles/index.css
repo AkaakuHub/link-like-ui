@@ -5,6 +5,14 @@
 
 @font-face {
 	font-family: "Poppins";
+	src: url("../assets/fonts/Poppins-ExtraLight.ttf") format("truetype");
+	font-style: normal;
+	font-weight: 200;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Poppins";
 	src: url("../assets/fonts/Poppins-Regular.ttf") format("truetype");
 	font-style: normal;
 	font-weight: 400;
@@ -36,6 +44,89 @@
 	--color-ll-prism-4: #93a5fb;
 	--color-ll-prism-5: #9da3fb;
 	--color-ll-prism-6: #a3a7fb;
+	--color-ll-badge-orange: #fc9060;
+	--color-ll-badge-red: #fa575e;
+	--color-ll-true-white: #ffffff;
+}
+
+@layer utilities {
+	.ll-font-ja {
+		font-family: "Noto Sans JP", "Segoe UI", sans-serif;
+	}
+
+	.ll-bg-system-gradient {
+		background-image: linear-gradient(
+			to right,
+			var(--color-ll-system-left),
+			var(--color-ll-system-right)
+		);
+	}
+
+	.ll-glass-surface {
+		background-color: color-mix(
+			in srgb,
+			var(--color-ll-white) 36%,
+			transparent
+		);
+		backdrop-filter: blur(var(--blur-3xl));
+	}
+
+	.ll-shadow-float {
+		box-shadow: 0 0 12px 3px
+			color-mix(in srgb, var(--color-ll-gray) 12%, transparent);
+	}
+
+	.ll-shadow-icon-tile {
+		box-shadow: 0 4px 12px
+			color-mix(in srgb, var(--color-ll-gray) 10%, transparent);
+	}
+
+	.ll-shadow-control {
+		box-shadow: 0 0 8px
+			color-mix(in srgb, var(--color-ll-gray) 35%, transparent);
+	}
+
+	.ll-surface-muted-panel {
+		border-radius: 0.65rem;
+		background-color: var(--color-ll-modal-content-gray);
+		padding: calc(var(--spacing) * 3);
+	}
+
+	.ll-interactive-filter {
+		transition-property:
+			filter, transform, background-color, color, border-color;
+		transition-duration: 150ms;
+		transition-timing-function: ease-out;
+	}
+
+	.ll-interactive-filter:hover {
+		filter: brightness(0.8);
+	}
+
+	.ll-interactive-filter:disabled {
+		cursor: not-allowed;
+	}
+
+	.ll-interactive-filter:disabled:hover {
+		filter: brightness(1);
+	}
+
+	.ll-stack-field {
+		row-gap: calc(var(--spacing) * 2.5);
+		display: grid;
+	}
+
+	.ll-stack-tight {
+		row-gap: calc(var(--spacing) * 2);
+		display: grid;
+	}
+
+	.ll-split-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		column-gap: calc(var(--spacing) * 3);
+	}
 }
 
 @keyframes ll-system-modal-open {
@@ -72,6 +163,71 @@
 	}
 	100% {
 		opacity: 0.2;
+	}
+}
+
+@keyframes ll-tap-effect {
+	0% {
+		scale: 1;
+		opacity: 1;
+	}
+	20% {
+		opacity: 1;
+	}
+	100% {
+		scale: 0;
+		opacity: 0;
+	}
+}
+
+@keyframes ll-tap-effect-burst {
+	0% {
+		scale: 1;
+		opacity: 1;
+	}
+	100% {
+		scale: 2.2;
+		opacity: 0;
+	}
+}
+
+@keyframes llHomeMenuEnter {
+	from {
+		opacity: 0;
+		transform: translateX(-50%) translateY(100dvh) scale(0.8);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(-50%) translateY(0) scale(1);
+	}
+}
+
+@keyframes llHomeMenuExit {
+	from {
+		opacity: 1;
+		transform: translateX(-50%) translateY(0) scale(1);
+	}
+	to {
+		opacity: 0;
+		transform: translateX(-50%) translateY(100dvh) scale(0.8);
+	}
+}
+
+@keyframes llHomeMenuScrimIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes llHomeMenuScrimOut {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
 	}
 }
 

@@ -1,8 +1,11 @@
 pre-commit:
   parallel: false
   commands:
+    tailwind-canonical:
+      run: pnpm run fix:tailwind-canonical
+      stage_fixed: true
     biome:
-      run: pnpm run check
+      run: pnpm run biome:check
       stage_fixed: true
     knip:
       run: pnpm run knip

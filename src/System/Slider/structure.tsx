@@ -29,11 +29,11 @@ export const Slider = forwardRef<
 			{...props}
 		>
 			<SliderTrackPrimitive className="relative h-[0.34rem] grow overflow-hidden rounded-full bg-ll-slider-bg">
-				<SliderRangePrimitive className="absolute h-full bg-linear-to-r from-ll-system-left to-ll-system-right" />
+				<SliderRangePrimitive className="ll-bg-system-gradient absolute h-full" />
 			</SliderTrackPrimitive>
 			<SliderThumbPrimitive
 				className={cn(
-					"block h-[1.35rem] w-[1.35rem] rounded-full border-none bg-ll-white shadow-[0_0_8px_color-mix(in_srgb,var(--color-ll-gray)_35%,transparent)] transition-colors hover:cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ll-label",
+					"ll-shadow-control block h-[1.35rem] w-[1.35rem] rounded-full border-none bg-ll-white transition-colors hover:cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ll-label",
 					thumbClassName,
 				)}
 			/>

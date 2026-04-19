@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 88" fill="none">
+  <defs>
+    <linearGradient id="backGradient" x1="12" y1="44" x2="108" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#65defc"/>
+      <stop offset="1" stop-color="#938aff"/>
+    </linearGradient>
+  </defs>
+
+  <path
+    d="M34 23H74C88.9117 23 101 35.0883 101 50C101 64.9117 88.9117 77 74 77H18"
+    stroke="url(#backGradient)"
+    stroke-width="7"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <path
+    d="M12 44L34 28V60Z"
+    fill="url(#backGradient)"
+    transform="translate(0, -21)"
+  />
+</svg>

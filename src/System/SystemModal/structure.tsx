@@ -32,16 +32,16 @@ const bodyToneClassMap: Record<SystemModalBodyTone, string> = {
 };
 
 const systemModalOverlayClassName = tv({
-	base: "fixed inset-0 bg-black/67 transition-opacity duration-[180ms] ease-out data-[state=closed]:duration-[160ms] data-[state=closed]:ease-in data-[state=closed]:opacity-0 data-[state=open]:opacity-100",
+	base: "fixed inset-0 bg-black/67 transition-opacity duration-180 ease-out data-[state=closed]:duration-160 data-[state=closed]:ease-in data-[state=closed]:opacity-0 data-[state=open]:opacity-100",
 });
 
 const systemModalContentClassName = tv({
-	base: "fixed top-1/2 left-1/2 max-h-[84dvh] w-[calc(100vw-1rem)] -translate-x-1/2 -translate-y-1/2 origin-center overflow-hidden rounded-[16px] border-none data-[state=open]:animate-[ll-system-modal-open_100ms_cubic-bezier(.93,.23,.71,.94)_both] data-[state=closed]:animate-[ll-system-modal-close_100ms_cubic-bezier(.93,.23,.71,.94)_both] focus-visible:outline-3 focus-visible:outline-ll-label",
+	base: "fixed top-1/2 left-1/2 max-h-[84dvh] w-[calc(100vw-1rem)] -translate-x-1/2 -translate-y-1/2 origin-center overflow-hidden rounded-[32px] border-none data-[state=open]:animate-[ll-system-modal-open_100ms_cubic-bezier(.93,.23,.71,.94)_both] data-[state=closed]:animate-[ll-system-modal-close_100ms_cubic-bezier(.93,.23,.71,.94)_both] focus-visible:outline-3 focus-visible:outline-ll-label",
 	variants: {
 		width: {
-			sm: "max-w-[21.75rem]",
+			sm: "max-w-87",
 			md: "max-w-[24rem]",
-			lg: "max-w-[26rem]",
+			lg: "max-w-104",
 		},
 	},
 	defaultVariants: {
@@ -98,7 +98,7 @@ export function SystemModalHeader({
 	return (
 		<div
 			className={cn(
-				"relative flex h-[3.15rem] items-center justify-center bg-linear-to-r from-ll-system-left to-ll-system-right px-4",
+				"ll-bg-system-gradient relative flex h-[3.15rem] items-center justify-center px-4",
 				className,
 			)}
 			{...props}
@@ -133,7 +133,7 @@ export function SystemModalBody({
 	return (
 		<SimpleBar
 			autoHide={false}
-			className='ll-system-modal-scrollbar font-["Noto_Sans_JP","Segoe_UI",sans-serif] text-[0.94rem] leading-[1.7] text-ll-gray'
+			className="ll-system-modal-scrollbar ll-font-ja text-[0.94rem] leading-[1.7] text-ll-gray"
 			style={{ maxHeight: "min(58dvh, 33rem)", ...style }}
 			{...props}
 		>
@@ -165,7 +165,7 @@ export const SystemModalTitle = forwardRef<
 		<SystemModalTitlePrimitive
 			ref={ref}
 			className={cn(
-				'relative z-[1] font-["Noto_Sans_JP","Segoe_UI",sans-serif] text-[1.32rem] leading-none tracking-[0.03em] text-ll-white',
+				"ll-font-ja relative z-1 text-[1.32rem] leading-none tracking-[0.03em] text-ll-white",
 				className,
 			)}
 			{...props}

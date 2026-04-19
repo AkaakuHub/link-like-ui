@@ -4,11 +4,20 @@ import {
 	forwardRef,
 	type HTMLAttributes,
 } from "react";
+import { tv } from "tailwind-variants";
 import { cn } from "../../utils";
 import { FormInputBase, FormSelectBase, FormTextareaBase } from "./primitives";
 
-const formControlBaseClassName =
-	'w-full rounded-[0.7rem] border border-ll-label bg-ll-white px-3 text-ll-gray outline-none font-["Noto_Sans_JP","Segoe_UI",sans-serif] placeholder:text-ll-disabled';
+const formControlVariants = tv({
+	base: "ll-font-ja w-full rounded-[0.7rem] border border-ll-label bg-ll-white px-3 text-ll-gray outline-none placeholder:text-ll-disabled",
+	variants: {
+		kind: {
+			input: "h-[2.9rem] leading-none",
+			textarea: "min-h-42 resize-none py-3",
+			select: "h-[2.9rem] appearance-none pr-10 leading-none",
+		},
+	},
+});
 
 export const FormInputPrimitive = forwardRef<
 	ElementRef<typeof FormInputBase>,
@@ -17,11 +26,7 @@ export const FormInputPrimitive = forwardRef<
 	return (
 		<FormInputBase
 			ref={ref}
-			className={cn(
-				formControlBaseClassName,
-				"h-[2.9rem] leading-none",
-				className,
-			)}
+			className={cn(formControlVariants({ kind: "input" }), className)}
 			{...props}
 		/>
 	);
@@ -36,11 +41,7 @@ export const FormTextareaPrimitive = forwardRef<
 	return (
 		<FormTextareaBase
 			ref={ref}
-			className={cn(
-				formControlBaseClassName,
-				"min-h-[10.5rem] py-3 resize-none",
-				className,
-			)}
+			className={cn(formControlVariants({ kind: "textarea" }), className)}
 			{...props}
 		/>
 	);
@@ -55,11 +56,7 @@ export const FormSelectPrimitive = forwardRef<
 	return (
 		<FormSelectBase
 			ref={ref}
-			className={cn(
-				formControlBaseClassName,
-				"h-[2.9rem] appearance-none pr-10 leading-none",
-				className,
-			)}
+			className={cn(formControlVariants({ kind: "select" }), className)}
 			{...props}
 		/>
 	);
@@ -91,19 +88,14 @@ export function FormField({
 	className,
 	...props
 }: HTMLAttributes<HTMLDivElement>) {
-	return <div className={cn("space-y-2.5", className)} {...props} />;
+	return <div className={cn("ll-stack-field", className)} {...props} />;
 }
 
 export function FormFieldHeader({
 	className,
 	...props
 }: HTMLAttributes<HTMLDivElement>) {
-	return (
-		<div
-			className={cn("flex items-center justify-between gap-3", className)}
-			{...props}
-		/>
-	);
+	return <div className={cn("ll-split-row", className)} {...props} />;
 }
 
 export function FormFieldMeta({
@@ -121,10 +113,7 @@ export function FormFieldLabelText({
 }: HTMLAttributes<HTMLSpanElement>) {
 	return (
 		<span
-			className={cn(
-				'font-["Noto_Sans_JP","Segoe_UI",sans-serif] font-bold text-ll-gray',
-				className,
-			)}
+			className={cn("ll-font-ja font-bold text-ll-gray", className)}
 			{...props}
 		/>
 	);
@@ -135,13 +124,7 @@ export function FormFieldRequiredText({
 	...props
 }: HTMLAttributes<HTMLSpanElement>) {
 	return (
-		<span
-			className={cn(
-				'font-["Noto_Sans_JP","Segoe_UI",sans-serif] text-ll-orange',
-				className,
-			)}
-			{...props}
-		/>
+		<span className={cn("ll-font-ja text-ll-orange", className)} {...props} />
 	);
 }
 
@@ -151,10 +134,7 @@ export function FormFieldErrorText({
 }: HTMLAttributes<HTMLSpanElement>) {
 	return (
 		<span
-			className={cn(
-				'font-["Noto_Sans_JP","Segoe_UI",sans-serif] text-right text-ll-red',
-				className,
-			)}
+			className={cn("ll-font-ja text-right text-ll-red", className)}
 			{...props}
 		/>
 	);

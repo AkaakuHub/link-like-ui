@@ -7,28 +7,54 @@ export type NoticeViewState =
 	| { tab: NoticeTabValue; type: "list" }
 	| { itemId: string; tab: NoticeTabValue; type: "detail" };
 
-const initialNoticeView: NoticeViewState = { tab: "notice-01", type: "list" };
-
-interface NoticeModalStore {
+export interface NoticeModalState {
 	activeTab: NoticeTabValue;
 	history: NoticeViewState[];
 	isOpen: boolean;
+}
+
+export function createInitialNoticeView(): NoticeViewState {
+	return { tab: "notice-01", type: "list" };
+}
+
+export function createInitialNoticeModalState(): NoticeModalState {
+	const initialNoticeView = createInitialNoticeView();
+
+	return {
+		activeTab: initialNoticeView.tab,
+		history: [initialNoticeView],
+		isOpen: false,
+	};
+}
+
+export function selectCurrentNoticeView(state: NoticeModalState): NoticeViewState {
+	return state.history[state.history.length - 1] ?? createInitialNoticeView();
+}
+
+interface NoticeModalActions {
 	back: () => void;
 	openDetail: (itemId: string) => void;
 	setModalOpen: (nextOpen: boolean) => void;
 	setTab: (tab: NoticeTabValue) => void;
 }
 
+type NoticeModalStore = NoticeModalState & NoticeModalActions;
+
 export const useNoticeModalStore = create<NoticeModalStore>((set) => ({
-	activeTab: initialNoticeView.tab,
-	history: [initialNoticeView],
-	isOpen: false,
+	...createInitialNoticeModalState(),
 	back: () => {
 		set((state) => {
 			if (state.history.length <= 1) {
 				return state;
 			}
-			return { history: state.history.slice(0, -1) };
+
+			const nextHistory = state.history.slice(0, -1);
+			const currentNoticeView = nextHistory[nextHistory.length - 1];
+
+			return {
+				activeTab: currentNoticeView?.tab ?? state.activeTab,
+				history: nextHistory,
+			};
 		});
 	},
 	openDetail: (itemId: string) => {
@@ -39,11 +65,7 @@ export const useNoticeModalStore = create<NoticeModalStore>((set) => ({
 	setModalOpen: (nextOpen: boolean) => {
 		set(() => {
 			if (!nextOpen) {
-				return {
-					activeTab: initialNoticeView.tab,
-					history: [initialNoticeView],
-					isOpen: false,
-				};
+				return createInitialNoticeModalState();
 			}
 			return { isOpen: true };
 		});

@@ -1,4 +1,5 @@
 import { existsSync, readdirSync } from "node:fs";
+import svgr from "@svgr/rollup";
 import { defineConfig } from "tsdown";
 
 function collectEntryFiles(): Record<string, string> {
@@ -32,4 +33,5 @@ export default defineConfig({
 	dts: true,
 	entry: collectEntryFiles(),
 	platform: "neutral",
+	plugins: [svgr()],
 });
