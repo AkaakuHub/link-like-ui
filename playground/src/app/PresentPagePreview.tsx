@@ -90,7 +90,7 @@ export function PresentPagePreview() {
 							{notes.map((note) => (
 								<ScreenBottomNoteLine
 									key={note.text}
-									isAccent={note.isAccent}
+									{...("isAccent" in note ? { isAccent: note.isAccent } : {})}
 								>
 									{note.text}
 								</ScreenBottomNoteLine>

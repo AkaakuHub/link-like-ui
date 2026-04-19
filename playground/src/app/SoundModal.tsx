@@ -68,7 +68,7 @@ export function SoundModal({
 	return (
 		<SystemModal open={open} onOpenChange={onOpenChange}>
 			<SystemModalContent
-				overlayClassName={hasOverlay ? undefined : "bg-transparent"}
+				{...(hasOverlay ? {} : { overlayClassName: "bg-transparent" })}
 				width="md"
 			>
 				<SystemModalHeader>
@@ -81,10 +81,10 @@ export function SoundModal({
 							updateToggle("master", pressed);
 						}}
 						onValueChange={(nextValue) => updateValue("master", nextValue)}
-						pressed={toggles.master ?? false}
+						pressed={toggles["master"] ?? false}
 						sliderTrackClassName="h-[0.68rem]"
 						toggleAriaLabel="Toggle Main"
-						value={values.master ?? 70}
+						value={values["master"] ?? 70}
 					/>
 					<TabRoot value={activeTab} onValueChange={handleTabChange}>
 						<TabList>

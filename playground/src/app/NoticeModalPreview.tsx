@@ -1,6 +1,4 @@
 import {
-	noticeTabValues,
-	type NoticeTabValue,
 	selectCurrentNoticeView,
 	useNoticeModalStore,
 } from "../stores/useNoticeModalStore";
