@@ -12,6 +12,7 @@ import {
 } from "./structure";
 
 interface HomeLayoutDockProps {
+	canGoBack: boolean;
 	homeAction: {
 		ariaLabel: string;
 		label: string;
@@ -19,6 +20,7 @@ interface HomeLayoutDockProps {
 	};
 	hasMenuNotification: boolean;
 	isMenuOpen: boolean;
+	onBack: () => void;
 	onToggleMenu: () => void;
 }
 
@@ -44,15 +46,21 @@ function MenuGlyph({ isMenuOpen }: { isMenuOpen: boolean }) {
 }
 
 export function HomeLayoutDock({
+	canGoBack,
 	homeAction,
 	hasMenuNotification,
 	isMenuOpen,
+	onBack,
 	onToggleMenu,
 }: HomeLayoutDockProps) {
 	return (
 		<LayoutDock>
 			<LayoutDockSurface>
-				<LayoutDockButton aria-label="Back">
+				<LayoutDockButton
+					aria-label="Back"
+					disabled={!canGoBack}
+					onClick={onBack}
+				>
 					<BackIcon className="h-10 w-10" />
 					<LayoutDockDivider />
 				</LayoutDockButton>

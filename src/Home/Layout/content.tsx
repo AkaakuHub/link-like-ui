@@ -23,9 +23,6 @@ import {
 	homeMenuScrimInAnimationClass,
 	homeMenuScrimOutAnimationClass,
 } from "./animation";
-
-const submenuModalAnimationDurationMs = 180;
-
 import { HomeLayoutDock } from "./Dock/content";
 import { HomeLayoutHeader } from "./Header/content";
 import { formatLocalClock } from "./Header/helpers";
@@ -43,6 +40,7 @@ import {
 	LayoutScenery,
 	LayoutScrim,
 } from "./structure";
+import { useHomeLayoutState } from "./useHomeLayoutState";
 
 export interface LayoutAction {
 	ariaLabel: string;
@@ -157,12 +155,18 @@ function HomeLayout({
 	rightContent,
 	topBanners,
 }: Omit<LayoutProps, "variant">) {
-	const [isMenuOpen, setIsMenuOpen] = useState<boolean>(defaultMenuOpen);
+	const {
+		activeSubmenuTileId,
+		back,
+		canGoBack,
+		closeMenu,
+		isMenuOpen,
+		isSubmenuModalOpen,
+		openSubmenu,
+		setSubmenuModalOpen,
+		toggleMenu,
+	} = useHomeLayoutState(defaultMenuOpen);
 	const [isMenuVisible, setIsMenuVisible] = useState<boolean>(defaultMenuOpen);
-	const [activeSubmenuTileId, setActiveSubmenuTileId] = useState<string | null>(
-		null,
-	);
-	const [isSubmenuModalOpen, setIsSubmenuModalOpen] = useState<boolean>(false);
 	const [clock, setClock] = useState(() => formatLocalClock(new Date()));
 	const battery = useBatteryState();
 	const layoutRootStyle = {
@@ -195,40 +199,6 @@ function HomeLayout({
 		};
 	}, [isMenuOpen]);
 
-	useEffect(() => {
-		if (!isMenuOpen) {
-			setIsSubmenuModalOpen(false);
-			setActiveSubmenuTileId(null);
-			return;
-		}
-
-		const handleKeyDown = (event: KeyboardEvent) => {
-			if (event.key === "Escape") {
-				setIsMenuOpen(false);
-			}
-		};
-
-		globalThis.addEventListener("keydown", handleKeyDown);
-
-		return () => {
-			globalThis.removeEventListener("keydown", handleKeyDown);
-		};
-	}, [isMenuOpen]);
-
-	useEffect(() => {
-		if (isSubmenuModalOpen || activeSubmenuTileId === null) {
-			return;
-		}
-
-		const timeoutId = globalThis.setTimeout(() => {
-			setActiveSubmenuTileId(null);
-		}, submenuModalAnimationDurationMs);
-
-		return () => {
-			globalThis.clearTimeout(timeoutId);
-		};
-	}, [activeSubmenuTileId, isSubmenuModalOpen]);
-
 	const activeSubmenuTile =
 		activeSubmenuTileId === null
 			? null
@@ -255,7 +225,7 @@ function HomeLayout({
 							: homeMenuScrimOutAnimationClass
 					}
 					onClick={() => {
-						setIsMenuOpen(false);
+						closeMenu();
 					}}
 				/>
 			) : null}
@@ -264,8 +234,7 @@ function HomeLayout({
 				isMenuVisible={isMenuVisible}
 				menuTiles={menuTiles}
 				onOpenSubmenu={(tileId) => {
-					setActiveSubmenuTileId(tileId);
-					setIsSubmenuModalOpen(true);
+					openSubmenu(tileId);
 				}}
 				topBanners={topBanners}
 			/>
@@ -273,7 +242,7 @@ function HomeLayout({
 				<SystemModal
 					open={isSubmenuModalOpen}
 					onOpenChange={(nextOpen) => {
-						setIsSubmenuModalOpen(nextOpen);
+						setSubmenuModalOpen(nextOpen);
 					}}
 				>
 					<SystemModalContent
@@ -308,11 +277,15 @@ function HomeLayout({
 				</SystemModal>
 			) : null}
 			<HomeLayoutDock
+				canGoBack={canGoBack}
 				homeAction={homeAction}
 				hasMenuNotification={hasMenuNotification}
 				isMenuOpen={isMenuOpen}
+				onBack={() => {
+					back();
+				}}
 				onToggleMenu={() => {
-					setIsMenuOpen((currentValue) => !currentValue);
+					toggleMenu();
 				}}
 			/>
 		</LayoutRoot>
