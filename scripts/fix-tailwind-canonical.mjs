@@ -10,6 +10,7 @@ const cssPath = path.resolve(repoRoot, "src/styles/index.css");
 const supportedExtensions = new Set([".ts", ".tsx"]);
 const classAttributes = new Set(["class", "className"]);
 const calleeFunctions = new Set(["cn", "clsx", "classNames", "twMerge", "cva"]);
+const recursiveClassConfigFunctions = new Set(["tv", "cva"]);
 const mode = process.argv.includes("--check") ? "check" : "write";
 
 async function main() {
@@ -134,13 +135,32 @@ function handleJsxAttribute(node, sourceFile, designSystem, replacements) {
 
 	if (ts.isStringLiteral(expression)) {
 		maybeAddReplacement(expression, sourceFile, designSystem, replacements);
+		return;
 	}
+
+	visitStringLiteralsRecursively(
+		expression,
+		sourceFile,
+		designSystem,
+		replacements,
+	);
 }
 
 function handleCallExpression(node, sourceFile, designSystem, replacements) {
 	const calleeName = getCalleeName(node.expression);
 
 	if (calleeName === null || !calleeFunctions.has(calleeName)) {
+		if (calleeName !== null && recursiveClassConfigFunctions.has(calleeName)) {
+			for (const argument of node.arguments) {
+				visitStringLiteralsRecursively(
+					argument,
+					sourceFile,
+					designSystem,
+					replacements,
+				);
+			}
+		}
+
 		return;
 	}
 
@@ -149,6 +169,26 @@ function handleCallExpression(node, sourceFile, designSystem, replacements) {
 			maybeAddReplacement(argument, sourceFile, designSystem, replacements);
 		}
 	}
+}
+
+function visitStringLiteralsRecursively(
+	node,
+	sourceFile,
+	designSystem,
+	replacements,
+) {
+	if (ts.isStringLiteral(node)) {
+		maybeAddReplacement(node, sourceFile, designSystem, replacements);
+	}
+
+	ts.forEachChild(node, (child) =>
+		visitStringLiteralsRecursively(
+			child,
+			sourceFile,
+			designSystem,
+			replacements,
+		),
+	);
 }
 
 function getCalleeName(expression) {
@@ -199,14 +239,21 @@ function canonicalizeClassList(classList, designSystem) {
 
 	for (let index = 0; index < tokenMatches.length; index += 1) {
 		const match = tokenMatches[index];
-		const canonicalCandidate = canonicalCandidates[index];
+		const originalCandidate = match[0];
+		const rawCanonicalCandidate = canonicalCandidates[index];
+		const canonicalCandidate = shouldPreserveOriginalCandidate(
+			originalCandidate,
+			rawCanonicalCandidate,
+		)
+			? originalCandidate
+			: rawCanonicalCandidate;
 		const matchIndex = match.index ?? 0;
 
 		result += classList.slice(previousIndex, matchIndex);
 		result += canonicalCandidate;
 		previousIndex = matchIndex + match[0].length;
 
-		if (canonicalCandidate !== match[0]) {
+		if (canonicalCandidate !== originalCandidate) {
 			changed = true;
 		}
 	}
@@ -214,6 +261,25 @@ function canonicalizeClassList(classList, designSystem) {
 	result += classList.slice(previousIndex);
 
 	return changed ? result : null;
+}
+
+function shouldPreserveOriginalCandidate(
+	originalCandidate,
+	canonicalCandidate,
+) {
+	return (
+		isFontFamilyClassCandidate(originalCandidate) ||
+		isFontFamilyClassCandidate(canonicalCandidate)
+	);
+}
+
+function isFontFamilyClassCandidate(candidate) {
+	return (
+		candidate.startsWith("font-[") &&
+		(candidate.includes('"') ||
+			candidate.includes(",") ||
+			candidate.includes("family:"))
+	);
 }
 
 function applyReplacements(sourceText, replacements) {

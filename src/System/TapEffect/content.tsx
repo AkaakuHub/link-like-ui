@@ -225,8 +225,8 @@ export function TapEffect({
 						<TapEffectRing
 							className={
 								effect.kind === "initial"
-									? "animate-[ll-tap-effect-burst_var(--ll-tap-effect-duration)_ease-out_forwards] border-[8px] border-ll-white/18 blur-[6px] mix-blend-screen shadow-[0_0_10px_4px_color-mix(in_srgb,var(--color-ll-true-white)_24%,transparent),0_0_20px_8px_color-mix(in_srgb,var(--color-ll-true-white)_12%,transparent)]"
-									: "animate-[ll-tap-effect_var(--ll-tap-effect-duration)_ease-out_forwards] border-[8px] border-ll-white/18 blur-[6px] mix-blend-screen shadow-[0_0_10px_4px_color-mix(in_srgb,var(--color-ll-true-white)_24%,transparent),0_0_20px_8px_color-mix(in_srgb,var(--color-ll-true-white)_12%,transparent)]"
+									? "animate-[ll-tap-effect-burst_var(--ll-tap-effect-duration)_ease-out_forwards] border-8 border-ll-white/18 blur-[6px] mix-blend-screen shadow-[0_0_10px_4px_color-mix(in_srgb,var(--color-ll-true-white)_24%,transparent),0_0_20px_8px_color-mix(in_srgb,var(--color-ll-true-white)_12%,transparent)]"
+									: "animate-[ll-tap-effect_var(--ll-tap-effect-duration)_ease-out_forwards] border-8 border-ll-white/18 blur-[6px] mix-blend-screen shadow-[0_0_10px_4px_color-mix(in_srgb,var(--color-ll-true-white)_24%,transparent),0_0_20px_8px_color-mix(in_srgb,var(--color-ll-true-white)_12%,transparent)]"
 							}
 							size={effect.size}
 						/>
