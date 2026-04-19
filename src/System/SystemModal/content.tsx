@@ -54,10 +54,7 @@ export function SystemModalPanel({
 }: HTMLAttributes<HTMLDivElement>) {
 	return (
 		<div
-			className={cn(
-				"space-y-4 rounded-[0.65rem] bg-ll-modal-content-gray p-3",
-				className,
-			)}
+			className={cn("ll-surface-muted-panel space-y-4", className)}
 			{...props}
 		/>
 	);

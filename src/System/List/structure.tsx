@@ -23,10 +23,7 @@ export function ListRoot({
 }: ComponentPropsWithoutRef<typeof ListRootBase>) {
 	return (
 		<ListRootBase
-			className={cn(
-				"rounded-[0.65rem] bg-ll-modal-content-gray p-3",
-				className,
-			)}
+			className={cn("ll-surface-muted-panel", className)}
 			{...props}
 		/>
 	);

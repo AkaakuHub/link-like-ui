@@ -13,8 +13,7 @@ const buttonVariants = tv({
 	variants: {
 		variant: {
 			primary: "ll-bg-system-gradient text-ll-white disabled:bg-none",
-			secondary:
-				"bg-white text-ll-gray shadow-[0_0_8px_color-mix(in_srgb,var(--color-ll-gray)_35%,transparent)]",
+			secondary: "ll-shadow-control bg-white text-ll-gray",
 		},
 		size: {
 			sm: "h-8 px-3 text-[0.85rem]",

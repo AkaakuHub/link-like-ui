@@ -244,7 +244,7 @@ export function GradientIconCluster({
 				<span
 					key={item.title}
 					className={cn(
-						"grid aspect-square h-auto w-full max-w-full place-items-center self-center rounded-[26%] bg-ll-white shadow-[0_4px_12px_color-mix(in_srgb,var(--color-ll-gray)_10%,transparent)]",
+						"ll-shadow-icon-tile grid aspect-square h-auto w-full max-w-full place-items-center self-center rounded-[26%] bg-ll-white",
 						itemClassName,
 					)}
 				>

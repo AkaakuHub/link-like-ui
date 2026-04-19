@@ -104,12 +104,12 @@ export function HomeLayoutSheet({
 							{...(tile.illustration?.kind === "cluster"
 								? {
 										className:
-											"border-ll-white/48 bg-ll-white/36 p-[0.16rem] shadow-[0_0_12px_3px_color-mix(in_srgb,var(--color-ll-gray)_10%,transparent)] backdrop-blur-3xl",
+											"ll-glass-surface ll-shadow-float-soft border-ll-white/48 p-[0.16rem]",
 										clusterClassName:
 											"aspect-square h-full w-full place-self-center gap-[5%] p-[6%]",
 										clusterIconClassName: "h-[76%] w-[76%]",
 										clusterItemClassName:
-											"rounded-[22%] bg-ll-white/92 shadow-[0_4px_12px_color-mix(in_srgb,var(--color-ll-gray)_10%,transparent)]",
+											"ll-shadow-icon-tile rounded-[22%] bg-ll-white/92",
 										contentClassName: "h-full w-full justify-center gap-0 pt-0",
 										illustrationFrameClassName:
 											"aspect-square h-full w-full max-h-full max-w-full place-self-center",
