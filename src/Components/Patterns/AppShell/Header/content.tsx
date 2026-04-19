@@ -123,14 +123,14 @@ export function HomeLayoutHeader({
 			</LayoutHeader>
 			{showClock ? (
 				<LayoutClock>
-					<div className="w-36">
+					<div className="w-[9.7rem]">
 						<ClockDigitRow value={clock.hours} />
 						<div className="mt-2">
 							<ClockDigitRow value={clock.minutes} />
 						</div>
 						<p
 							className={cn(
-								"mt-2 block w-full text-center text-[1.44rem] leading-none font-normal tracking-[0.12em] text-ll-white/78",
+								"mt-2 block w-full whitespace-nowrap text-center text-[1.44rem] leading-none font-normal tracking-widest text-ll-white/78",
 								clockTextClassName(),
 							)}
 						>
