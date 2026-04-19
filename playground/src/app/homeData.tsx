@@ -37,6 +37,7 @@ export const homeMenuItems: HomeScreenMenuItemInput[] = [
 		label: "Present",
 		illustration: createSingleIllustration(LuGift, "Present"),
 		badge: "7",
+		pageId: "present",
 	},
 	{
 		label: "Shop",

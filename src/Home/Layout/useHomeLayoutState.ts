@@ -4,6 +4,7 @@ import {
 	createHomeLayoutStore,
 	selectActiveSubmenuTileId,
 	selectCanGoBack,
+	selectCurrentPageId,
 	selectIsMenuOpen,
 } from "./store";
 
@@ -18,6 +19,7 @@ export function useHomeLayoutState(defaultMenuOpen: boolean) {
 
 	const homeLayoutStore = homeLayoutStoreRef.current;
 	const canGoBack = useStore(homeLayoutStore, selectCanGoBack);
+	const currentPageId = useStore(homeLayoutStore, selectCurrentPageId);
 	const isMenuOpen = useStore(homeLayoutStore, selectIsMenuOpen);
 	const activeSubmenuTileId = useStore(
 		homeLayoutStore,
@@ -50,6 +52,13 @@ export function useHomeLayoutState(defaultMenuOpen: boolean) {
 		canGoBack,
 		closeMenu: () => {
 			homeLayoutStore.getState().closeMenu();
+		},
+		currentPageId,
+		goToHome: () => {
+			homeLayoutStore.getState().goToHome();
+		},
+		goToPage: (pageId: string) => {
+			homeLayoutStore.getState().goToPage(pageId);
 		},
 		isMenuOpen,
 		isSubmenuModalOpen: activeSubmenuTileId !== null,

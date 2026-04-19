@@ -21,6 +21,7 @@ interface HomeLayoutDockProps {
 	hasMenuNotification: boolean;
 	isMenuOpen: boolean;
 	onBack: () => void;
+	onGoHome: () => void;
 	onToggleMenu: () => void;
 }
 
@@ -51,6 +52,7 @@ export function HomeLayoutDock({
 	hasMenuNotification,
 	isMenuOpen,
 	onBack,
+	onGoHome,
 	onToggleMenu,
 }: HomeLayoutDockProps) {
 	return (
@@ -84,10 +86,7 @@ export function HomeLayoutDock({
 					<MenuGlyph isMenuOpen={isMenuOpen} />
 					<LayoutDockDivider />
 				</LayoutDockButton>
-				<LayoutDockButton
-					aria-label={homeAction.ariaLabel}
-					onClick={homeAction.onClick}
-				>
+				<LayoutDockButton aria-label={homeAction.ariaLabel} onClick={onGoHome}>
 					<HomeIcon className="h-10 w-10" />
 				</LayoutDockButton>
 			</LayoutDockSurface>

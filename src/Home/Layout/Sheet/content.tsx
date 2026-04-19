@@ -31,6 +31,7 @@ export interface LayoutTileDefinition {
 	illustration?: LayoutTileIllustrationDefinition;
 	label: string;
 	onClick?: ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
+	pageId?: string;
 	rowSpan: LayoutTileRowSpan;
 	submenu?: LayoutTileSubmenuDefinition;
 }
@@ -51,6 +52,7 @@ interface HomeLayoutSheetProps {
 	isMenuOpen: boolean;
 	isMenuVisible: boolean;
 	menuTiles: LayoutTileDefinition[];
+	onGoToPage: (pageId: string) => void;
 	onOpenSubmenu: (tileId: string) => void;
 	topBanners: LayoutBannerDefinition[];
 }
@@ -59,6 +61,7 @@ export function HomeLayoutSheet({
 	isMenuOpen,
 	isMenuVisible,
 	menuTiles,
+	onGoToPage,
 	onOpenSubmenu,
 	topBanners,
 }: HomeLayoutSheetProps) {
@@ -121,6 +124,11 @@ export function HomeLayoutSheet({
 							onClick={(event) => {
 								if (tile.submenu) {
 									onOpenSubmenu(tile.id);
+									return;
+								}
+
+								if (tile.pageId) {
+									onGoToPage(tile.pageId);
 									return;
 								}
 

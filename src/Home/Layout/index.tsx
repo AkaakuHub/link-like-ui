@@ -6,6 +6,7 @@ export {
 	Layout,
 	type LayoutAction,
 	type LayoutBannerDefinition,
+	type LayoutPageDefinition,
 	type LayoutProps,
 	type LayoutTileDefinition,
 	type LayoutVariant,

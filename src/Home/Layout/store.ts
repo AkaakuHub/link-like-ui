@@ -1,17 +1,18 @@
 import { createStore } from "zustand/vanilla";
 
-type HomeLayoutView =
-	| { type: "root" }
-	| { type: "menu" }
-	| { tileId: string; type: "submenu" };
+type HomeLayoutPageId = "home" | string;
+type HomeLayoutOverlay = { type: "menu" } | { tileId: string; type: "submenu" };
 
 interface HomeLayoutState {
-	history: HomeLayoutView[];
+	overlayHistory: HomeLayoutOverlay[];
+	pageHistory: HomeLayoutPageId[];
 }
 
 interface HomeLayoutActions {
 	back: () => void;
 	closeMenu: () => void;
+	goToPage: (pageId: HomeLayoutPageId) => void;
+	goToHome: () => void;
 	openMenu: () => void;
 	openSubmenu: (tileId: string) => void;
 	setSubmenuModalOpen: (nextOpen: boolean) => void;
@@ -20,35 +21,50 @@ interface HomeLayoutActions {
 
 type HomeLayoutStore = HomeLayoutState & HomeLayoutActions;
 
-const homeRootView: HomeLayoutView = { type: "root" };
-const homeMenuView: HomeLayoutView = { type: "menu" };
-
 function createInitialHomeLayoutState(
 	defaultMenuOpen: boolean,
 ): HomeLayoutState {
 	return {
-		history: defaultMenuOpen ? [homeRootView, homeMenuView] : [homeRootView],
+		overlayHistory: defaultMenuOpen ? [{ type: "menu" }] : [],
+		pageHistory: ["home"],
 	};
 }
 
-function selectCurrentHomeLayoutView(state: HomeLayoutState): HomeLayoutView {
-	return state.history[state.history.length - 1] ?? homeRootView;
+function selectCurrentPageIdInternal(state: HomeLayoutState): HomeLayoutPageId {
+	const pageHistory = state.pageHistory ?? ["home"];
+
+	return pageHistory[pageHistory.length - 1] ?? "home";
+}
+
+function selectCurrentOverlay(
+	state: HomeLayoutState,
+): HomeLayoutOverlay | null {
+	const overlayHistory = state.overlayHistory ?? [];
+
+	return overlayHistory[overlayHistory.length - 1] ?? null;
 }
 
 export function selectCanGoBack(state: HomeLayoutState): boolean {
-	return state.history.length > 1;
+	const overlayHistory = state.overlayHistory ?? [];
+	const pageHistory = state.pageHistory ?? ["home"];
+
+	return overlayHistory.length > 0 || pageHistory.length > 1;
+}
+
+export function selectCurrentPageId(state: HomeLayoutState): HomeLayoutPageId {
+	return selectCurrentPageIdInternal(state);
 }
 
 export function selectIsMenuOpen(state: HomeLayoutState): boolean {
-	return selectCurrentHomeLayoutView(state).type !== "root";
+	return (state.overlayHistory ?? []).length > 0;
 }
 
 export function selectActiveSubmenuTileId(
 	state: HomeLayoutState,
 ): string | null {
-	const currentView = selectCurrentHomeLayoutView(state);
+	const currentOverlay = selectCurrentOverlay(state);
 
-	return currentView.type === "submenu" ? currentView.tileId : null;
+	return currentOverlay?.type === "submenu" ? currentOverlay.tileId : null;
 }
 
 export function createHomeLayoutStore(defaultMenuOpen: boolean) {
@@ -56,86 +72,138 @@ export function createHomeLayoutStore(defaultMenuOpen: boolean) {
 		...createInitialHomeLayoutState(defaultMenuOpen),
 		back: () => {
 			set((state) => {
-				if (state.history.length <= 1) {
+				if (state.overlayHistory.length > 0) {
+					return {
+						overlayHistory: state.overlayHistory.slice(0, -1),
+					};
+				}
+
+				if (state.pageHistory.length <= 1) {
 					return state;
 				}
 
 				return {
-					history: state.history.slice(0, -1),
+					pageHistory: state.pageHistory.slice(0, -1),
 				};
 			});
 		},
 		closeMenu: () => {
 			set((state) => {
-				if (!selectIsMenuOpen(state)) {
-					return state;
-				}
-
-				return createInitialHomeLayoutState(false);
-			});
-		},
-		openMenu: () => {
-			set((state) => {
-				if (selectIsMenuOpen(state)) {
+				if (state.overlayHistory.length === 0) {
 					return state;
 				}
 
 				return {
-					history: [...state.history, homeMenuView],
+					overlayHistory: [],
+				};
+			});
+		},
+		goToPage: (pageId) => {
+			set((state) => {
+				const currentPageId = selectCurrentPageIdInternal(state);
+
+				if (currentPageId === pageId) {
+					if (state.overlayHistory.length === 0) {
+						return state;
+					}
+
+					return {
+						overlayHistory: [],
+					};
+				}
+
+				return {
+					overlayHistory: [],
+					pageHistory: [...state.pageHistory, pageId],
+				};
+			});
+		},
+		goToHome: () => {
+			set((state) => {
+				if (
+					state.overlayHistory.length === 0 &&
+					selectCurrentPageIdInternal(state) === "home" &&
+					state.pageHistory.length === 1
+				) {
+					return state;
+				}
+
+				return {
+					overlayHistory: [],
+					pageHistory: ["home"],
+				};
+			});
+		},
+		openMenu: () => {
+			set((state) => {
+				if (state.overlayHistory.length > 0) {
+					return state;
+				}
+
+				return {
+					overlayHistory: [...state.overlayHistory, { type: "menu" }],
 				};
 			});
 		},
 		openSubmenu: (tileId) => {
 			set((state) => {
-				const currentView = selectCurrentHomeLayoutView(state);
+				const currentOverlay = selectCurrentOverlay(state);
 
-				if (currentView.type === "submenu" && currentView.tileId === tileId) {
+				if (
+					currentOverlay?.type === "submenu" &&
+					currentOverlay.tileId === tileId
+				) {
 					return state;
 				}
 
-				if (currentView.type === "root") {
+				if (currentOverlay === null) {
 					return {
-						history: [
-							...state.history,
-							homeMenuView,
+						overlayHistory: [
+							...state.overlayHistory,
+							{ type: "menu" },
 							{ tileId, type: "submenu" },
 						],
 					};
 				}
 
-				if (currentView.type === "submenu") {
+				if (currentOverlay.type === "submenu") {
 					return {
-						history: [
-							...state.history.slice(0, -1),
+						overlayHistory: [
+							...state.overlayHistory.slice(0, -1),
 							{ tileId, type: "submenu" },
 						],
 					};
 				}
 
 				return {
-					history: [...state.history, { tileId, type: "submenu" }],
+					overlayHistory: [
+						...state.overlayHistory,
+						{ tileId, type: "submenu" },
+					],
 				};
 			});
 		},
 		setSubmenuModalOpen: (nextOpen) => {
 			set((state) => {
-				if (nextOpen || selectCurrentHomeLayoutView(state).type !== "submenu") {
+				if (nextOpen || selectCurrentOverlay(state)?.type !== "submenu") {
 					return state;
 				}
 
 				return {
-					history: state.history.slice(0, -1),
+					overlayHistory: state.overlayHistory.slice(0, -1),
 				};
 			});
 		},
 		toggleMenu: () => {
 			set((state) => {
-				if (selectIsMenuOpen(state)) {
-					return createInitialHomeLayoutState(false);
+				if (state.overlayHistory.length > 0) {
+					return {
+						overlayHistory: [],
+					};
 				}
 
 				return {
-					history: [...state.history, homeMenuView],
+					overlayHistory: [...state.overlayHistory, { type: "menu" }],
 				};
 			});
 		},

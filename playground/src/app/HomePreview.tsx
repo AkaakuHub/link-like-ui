@@ -2,6 +2,7 @@ import { HomeScreen } from "../../../src/Home/Layout";
 import { TapEffect } from "../../../src/System/TapEffect";
 import { homeMenuItems, homeTopBanners } from "./homeData";
 import { countNoticeItems } from "./noticeData";
+import { presentPageDefinition } from "./presentData";
 
 export function HomePreview() {
 	return (
@@ -12,6 +13,7 @@ export function HomePreview() {
 					defaultMenuOpen
 					menuItems={homeMenuItems}
 					menuNotificationCount={countNoticeItems()}
+					pageDefinitions={[presentPageDefinition]}
 				/>
 			</main>
 		</TapEffect>

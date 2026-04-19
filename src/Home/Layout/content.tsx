@@ -74,6 +74,14 @@ export type {
 	LayoutTileDefinition,
 } from "./Sheet/content";
 
+export interface LayoutPageDefinition {
+	centerContent?: ReactNode;
+	content: ReactNode;
+	id: string;
+	rightContent?: ReactNode;
+	showClock?: boolean;
+}
+
 export interface LayoutProps {
 	actions?: LayoutAction[];
 	centerContent?: ReactNode;
@@ -82,6 +90,7 @@ export interface LayoutProps {
 	hasMenuNotification?: boolean;
 	homeAction?: LayoutAction;
 	menuTiles: LayoutTileDefinition[];
+	pageDefinitions?: LayoutPageDefinition[];
 	topBanners: LayoutBannerDefinition[];
 	rightContent?: ReactNode;
 	statusLabel?: string;
@@ -104,6 +113,7 @@ export interface HomeScreenMenuItemInput {
 	illustration?: LayoutTileIllustrationDefinition;
 	label: string;
 	onClick?: ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
+	pageId?: string;
 	rowSpan?: LayoutTileDefinition["rowSpan"];
 	submenu?: LayoutTileSubmenuDefinition;
 }
@@ -111,11 +121,16 @@ export interface HomeScreenMenuItemInput {
 export interface HomeScreenProps
 	extends Omit<
 		LayoutProps,
-		"hasMenuNotification" | "menuTiles" | "topBanners" | "variant"
+		| "hasMenuNotification"
+		| "menuTiles"
+		| "pageDefinitions"
+		| "topBanners"
+		| "variant"
 	> {
 	banners: HomeScreenBannerInput[];
 	menuItems: HomeScreenMenuItemInput[];
 	menuNotificationCount?: number;
+	pageDefinitions?: LayoutPageDefinition[];
 }
 
 function resolveBannerId(banner: HomeScreenBannerInput, index: number) {
@@ -152,6 +167,7 @@ function HomeLayout({
 	hasMenuNotification = false,
 	homeAction = { ariaLabel: "Home", label: "Home" },
 	menuTiles,
+	pageDefinitions = [],
 	rightContent,
 	topBanners,
 }: Omit<LayoutProps, "variant">) {
@@ -160,8 +176,11 @@ function HomeLayout({
 		back,
 		canGoBack,
 		closeMenu,
+		currentPageId,
+		goToHome,
 		isMenuOpen,
 		isSubmenuModalOpen,
+		goToPage,
 		openSubmenu,
 		setSubmenuModalOpen,
 		toggleMenu,
@@ -203,6 +222,16 @@ function HomeLayout({
 		activeSubmenuTileId === null
 			? null
 			: (menuTiles.find((tile) => tile.id === activeSubmenuTileId) ?? null);
+	const activePageDefinition =
+		currentPageId === "home"
+			? null
+			: (pageDefinitions.find(
+					(pageDefinition) => pageDefinition.id === currentPageId,
+				) ?? null);
+	const headerCenterContent =
+		activePageDefinition?.centerContent ?? centerContent;
+	const headerRightContent = activePageDefinition?.rightContent ?? rightContent;
+	const showClock = activePageDefinition?.showClock ?? currentPageId === "home";
 
 	return (
 		<LayoutRoot style={layoutRootStyle}>
@@ -212,10 +241,12 @@ function HomeLayout({
 			</LayoutScenery>
 			<HomeLayoutHeader
 				battery={battery}
-				centerContent={centerContent}
+				centerContent={headerCenterContent}
 				clock={clock}
-				rightContent={rightContent}
+				rightContent={headerRightContent}
+				showClock={showClock}
 			/>
+			{activePageDefinition?.content ?? null}
 			{isMenuVisible ? (
 				<LayoutScrim
 					aria-label="Close menu"
@@ -233,6 +264,9 @@ function HomeLayout({
 				isMenuOpen={isMenuOpen}
 				isMenuVisible={isMenuVisible}
 				menuTiles={menuTiles}
+				onGoToPage={(pageId) => {
+					goToPage(pageId);
+				}}
 				onOpenSubmenu={(tileId) => {
 					openSubmenu(tileId);
 				}}
@@ -287,6 +321,9 @@ function HomeLayout({
 				onToggleMenu={() => {
 					toggleMenu();
 				}}
+				onGoHome={() => {
+					goToHome();
+				}}
 			/>
 		</LayoutRoot>
 	);
@@ -304,6 +341,7 @@ export function HomeScreen({
 	banners,
 	menuItems,
 	menuNotificationCount = 0,
+	pageDefinitions = [],
 	...props
 }: HomeScreenProps) {
 	return (
@@ -311,6 +349,7 @@ export function HomeScreen({
 			{...props}
 			hasMenuNotification={menuNotificationCount > 0}
 			menuTiles={toLayoutTileDefinitions(menuItems)}
+			pageDefinitions={pageDefinitions}
 			topBanners={toLayoutBannerDefinitions(banners)}
 			variant="home"
 		/>
