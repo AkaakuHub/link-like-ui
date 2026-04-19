@@ -4,6 +4,7 @@ import type {
 	HTMLAttributes,
 	ImgHTMLAttributes,
 } from "react";
+import SimpleBar from "simplebar-react";
 import { cn } from "../../../utils";
 import {
 	LayoutButtonBase,
@@ -33,16 +34,24 @@ const layoutGridColumnClassMap: Record<LayoutGridColumns, string> = {
 
 export function LayoutSheet({
 	className,
+	children,
 	...props
 }: ComponentPropsWithoutRef<typeof LayoutPanelBase>) {
 	return (
 		<LayoutPanelBase
 			className={cn(
-				"ll-glass-surface ll-shadow-float absolute bottom-[calc(var(--ll-home-dock-height)+var(--ll-home-sheet-gap))] left-1/2 z-20 max-h-[calc(100dvh-var(--ll-home-sheet-top-safe)-var(--ll-home-dock-height)-var(--ll-home-sheet-gap))] w-[calc(100%-4rem)] max-w-100 overflow-y-auto rounded-[1.45rem] p-4 transition-[opacity,transform] duration-200 ease-out",
+				"ll-glass-surface ll-shadow-float absolute bottom-[calc(var(--ll-home-dock-height)+var(--ll-home-sheet-gap))] left-1/2 z-20 max-h-[calc(100dvh-var(--ll-home-sheet-top-safe)-var(--ll-home-dock-height)-var(--ll-home-sheet-gap))] w-[calc(100%-4rem)] max-w-100 overflow-hidden rounded-[1.45rem] transition-[opacity,transform] duration-200 ease-out",
 				className,
 			)}
 			{...props}
-		/>
+		>
+			<SimpleBar
+				autoHide={false}
+				className="ll-system-modal-scrollbar max-h-[calc(100dvh-var(--ll-home-sheet-top-safe)-var(--ll-home-dock-height)-var(--ll-home-sheet-gap))]"
+			>
+				<div className="p-4">{children}</div>
+			</SimpleBar>
+		</LayoutPanelBase>
 	);
 }
 
