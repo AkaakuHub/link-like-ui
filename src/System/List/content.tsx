@@ -51,7 +51,7 @@ export function ListNoticeCard({
 			tabIndex={onAction ? 0 : undefined}
 			{...props}
 		>
-			<div className="space-y-2">
+			<div className="ll-stack-tight">
 				<ListCardHeader>
 					<ListCardHeading>{heading}</ListCardHeading>
 					<ListCardMeta>{meta}</ListCardMeta>

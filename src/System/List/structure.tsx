@@ -3,8 +3,19 @@ import type {
 	ComponentPropsWithoutRef,
 	HTMLAttributes,
 } from "react";
+import { tv } from "tailwind-variants";
 import { cn } from "../../utils";
 import { ListCardBase, ListItemsBase, ListRootBase } from "./primitives";
+
+const listLabelVariants = tv({
+	base: "inline-flex min-w-16 items-center justify-center rounded-full px-3 py-0.5 text-[0.72rem] leading-none font-bold",
+	variants: {
+		tone: {
+			heading: "bg-ll-pink text-ll-white",
+			action: "ll-bg-system-gradient text-ll-white",
+		},
+	},
+});
 
 export function ListRoot({
 	className,
@@ -25,7 +36,9 @@ export function ListItems({
 	className,
 	...props
 }: ComponentPropsWithoutRef<typeof ListItemsBase>) {
-	return <ListItemsBase className={cn("space-y-2.5", className)} {...props} />;
+	return (
+		<ListItemsBase className={cn("ll-stack-field", className)} {...props} />
+	);
 }
 
 export function ListCard({
@@ -47,12 +60,7 @@ export function ListCardHeader({
 	className,
 	...props
 }: HTMLAttributes<HTMLDivElement>) {
-	return (
-		<div
-			className={cn("flex items-center justify-between gap-3", className)}
-			{...props}
-		/>
-	);
+	return <div className={cn("ll-split-row", className)} {...props} />;
 }
 
 export function ListCardLead({
@@ -70,10 +78,7 @@ export function ListCardHeading({
 }: HTMLAttributes<HTMLSpanElement>) {
 	return (
 		<span
-			className={cn(
-				"inline-flex min-w-16 items-center justify-center rounded-full bg-ll-pink px-3 py-0.5 text-[0.72rem] leading-none font-bold text-ll-white",
-				className,
-			)}
+			className={cn(listLabelVariants({ tone: "heading" }), className)}
 			{...props}
 		/>
 	);
@@ -86,7 +91,7 @@ export function ListCardMeta({
 	return (
 		<span
 			className={cn(
-				'font-["Noto_Sans_JP","Segoe_UI",sans-serif] text-[0.74rem] leading-none text-ll-gray',
+				"ll-font-ja text-[0.74rem] leading-none text-ll-gray",
 				className,
 			)}
 			{...props}
@@ -101,7 +106,7 @@ export function ListCardText({
 	return (
 		<p
 			className={cn(
-				'font-["Noto_Sans_JP","Segoe_UI",sans-serif] text-[0.9rem] leading-[1.4] text-ll-gray',
+				"ll-font-ja text-[0.9rem] leading-[1.4] text-ll-gray",
 				className,
 			)}
 			{...props}
@@ -117,10 +122,7 @@ export function ListActionButton({
 	return (
 		<button
 			type={type ?? "button"}
-			className={cn(
-				"inline-flex min-w-16 items-center justify-center rounded-full bg-linear-to-r from-ll-system-left to-ll-system-right px-3 py-0.5 text-[0.72rem] leading-none font-bold text-ll-white",
-				className,
-			)}
+			className={cn(listLabelVariants({ tone: "action" }), className)}
 			{...props}
 		/>
 	);

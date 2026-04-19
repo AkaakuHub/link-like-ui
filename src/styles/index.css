@@ -49,6 +49,41 @@
 	--color-ll-true-white: #ffffff;
 }
 
+@layer utilities {
+	.ll-font-ja {
+		font-family: "Noto Sans JP", "Segoe UI", sans-serif;
+	}
+
+	.ll-font-display {
+		font-family: "Poppins", "Segoe UI", sans-serif;
+	}
+
+	.ll-bg-system-gradient {
+		background-image: linear-gradient(
+			to right,
+			var(--color-ll-system-left),
+			var(--color-ll-system-right)
+		);
+	}
+
+	.ll-stack-field {
+		row-gap: calc(var(--spacing) * 2.5);
+		display: grid;
+	}
+
+	.ll-stack-tight {
+		row-gap: calc(var(--spacing) * 2);
+		display: grid;
+	}
+
+	.ll-split-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		column-gap: calc(var(--spacing) * 3);
+	}
+}
+
 @keyframes ll-system-modal-open {
 	from {
 		opacity: 0;

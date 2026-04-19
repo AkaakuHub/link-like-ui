@@ -38,7 +38,7 @@ export const RadioItem = forwardRef<
 			)}
 			{...props}
 		>
-			<RadioGroupIndicatorPrimitive className="inline-flex h-[0.65rem] w-[0.65rem] rounded-full bg-linear-to-r from-ll-system-left to-ll-system-right" />
+			<RadioGroupIndicatorPrimitive className="ll-bg-system-gradient inline-flex h-[0.65rem] w-[0.65rem] rounded-full" />
 		</RadioGroupItemPrimitive>
 	);
 });

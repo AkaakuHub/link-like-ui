@@ -1,7 +1,17 @@
 import type { HTMLAttributes, ReactNode } from "react";
+import { tv } from "tailwind-variants";
 import { cn } from "../../utils";
 import { AudioIcon, Toggle } from "../Toggle";
 import { Slider } from "./structure";
+
+const sliderRowVariants = tv({
+	slots: {
+		row: "grid grid-cols-[4.5rem_2rem_1fr_2.25rem] items-center gap-3",
+		label: "text-left text-[1rem] leading-none text-ll-gray",
+		leading: "flex items-center justify-center",
+		value: "text-left text-[1rem] leading-none text-ll-label",
+	},
+});
 
 export interface SliderRowProps extends HTMLAttributes<HTMLDivElement> {
 	label: string;
@@ -27,15 +37,17 @@ export function SliderRow({
 	sliderThumbClassName,
 	step = 1,
 }: SliderRowProps) {
+	const {
+		label: labelClassName,
+		leading: leadingClassName,
+		row,
+		value: valueClassName,
+	} = sliderRowVariants();
+
 	return (
-		<div
-			className={cn(
-				"grid grid-cols-[4.5rem_2rem_1fr_2.25rem] items-center gap-3",
-				className,
-			)}
-		>
-			<p className="text-left text-[1rem] leading-none text-ll-gray">{label}</p>
-			<div className="flex items-center justify-center">{leading}</div>
+		<div className={cn(row(), className)}>
+			<p className={labelClassName()}>{label}</p>
+			<div className={leadingClassName()}>{leading}</div>
 			<Slider
 				value={[value]}
 				onValueChange={(next) => {
@@ -53,9 +65,7 @@ export function SliderRow({
 					? { thumbClassName: sliderThumbClassName }
 					: {})}
 			/>
-			<p className="text-left text-[1rem] leading-none text-ll-label">
-				{value}
-			</p>
+			<p className={valueClassName()}>{value}</p>
 		</div>
 	);
 }

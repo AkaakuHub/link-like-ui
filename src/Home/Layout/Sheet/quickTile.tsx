@@ -108,7 +108,7 @@ export function LayoutQuickTile({
 				) : null}
 				{hideLabel ? null : (
 					<div className="mt-[0.08rem] w-full min-w-0 overflow-x-hidden overflow-y-visible px-[0.01rem] pb-[0.02rem]">
-						<p className="block overflow-visible text-center whitespace-nowrap bg-linear-to-r from-ll-system-left to-ll-system-right bg-clip-text text-[0.86rem] leading-[1.18] font-medium text-transparent text-ellipsis max-[420px]:text-[0.78rem] max-[380px]:text-[0.7rem] max-[360px]:text-[0.63rem]">
+						<p className="ll-bg-system-gradient block overflow-visible text-center whitespace-nowrap bg-clip-text text-[0.86rem] leading-[1.18] font-medium text-transparent text-ellipsis max-[420px]:text-[0.78rem] max-[380px]:text-[0.7rem] max-[360px]:text-[0.63rem]">
 							<span className="inline-block max-w-full overflow-hidden align-top text-ellipsis whitespace-nowrap pb-[0.08rem]">
 								{label}
 							</span>

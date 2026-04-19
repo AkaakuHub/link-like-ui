@@ -11,8 +11,7 @@ const headingSizeClassMap: Record<SystemModalHeadingSize, string> = {
 };
 
 const headingToneClassMap: Record<SystemModalHeadingTone, string> = {
-	gradient:
-		"bg-linear-to-r from-ll-system-left to-ll-system-right text-ll-white",
+	gradient: "ll-bg-system-gradient text-ll-white",
 	label: "bg-ll-label text-ll-white",
 };
 

@@ -84,7 +84,7 @@ export function LayoutDockGlyphLine({
 	return (
 		<span
 			className={cn(
-				"absolute top-1/2 left-1/2 block h-[0.1em] w-[1.04em] -translate-x-1/2 -translate-y-1/2 rounded-full bg-linear-to-r from-ll-system-left to-ll-system-right transition-transform duration-300 ease-out",
+				"ll-bg-system-gradient absolute top-1/2 left-1/2 block h-[0.1em] w-[1.04em] -translate-x-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-out",
 				className,
 			)}
 			{...props}

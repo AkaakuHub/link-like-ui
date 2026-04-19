@@ -16,7 +16,7 @@ interface ClockDigitRowProps {
 }
 
 const clockTextClassName = tv({
-	base: '[font-family:"Poppins","Segoe_UI",sans-serif] [text-shadow:0_0_6px_color-mix(in_srgb,var(--color-ll-gray)_40%,transparent)]',
+	base: "ll-font-display [text-shadow:0_0_6px_color-mix(in_srgb,var(--color-ll-gray)_40%,transparent)]",
 });
 
 function ClockDigitRow({ value }: ClockDigitRowProps) {

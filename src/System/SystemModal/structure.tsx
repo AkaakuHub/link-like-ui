@@ -98,7 +98,7 @@ export function SystemModalHeader({
 	return (
 		<div
 			className={cn(
-				"relative flex h-[3.15rem] items-center justify-center bg-linear-to-r from-ll-system-left to-ll-system-right px-4",
+				"ll-bg-system-gradient relative flex h-[3.15rem] items-center justify-center px-4",
 				className,
 			)}
 			{...props}
@@ -133,7 +133,7 @@ export function SystemModalBody({
 	return (
 		<SimpleBar
 			autoHide={false}
-			className='ll-system-modal-scrollbar font-["Noto_Sans_JP","Segoe_UI",sans-serif] text-[0.94rem] leading-[1.7] text-ll-gray'
+			className="ll-system-modal-scrollbar ll-font-ja text-[0.94rem] leading-[1.7] text-ll-gray"
 			style={{ maxHeight: "min(58dvh, 33rem)", ...style }}
 			{...props}
 		>
@@ -165,7 +165,7 @@ export const SystemModalTitle = forwardRef<
 		<SystemModalTitlePrimitive
 			ref={ref}
 			className={cn(
-				'relative z-1 font-["Noto_Sans_JP","Segoe_UI",sans-serif] text-[1.32rem] leading-none tracking-[0.03em] text-ll-white',
+				"ll-font-ja relative z-1 text-[1.32rem] leading-none tracking-[0.03em] text-ll-white",
 				className,
 			)}
 			{...props}
