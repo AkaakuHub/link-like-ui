@@ -12,13 +12,14 @@ import {
 } from "./primitives";
 
 interface SliderProps extends ComponentPropsWithoutRef<typeof SliderPrimitive> {
+	trackClassName?: string;
 	thumbClassName?: string;
 }
 
 export const Slider = forwardRef<
 	ElementRef<typeof SliderPrimitive>,
 	SliderProps
->(({ className, thumbClassName, ...props }, ref) => {
+>(({ className, thumbClassName, trackClassName, ...props }, ref) => {
 	return (
 		<SliderPrimitive
 			ref={ref}
@@ -28,7 +29,12 @@ export const Slider = forwardRef<
 			)}
 			{...props}
 		>
-			<SliderTrackPrimitive className="relative h-[0.34rem] grow overflow-hidden rounded-full bg-ll-slider-bg">
+			<SliderTrackPrimitive
+				className={cn(
+					"relative h-[0.34rem] grow overflow-hidden rounded-full bg-ll-slider-bg",
+					trackClassName,
+				)}
+			>
 				<SliderRangePrimitive className="ll-bg-system-gradient absolute h-full" />
 			</SliderTrackPrimitive>
 			<SliderThumbPrimitive

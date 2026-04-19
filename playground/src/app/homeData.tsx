@@ -28,44 +28,54 @@ function createSingleIllustration(
 	};
 }
 
-export const homeMenuItems: HomeScreenMenuItemInput[] = [
-	{
-		label: "Mission",
-		illustration: createSingleIllustration(FaAward, "Mission"),
-	},
-	{
-		label: "Present",
-		illustration: createSingleIllustration(LuGift, "Present"),
-		badge: "7",
-		pageId: "present",
-	},
-	{
-		label: "Shop",
-		illustration: createSingleIllustration(LuShoppingCart, "Shop"),
-	},
-	{
-		label: "Collection",
-		illustration: createSingleIllustration(LuNotebook, "Collection"),
-	},
-	{
-		label: "Circle",
-		illustration: createSingleIllustration(MdPeopleAlt, "Circle"),
-	},
-	{
-		label: "News",
-		illustration: createSingleIllustration(LuNewspaper, "News"),
-		badge: "1",
-	},
-	{
-		label: "Friend",
-		illustration: createSingleIllustration(FaHandshake, "Friend"),
-	},
-	{
-		illustration: systemTileIllustration,
-		label: "System",
-		submenu: systemSubmenuDefinition,
-	},
-];
+interface HomeMenuItemsOptions {
+	onSoundOpen: () => void;
+}
+
+export function homeMenuItems({
+	onSoundOpen,
+}: HomeMenuItemsOptions): HomeScreenMenuItemInput[] {
+	return [
+		{
+			label: "Mission",
+			illustration: createSingleIllustration(FaAward, "Mission"),
+		},
+		{
+			label: "Present",
+			illustration: createSingleIllustration(LuGift, "Present"),
+			badge: "7",
+			pageId: "present",
+		},
+		{
+			label: "Shop",
+			illustration: createSingleIllustration(LuShoppingCart, "Shop"),
+		},
+		{
+			label: "Collection",
+			illustration: createSingleIllustration(LuNotebook, "Collection"),
+		},
+		{
+			label: "Circle",
+			illustration: createSingleIllustration(MdPeopleAlt, "Circle"),
+		},
+		{
+			label: "News",
+			illustration: createSingleIllustration(LuNewspaper, "News"),
+			badge: "1",
+		},
+		{
+			label: "Friend",
+			illustration: createSingleIllustration(FaHandshake, "Friend"),
+		},
+		{
+			illustration: systemTileIllustration,
+			label: "System",
+			submenu: systemSubmenuDefinition({
+				onSoundOpen,
+			}),
+		},
+	];
+}
 
 export const homeTopBanners: HomeScreenBannerInput[] = [
 	{

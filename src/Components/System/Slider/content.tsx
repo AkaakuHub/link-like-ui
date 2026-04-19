@@ -21,6 +21,7 @@ export interface SliderRowProps extends HTMLAttributes<HTMLDivElement> {
 	min?: number;
 	max?: number;
 	step?: number;
+	sliderTrackClassName?: string;
 	sliderThumbClassName?: string;
 	sliderDisabled?: boolean;
 }
@@ -34,6 +35,7 @@ export function SliderRow({
 	max = 100,
 	min = 0,
 	sliderDisabled = false,
+	sliderTrackClassName,
 	sliderThumbClassName,
 	step = 1,
 }: SliderRowProps) {
@@ -61,6 +63,9 @@ export function SliderRow({
 				step={step}
 				disabled={sliderDisabled}
 				aria-label={label}
+				{...(sliderTrackClassName
+					? { trackClassName: sliderTrackClassName }
+					: {})}
 				{...(sliderThumbClassName
 					? { thumbClassName: sliderThumbClassName }
 					: {})}

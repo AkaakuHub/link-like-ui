@@ -7,6 +7,7 @@ interface SystemSubmenuDefinition {
 		icon: (typeof systemMenuIcons)[number];
 		id: string;
 		label: string;
+		onClick?: () => void;
 	}[];
 	title: string;
 }
@@ -23,12 +24,27 @@ export const systemTileIllustration = {
 	kind: "cluster",
 } as const satisfies NonNullable<HomeScreenMenuItemInput["illustration"]>;
 
-export const systemSubmenuDefinition = {
-	items: [
-		{ icon: systemMenuIcons[0], id: "system-item", label: "Item" },
-		{ icon: systemMenuIcons[1], id: "system-sound", label: "Sound" },
-		{ icon: systemMenuIcons[2], id: "system-option", label: "Option" },
-		{ icon: systemMenuIcons[3], id: "system-menu", label: "Menu" },
-	],
-	title: "System",
-} as const satisfies SystemSubmenuDefinition;
+interface SystemSubmenuDefinitionOptions {
+	onSoundOpen: () => void;
+}
+
+export function systemSubmenuDefinition({
+	onSoundOpen,
+}: SystemSubmenuDefinitionOptions): SystemSubmenuDefinition {
+	return {
+		items: [
+			{ icon: systemMenuIcons[0], id: "system-item", label: "Item" },
+			{
+				icon: systemMenuIcons[1],
+				id: "system-sound",
+				label: "Sound",
+				onClick: () => {
+					onSoundOpen();
+				},
+			},
+			{ icon: systemMenuIcons[2], id: "system-option", label: "Option" },
+			{ icon: systemMenuIcons[3], id: "system-menu", label: "Menu" },
+		],
+		title: "System",
+	};
+}

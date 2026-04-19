@@ -67,26 +67,39 @@ SystemModalOverlay.displayName = "SystemModalOverlay";
 export interface SystemModalContentProps
 	extends ComponentPropsWithoutRef<typeof SystemModalContentPrimitive> {
 	bodyClassName?: string;
+	overlayClassName?: string;
 	width?: "sm" | "md" | "lg";
 }
 
 export const SystemModalContent = forwardRef<
 	ElementRef<typeof SystemModalContentPrimitive>,
 	SystemModalContentProps
->(({ bodyClassName, children, className, width = "md", ...props }, ref) => {
-	return (
-		<SystemModalPortalPrimitive>
-			<SystemModalOverlay />
-			<SystemModalContentPrimitive
-				ref={ref}
-				className={cn(systemModalContentClassName({ width }), className)}
-				{...props}
-			>
-				<div className={cn("bg-ll-white", bodyClassName)}>{children}</div>
-			</SystemModalContentPrimitive>
-		</SystemModalPortalPrimitive>
-	);
-});
+>(
+	(
+		{
+			bodyClassName,
+			children,
+			className,
+			overlayClassName,
+			width = "md",
+			...props
+		},
+		ref,
+	) => {
+		return (
+			<SystemModalPortalPrimitive>
+				<SystemModalOverlay className={overlayClassName} />
+				<SystemModalContentPrimitive
+					ref={ref}
+					className={cn(systemModalContentClassName({ width }), className)}
+					{...props}
+				>
+					<div className={cn("bg-ll-white", bodyClassName)}>{children}</div>
+				</SystemModalContentPrimitive>
+			</SystemModalPortalPrimitive>
+		);
+	},
+);
 
 SystemModalContent.displayName = "SystemModalContent";
 

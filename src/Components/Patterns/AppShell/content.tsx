@@ -90,6 +90,7 @@ export interface LayoutProps {
 	hasMenuNotification?: boolean;
 	homeAction?: LayoutAction;
 	menuTiles: LayoutTileDefinition[];
+	overlayContent?: ReactNode;
 	pageDefinitions?: LayoutPageDefinition[];
 	topBanners: LayoutBannerDefinition[];
 	rightContent?: ReactNode;
@@ -167,6 +168,7 @@ function HomeLayout({
 	hasMenuNotification = false,
 	homeAction = { ariaLabel: "Home", label: "Home" },
 	menuTiles,
+	overlayContent,
 	pageDefinitions = [],
 	rightContent,
 	topBanners,
@@ -310,6 +312,7 @@ function HomeLayout({
 					</SystemModalContent>
 				</SystemModal>
 			) : null}
+			{overlayContent}
 			<HomeLayoutDock
 				canGoBack={canGoBack}
 				homeAction={homeAction}

@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { LoadingOverlay } from "../../../src/Components/System/Loading";
-import { ControlModalPreview } from "./ControlModalPreview";
 import { FilterModalPreview } from "./FilterModalPreview";
 import { FormModalPreview } from "./FormModalPreview";
 import { InfoModalPreview } from "./InfoModalPreview";
 import { NoticeModalPreview } from "./NoticeModalPreview";
 import { PanelModalPreview } from "./PanelModalPreview";
 import { PreviewToolbar } from "./PreviewToolbar";
+import { SoundModalPreview } from "./SoundModalPreview";
 import { TableModalPreview } from "./TableModalPreview";
 import { TextModalPreview } from "./TextModalPreview";
 
@@ -22,7 +22,7 @@ export function ComponentsPreview() {
 				}}
 			/>
 			<PanelModalPreview />
-			<ControlModalPreview />
+			<SoundModalPreview />
 			<InfoModalPreview />
 			<FilterModalPreview />
 			<FormModalPreview />

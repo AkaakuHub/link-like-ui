@@ -3,15 +3,20 @@ import { Button } from "../../../src/Components/System/Button";
 import { SliderToggleRow } from "../../../src/Components/System/Slider";
 import {
 	SystemModal,
-	SystemModalActions,
+	SystemModalActionGrid,
 	SystemModalBody,
 	SystemModalClose,
 	SystemModalContent,
+	SystemModalFooter,
 	SystemModalHeader,
 	SystemModalTitle,
-	SystemModalTrigger,
 } from "../../../src/Components/System/SystemModal";
-import { TabList, TabPanel, TabRoot, TabTrigger } from "../../../src/Components/System/Tab";
+import {
+	TabList,
+	TabPanel,
+	TabRoot,
+	TabTrigger,
+} from "../../../src/Components/System/Tab";
 import {
 	createInitialMap,
 	createInitialToggleMap,
@@ -21,7 +26,17 @@ import {
 	type ControlTabValue,
 } from "./controlData";
 
-export function ControlModalPreview() {
+interface SoundModalProps {
+	hasOverlay?: boolean;
+	onOpenChange: (nextOpen: boolean) => void;
+	open: boolean;
+}
+
+export function SoundModal({
+	hasOverlay = true,
+	onOpenChange,
+	open,
+}: SoundModalProps) {
 	const [activeTab, setActiveTab] = useState<ControlTabValue>("tab-01");
 	const [values, setValues] = useState<Record<string, number>>(
 		createInitialMap(70),
@@ -51,26 +66,25 @@ export function ControlModalPreview() {
 	}
 
 	return (
-		<SystemModal>
-			<SystemModalTrigger asChild>
-				<Button size="lg" variant="secondary">
-					Open Control Modal
-				</Button>
-			</SystemModalTrigger>
-			<SystemModalContent width="md">
+		<SystemModal open={open} onOpenChange={onOpenChange}>
+			<SystemModalContent
+				overlayClassName={hasOverlay ? undefined : "bg-transparent"}
+				width="md"
+			>
 				<SystemModalHeader>
-					<SystemModalTitle>Control Settings</SystemModalTitle>
+					<SystemModalTitle>Sound Settings</SystemModalTitle>
 				</SystemModalHeader>
 				<SystemModalBody>
 					<SliderToggleRow
 						label="Main"
-						value={values.master ?? 70}
-						onValueChange={(nextValue) => updateValue("master", nextValue)}
-						pressed={toggles.master ?? false}
 						onPressedChange={(pressed) => {
 							updateToggle("master", pressed);
 						}}
+						onValueChange={(nextValue) => updateValue("master", nextValue)}
+						pressed={toggles.master ?? false}
+						sliderTrackClassName="h-[0.68rem]"
 						toggleAriaLabel="Toggle Main"
+						value={values.master ?? 70}
 					/>
 					<TabRoot value={activeTab} onValueChange={handleTabChange}>
 						<TabList>
@@ -81,33 +95,40 @@ export function ControlModalPreview() {
 							))}
 						</TabList>
 						{tabLabels.map((tabItem) => (
-							<TabPanel key={tabItem.value} value={tabItem.value} tone="surface">
+							<TabPanel key={tabItem.value} tone="surface" value={tabItem.value}>
 								{rowsByTab[tabItem.value].map((rowItem) => (
 									<SliderToggleRow
 										key={rowItem.id}
 										label={rowItem.label}
-										value={values[rowItem.id] ?? 70}
+										onPressedChange={(pressed) => {
+											updateToggle(rowItem.id, pressed);
+										}}
 										onValueChange={(nextValue) => {
 											updateValue(rowItem.id, nextValue);
 										}}
 										pressed={toggles[rowItem.id] ?? false}
-										onPressedChange={(pressed) => {
-											updateToggle(rowItem.id, pressed);
-										}}
 										toggleAriaLabel={`Toggle ${rowItem.label}`}
+										value={values[rowItem.id] ?? 70}
 									/>
 								))}
 							</TabPanel>
 						))}
 					</TabRoot>
-					<SystemModalActions spacing="compact">
+				</SystemModalBody>
+				<SystemModalFooter>
+					<SystemModalActionGrid className="grid-cols-2">
 						<SystemModalClose asChild>
-							<Button variant="secondary" size="lg" radius="dialog" width="dialog">
-								Close
+							<Button radius="dialog" size="modal" variant="secondary">
+								Cancel
 							</Button>
 						</SystemModalClose>
-					</SystemModalActions>
-				</SystemModalBody>
+						<SystemModalClose asChild>
+							<Button radius="dialog" size="modal">
+								OK
+							</Button>
+						</SystemModalClose>
+					</SystemModalActionGrid>
+				</SystemModalFooter>
 			</SystemModalContent>
 		</SystemModal>
 	);
