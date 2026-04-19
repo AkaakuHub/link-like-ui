@@ -1,4 +1,5 @@
 import { execFileSync } from "node:child_process";
+import fsSync from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
@@ -86,6 +87,7 @@ function getTrackedTypeScriptFiles() {
 		.filter((filePath) => !filePath.startsWith("node_modules/"))
 		.filter((filePath) => !filePath.startsWith("cc-docs/"))
 		.map((filePath) => path.resolve(repoRoot, filePath))
+		.filter((filePath) => fsSync.existsSync(filePath))
 		.filter((filePath) => supportedExtensions.has(path.extname(filePath)));
 }
 
