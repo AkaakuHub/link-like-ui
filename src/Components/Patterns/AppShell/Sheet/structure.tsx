@@ -162,7 +162,10 @@ export function LayoutTile({
 	return (
 		<LayoutButtonBase
 			className={cn(
-				"ll-interactive-filter relative overflow-visible rounded-[0.92rem] border border-ll-white/62 bg-ll-white/92 text-left shadow-[0_6px_14px_color-mix(in_srgb,var(--color-ll-gray)_13%,transparent)] focus-visible:outline-3 focus-visible:outline-ll-label",
+				"ll-interactive-filter relative overflow-visible rounded-[0.92rem] border text-left focus-visible:outline-3 focus-visible:outline-ll-label",
+				disabledState === "none"
+					? "border-ll-white/62 bg-ll-white/92 shadow-[0_6px_14px_color-mix(in_srgb,var(--color-ll-gray)_13%,transparent)]"
+					: "border-transparent bg-transparent shadow-none",
 				layoutTileColumnClassMap[colSpan],
 				layoutTileRowClassMap[rowSpan],
 				className,

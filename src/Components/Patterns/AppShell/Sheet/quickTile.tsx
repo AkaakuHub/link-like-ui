@@ -112,14 +112,7 @@ export function LayoutQuickTile({
 				) : null}
 				{hideLabel ? null : (
 					<div className="mt-[0.08rem] w-full min-w-0 overflow-x-hidden overflow-y-visible px-[0.01rem] pb-[0.02rem]">
-						<p
-							className={cn(
-								"block overflow-visible text-center whitespace-nowrap text-[0.86rem] leading-[1.18] font-medium text-ellipsis max-[420px]:text-[0.78rem] max-[380px]:text-[0.7rem] max-[360px]:text-[0.63rem]",
-								disabledState === "none"
-									? "ll-bg-system-gradient bg-clip-text text-transparent"
-									: "text-ll-label/52",
-							)}
-						>
+						<p className="block overflow-visible text-center whitespace-nowrap text-[0.86rem] leading-[1.18] font-medium text-ll-label text-ellipsis max-[420px]:text-[0.78rem] max-[380px]:text-[0.7rem] max-[360px]:text-[0.63rem]">
 							<span className="inline-block max-w-full overflow-hidden align-top text-ellipsis whitespace-nowrap pb-[0.08rem]">
 								{label}
 							</span>
@@ -127,6 +120,9 @@ export function LayoutQuickTile({
 					</div>
 				)}
 			</div>
+			{disabledState !== "none" ? (
+				<div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-ll-gray/60" />
+			) : null}
 		</LayoutTile>
 	);
 }
