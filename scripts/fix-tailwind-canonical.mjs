@@ -33,6 +33,11 @@ async function main() {
 			true,
 			getScriptKind(filePath),
 		);
+
+		if (sourceFile.parseDiagnostics.length > 0) {
+			continue;
+		}
+
 		const replacements = [];
 
 		visitNode(sourceFile, sourceFile, designSystem, replacements);
@@ -285,7 +290,15 @@ function isFontFamilyClassCandidate(candidate) {
 }
 
 function applyReplacements(sourceText, replacements) {
-	const sortedReplacements = [...replacements].sort(
+	const uniqueReplacements = Array.from(
+		new Map(
+			replacements.map((replacement) => [
+				`${replacement.start}:${replacement.end}`,
+				replacement,
+			]),
+		).values(),
+	);
+	const sortedReplacements = uniqueReplacements.sort(
 		(left, right) => right.start - left.start,
 	);
 	let nextSourceText = sourceText;
