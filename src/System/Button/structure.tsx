@@ -3,7 +3,7 @@ import { tv } from "tailwind-variants";
 import { cn } from "../../utils";
 import { ButtonBase } from "./primitives";
 
-type ButtonVariant = "primary" | "secondary";
+type ButtonVariant = "primary" | "secondary" | "danger";
 type ButtonSize = "sm" | "md" | "lg" | "modal";
 type ButtonRadius = "default" | "dialog";
 type ButtonWidth = "auto" | "dialog";
@@ -14,6 +14,8 @@ const buttonVariants = tv({
 		variant: {
 			primary: "ll-bg-system-gradient text-ll-white disabled:bg-none",
 			secondary: "ll-shadow-control bg-white text-ll-gray",
+			danger:
+				"bg-linear-to-r from-ll-unfollow-left to-ll-unfollow-right text-ll-white disabled:bg-none",
 		},
 		size: {
 			sm: "h-8 px-3 text-[0.85rem]",
