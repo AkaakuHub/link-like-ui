@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { HomeScreen } from "../../../src/Components/Patterns/AppShell";
 import { TapEffect } from "../../../src/Components/System/TapEffect";
 import { homeMenuItems, homeTopBanners } from "./homeData";
+import { mediaPageDefinition } from "./mediaData";
 import { countNoticeItems } from "./noticeData";
 import { presentPageDefinition } from "./presentData";
 import { SoundModal } from "./SoundModal";
 
-type AppRoute = "home" | "present";
+type AppRoute = "home" | "media" | "present";
 type AppHistoryState = {
 	depth: number;
 	pageId: AppRoute;
@@ -14,6 +15,10 @@ type AppHistoryState = {
 };
 
 function resolveRouteFromPathname(pathname: string): AppRoute {
+	if (pathname === "/media") {
+		return "media";
+	}
+
 	return pathname === "/present" ? "present" : "home";
 }
 
@@ -59,7 +64,8 @@ export function HomePreview() {
 	}, []);
 
 	function navigateTo(pageId: AppRoute) {
-		const pathname = pageId === "home" ? "/" : "/present";
+		const pathname =
+			pageId === "home" ? "/" : pageId === "media" ? "/media" : "/present";
 
 		if (globalThis.location.pathname === pathname) {
 			setCurrentPageId(pageId);
@@ -93,7 +99,16 @@ export function HomePreview() {
 							globalThis.history.back();
 						},
 					}}
-					banners={homeTopBanners}
+					banners={homeTopBanners.map((banner, index) =>
+						index === 0
+							? {
+									...banner,
+									onClick: () => {
+										navigateTo("media");
+									},
+								}
+							: banner,
+					)}
 					canGoBackToPage={historyDepth > 0}
 					currentPageId={currentPageId}
 					homeAction={{
@@ -121,7 +136,7 @@ export function HomePreview() {
 							open={isSoundModalOpen}
 						/>
 					}
-					pageDefinitions={[presentPageDefinition]}
+					pageDefinitions={[mediaPageDefinition, presentPageDefinition]}
 				/>
 			</main>
 		</TapEffect>

@@ -44,6 +44,7 @@ export interface LayoutTileDefinition {
 interface HomeLayoutSheetProps {
 	isMenuOpen: boolean;
 	isMenuVisible: boolean;
+	onBannerClick: () => void;
 	menuTiles: LayoutTileDefinition[];
 	onGoToPage: (pageId: string) => void;
 	onOpenSubmenu: (tileId: string) => void;
@@ -53,6 +54,7 @@ interface HomeLayoutSheetProps {
 export function HomeLayoutSheet({
 	isMenuOpen,
 	isMenuVisible,
+	onBannerClick,
 	menuTiles,
 	onGoToPage,
 	onOpenSubmenu,
@@ -78,7 +80,14 @@ export function HomeLayoutSheet({
 					<LayoutImageBanner
 						key={banner.id}
 						aria-label={banner.alt}
-						{...(banner.onClick ? { onClick: banner.onClick } : {})}
+						{...(banner.onClick
+							? {
+									onClick: (event) => {
+										banner.onClick?.(event);
+										onBannerClick();
+									},
+								}
+							: {})}
 					>
 						<LayoutImageBannerMedia alt={banner.alt} src={banner.src} />
 						{banner.badge ? (

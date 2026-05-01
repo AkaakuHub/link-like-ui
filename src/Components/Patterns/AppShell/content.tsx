@@ -283,6 +283,9 @@ function HomeLayout({
 			<HomeLayoutSheet
 				isMenuOpen={isMenuOpen}
 				isMenuVisible={isMenuVisible}
+				onBannerClick={() => {
+					closeMenu();
+				}}
 				menuTiles={menuTiles}
 				onGoToPage={(pageId) => {
 					closeMenu();
@@ -348,6 +351,11 @@ function HomeLayout({
 					toggleMenu();
 				}}
 				onGoHome={() => {
+					if (isMenuOpen) {
+						closeMenu();
+						return;
+					}
+
 					if (currentPageId === "home" && !canGoBack) {
 						return;
 					}
