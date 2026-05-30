@@ -13,6 +13,7 @@ import {
 	ScreenPageRoot,
 } from "../../../src/Components/Patterns/ScreenPage";
 import { ScreenTitleBar } from "../../../src/Components/Patterns/ScreenTitleBar";
+import { LoadingOverlay } from "../../../src/Components/System/Loading";
 import {
 	fetchRealMediaItems,
 	type RealMediaItem,
@@ -43,13 +44,18 @@ export function RealMediaPreview() {
 	const [items, setItems] = useState<readonly RealMediaItem[]>([]);
 	const [nextOffset, setNextOffset] = useState<number>(0);
 	const [hasMore, setHasMore] = useState<boolean>(false);
+	const [isLoading, setIsLoading] = useState<boolean>(true);
 
 	useEffect(() => {
-		void fetchRealMediaItems().then((page) => {
-			setItems(page.items);
-			setNextOffset(page.nextOffset);
-			setHasMore(page.hasMore);
-		});
+		void fetchRealMediaItems()
+			.then((page) => {
+				setItems(page.items);
+				setNextOffset(page.nextOffset);
+				setHasMore(page.hasMore);
+			})
+			.finally(() => {
+				setIsLoading(false);
+			});
 	}, []);
 
 	function openWithMeets(item: MediaArchiveItemInput) {
@@ -67,45 +73,55 @@ export function RealMediaPreview() {
 	}
 
 	return (
-		<ScreenPageRoot className="bottom-(--ll-home-dock-height)">
-			<ScreenTitleBar>Real Media</ScreenTitleBar>
-			<ScreenPageBody bandHeight="2.35rem" className="min-h-0">
-				<ScreenPageContent className="min-h-0 grid-rows-[auto_minmax(0,1fr)]">
-					<MediaTopTabs
-						activeTab={activeTab}
-						onTabChange={setActiveTab}
-						tabs={realMediaTabs}
-					/>
-					<div className="min-h-0 overflow-y-auto bg-ll-white pb-4">
-						{activeTab === "mypage" || activeTab === "archives" ? (
-							<>
-								<MediaArchiveList items={items} onItemSelect={openWithMeets} />
-								{hasMore ? (
-									<div className="grid px-3 py-4">
-										<button
-											type="button"
-											className="mx-auto rounded-full bg-ll-label px-5 py-2 text-sm font-semibold text-ll-true-white"
-											onClick={() => {
-												void fetchRealMediaItems(nextOffset).then((page) => {
-													setItems((currentItems) => [
-														...currentItems,
-														...page.items,
-													]);
-													setNextOffset(page.nextOffset);
-													setHasMore(page.hasMore);
-												});
-											}}
-										>
-											More
-										</button>
-									</div>
-								) : null}
-							</>
-						) : null}
-						{activeTab === "channelList" ? <MediaChannelListEmptyPanel /> : null}
-					</div>
-				</ScreenPageContent>
-			</ScreenPageBody>
-		</ScreenPageRoot>
+		<>
+			<ScreenPageRoot className="bottom-(--ll-home-dock-height)">
+				<ScreenTitleBar>Real Media</ScreenTitleBar>
+				<ScreenPageBody bandHeight="2.35rem" className="min-h-0">
+					<ScreenPageContent className="min-h-0 grid-rows-[auto_minmax(0,1fr)]">
+						<MediaTopTabs
+							activeTab={activeTab}
+							onTabChange={setActiveTab}
+							tabs={realMediaTabs}
+						/>
+						<div className="min-h-0 overflow-y-auto bg-ll-white pb-4">
+							{activeTab === "mypage" || activeTab === "archives" ? (
+								<>
+									<MediaArchiveList items={items} onItemSelect={openWithMeets} />
+									{hasMore ? (
+										<div className="grid px-3 py-4">
+											<button
+												type="button"
+												className="mx-auto rounded-full bg-ll-label px-5 py-2 text-sm font-semibold text-ll-true-white"
+												onClick={() => {
+													setIsLoading(true);
+													void fetchRealMediaItems(nextOffset)
+														.then((page) => {
+															setItems((currentItems) => [
+																...currentItems,
+																...page.items,
+															]);
+															setNextOffset(page.nextOffset);
+															setHasMore(page.hasMore);
+														})
+														.finally(() => {
+															setIsLoading(false);
+														});
+												}}
+											>
+												More
+											</button>
+										</div>
+									) : null}
+								</>
+							) : null}
+							{activeTab === "channelList" ? (
+								<MediaChannelListEmptyPanel />
+							) : null}
+						</div>
+					</ScreenPageContent>
+				</ScreenPageBody>
+			</ScreenPageRoot>
+			{isLoading ? <LoadingOverlay text="Loading..." /> : null}
+		</>
 	);
 }

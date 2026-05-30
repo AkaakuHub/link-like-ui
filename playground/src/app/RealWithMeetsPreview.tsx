@@ -1,6 +1,7 @@
 import Hls from "hls.js";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { WithMeetsScreen } from "../../../src/Components/Patterns/WithMeetsScreen";
+import { LoadingOverlay } from "../../../src/Components/System/Loading";
 import {
 	fetchRealComments,
 	fetchRealMediaItem,
@@ -26,18 +27,24 @@ export function RealWithMeetsPreview() {
 	const [mediaItem, setMediaItem] = useState<RealMediaItem | null>(null);
 	const [playbackTime, setPlaybackTime] = useState<number>(0);
 	const [playbackDuration, setPlaybackDuration] = useState<number>(0);
+	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const videoSource = mediaItem?.hlsPath ?? hlsPath;
 
 	useEffect(() => {
 		if (!id) return;
 
-		void fetchRealComments(id).then((page) => {
-			setComments(page.items);
+		setIsLoading(true);
+		void Promise.all([
+			fetchRealComments(id).then((page) => {
+				setComments(page.items);
+			}),
+			fetchRealRankings(id).then((page) => {
+				setGifts(page.items);
+			}),
+			fetchRealMediaItem(id).then(setMediaItem),
+		]).finally(() => {
+			setIsLoading(false);
 		});
-		void fetchRealRankings(id).then((page) => {
-			setGifts(page.items);
-		});
-		void fetchRealMediaItem(id).then(setMediaItem);
 	}, [id]);
 
 	useEffect(() => {
@@ -88,33 +95,36 @@ export function RealWithMeetsPreview() {
 	}
 
 	return (
-		<WithMeetsScreen
-			chapters={mediaItem?.chapters ?? []}
-			comments={comments}
-			description={mediaItem?.description ?? ""}
-			gifts={gifts}
-			onPlaybackToggle={() => {
-				const video = videoRef.current;
-				if (!video) return;
-				if (video.paused) {
-					void video.play();
-					return;
-				}
-				video.pause();
-			}}
-			onSeek={(seconds) => {
-				const video = videoRef.current;
-				if (!video) return;
-				video.currentTime = seconds;
-			}}
-			onBack={backToRealMedia}
-			posterAlt={mediaItem?.imageAlt ?? title}
-			posterSrc={mediaItem?.imageSrc ?? posterSrc}
-			playbackDuration={playbackDuration}
-			playbackTime={playbackTime}
-			title={mediaItem?.title ?? title}
-			videoRef={videoRef}
-			videoSrc={videoSource}
-		/>
+		<>
+			<WithMeetsScreen
+				chapters={mediaItem?.chapters ?? []}
+				comments={comments}
+				description={mediaItem?.description ?? ""}
+				gifts={gifts}
+				onPlaybackToggle={() => {
+					const video = videoRef.current;
+					if (!video) return;
+					if (video.paused) {
+						void video.play();
+						return;
+					}
+					video.pause();
+				}}
+				onSeek={(seconds) => {
+					const video = videoRef.current;
+					if (!video) return;
+					video.currentTime = seconds;
+				}}
+				onBack={backToRealMedia}
+				posterAlt={mediaItem?.imageAlt ?? title}
+				posterSrc={mediaItem?.imageSrc ?? posterSrc}
+				playbackDuration={playbackDuration}
+				playbackTime={playbackTime}
+				title={mediaItem?.title ?? title}
+				videoRef={videoRef}
+				videoSrc={videoSource}
+			/>
+			{isLoading ? <LoadingOverlay text="Loading..." /> : null}
+		</>
 	);
 }
