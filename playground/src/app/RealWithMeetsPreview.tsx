@@ -35,7 +35,7 @@ export function RealWithMeetsPreview() {
 
 		setIsLoading(true);
 		void Promise.all([
-			fetchRealComments(id).then((page) => {
+			fetchRealComments(id, 0, 80, 0).then((page) => {
 				setComments(page.items);
 			}),
 			fetchRealRankings(id).then((page) => {
@@ -46,6 +46,20 @@ export function RealWithMeetsPreview() {
 			setIsLoading(false);
 		});
 	}, [id]);
+
+	useEffect(() => {
+		if (!id || playbackTime <= 0) return;
+
+		const timeoutId = globalThis.setTimeout(() => {
+			void fetchRealComments(id, 0, 80, playbackTime * 1000).then((page) => {
+				setComments(page.items);
+			});
+		}, 350);
+
+		return () => {
+			globalThis.clearTimeout(timeoutId);
+		};
+	}, [id, playbackTime]);
 
 	useEffect(() => {
 		const video = videoRef.current;

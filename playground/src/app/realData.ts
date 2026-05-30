@@ -58,9 +58,19 @@ export async function fetchRealComments(
 	liveId: string,
 	offset = 0,
 	limit = 80,
+	playTimeMs?: number,
 ): Promise<RealDataPage<RealComment>> {
+	const params = new URLSearchParams({
+		limit: String(limit),
+		offset: String(offset),
+	});
+
+	if (playTimeMs !== undefined) {
+		params.set("playTimeMs", String(Math.floor(playTimeMs)));
+	}
+
 	const response = await fetch(
-		`/__real-data/comments/${encodeURIComponent(liveId)}?offset=${offset}&limit=${limit}`,
+		`/__real-data/comments/${encodeURIComponent(liveId)}?${params.toString()}`,
 	);
 
 	if (!response.ok) {

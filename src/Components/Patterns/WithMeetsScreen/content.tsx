@@ -119,16 +119,21 @@ function WithMeetsPlaybackControls({
 		<WithMeetsProgressArea>
 			<button
 				type="button"
-				className="relative h-[0.32em] w-full bg-ll-disabled/88"
+				className="relative grid h-[1.4em] w-full items-center"
 				onClick={(event) => {
 					const rect = event.currentTarget.getBoundingClientRect();
 					const ratio = (event.clientX - rect.left) / rect.width;
 					onSeek?.(Math.max(0, Math.min(duration, duration * ratio)));
 				}}
 			>
+				<span className="absolute inset-x-0 h-[0.5em] rounded-full bg-ll-disabled/88" />
 				<span
-					className="block h-full bg-ll-red"
+					className="absolute left-0 h-[0.5em] rounded-full bg-ll-red"
 					style={{ width: `${progress}%` }}
+				/>
+				<span
+					className="absolute h-[1em] w-[1em] -translate-x-1/2 rounded-full bg-ll-red shadow-[0_1px_4px_color-mix(in_srgb,var(--color-ll-black)_30%,transparent)]"
+					style={{ left: `${progress}%` }}
 				/>
 			</button>
 			<WithMeetsControlRow>
@@ -520,7 +525,6 @@ export function WithMeetsScreen({
 						<WithMeetsStageVideo
 							ref={videoRef}
 							poster={posterSrc}
-							src={videoSrc}
 							controls={false}
 						/>
 					) : (

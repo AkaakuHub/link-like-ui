@@ -97,10 +97,17 @@ export function realDataPlugin(): Plugin {
 }
 
 function readPageOptions(requestUrl: URL) {
-	return {
+	const playTimeMs = requestUrl.searchParams.get("playTimeMs");
+	const options = {
 		limit: clampNumber(Number(requestUrl.searchParams.get("limit") ?? 60), 1, 200),
 		offset: Math.max(0, Number(requestUrl.searchParams.get("offset") ?? 0)),
 	};
+	return playTimeMs === null
+		? options
+		: {
+				...options,
+				playTimeMs: Math.max(0, Number(playTimeMs)),
+			};
 }
 
 function clampNumber(value: number, min: number, max: number) {

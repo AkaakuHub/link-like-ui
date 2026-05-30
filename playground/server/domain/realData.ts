@@ -62,4 +62,5 @@ export interface RealDataRepository {
 export interface RealDataPageOptions {
 	limit: number;
 	offset: number;
+	playTimeMs?: number;
 }

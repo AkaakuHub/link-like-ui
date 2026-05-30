@@ -97,22 +97,39 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 		liveId: string,
 		options: RealDataPageOptions,
 	): Promise<RealDataPage<RealComment>> {
+		const playTimeCondition =
+			typeof options.playTimeMs === "number"
+				? `and play_time_ms <= ${Math.floor(options.playTimeMs)}`
+				: "";
+		const orderBy =
+			typeof options.playTimeMs === "number"
+				? "play_time_ms desc, timeline_id desc"
+				: "play_time_ms asc, timeline_id asc";
 		const rows = await this.#queryJson<RealComment>(`
 			select coalesce(json_agg(row_to_json(comment_rows)), '[]'::json)
 			from (
 				select
-					id::text as id,
+					(timeline_id || '-' || play_time_ms::text || '-' || coalesce(user_player_id, '')) as id,
 					body as message,
 					coalesce(play_time_ms, 0) as "playTimeMs",
 					user_name as "userName"
 				from withlive_comments
 				where live_id = ${sqlLiteral(liveId)}
-				order by play_time_ms asc, id asc
+					and body is not null
+					and body <> ''
+					${playTimeCondition}
+				order by ${orderBy}
 				limit ${options.limit + 1}
 				offset ${options.offset}
 			) comment_rows
 		`);
-		return pageFromLimitPlusOne(rows, options);
+		const page = pageFromLimitPlusOne(rows, options);
+		return typeof options.playTimeMs === "number"
+			? {
+					...page,
+					items: [...page.items].reverse(),
+				}
+			: page;
 	}
 
 	async getRankings(
