@@ -1,108 +1,133 @@
 import type { LayoutPageDefinition } from "../../../src/Components/Patterns/AppShell";
+import {
+	MediaHeaderPointAction,
+	MediaHeaderProfile,
+} from "../../../src/Components/Patterns/MediaScreen";
 import { MediaPagePreview } from "./MediaPagePreview";
 
-export type MediaPrimaryTab =
-	| "archives"
-	| "music-video"
-	| "ranking"
-	| "upcoming"
-	| "with-station";
+export type MediaPrimaryTab = "archives" | "channelList" | "mypage";
 
 export interface RecentMediaItem {
 	availability: string;
-	badge: string;
 	id: string;
-	subtitle: string;
+	imageAlt: string;
+	imageSrc: string;
 	title: string;
-	toneClassName: string;
 }
 
 export interface ArchiveMediaItem {
 	duration: string;
 	id: string;
+	imageAlt: string;
+	imageSrc: string;
 	releasedAt: string;
 	title: string;
-	toneClassName: string;
 }
-
-export const mediaPrimaryTabs: readonly {
-	id: MediaPrimaryTab;
-	label: string;
-}[] = [
-	{ id: "upcoming", label: "UPCOMING" },
-	{ id: "archives", label: "ARCHIVES" },
-	{ id: "with-station", label: "WITH×STATION" },
-	{ id: "music-video", label: "MUSIC VIDEO" },
-	{ id: "ranking", label: "RANKING" },
-] as const;
 
 export const recentMediaItems: readonly RecentMediaItem[] = [
 	{
-		availability: "2026/04/16 21:00 Available",
-		badge: "Time-Limited",
+		availability: "Scheduled for 2024/02/10 21:00",
 		id: "recent-01",
-		subtitle: "Feature Clip 01",
-		title: "Quiz Clip: What kind of trick is this?",
-		toneClassName:
-			"from-ll-system-left via-ll-system-right/90 to-ll-pink/85",
+		imageAlt: "scheduled stream placeholder",
+		imageSrc: "https://placehold.jp/480x270.png",
+		title: "Scheduled Session One",
 	},
 	{
-		availability: "2026/04/13 20:30 Available",
-		badge: "Featured",
+		availability: "Scheduled for 2024/02/12 20:00",
 		id: "recent-02",
-		subtitle: "Feature Clip 02",
-		title: "Reading Session: A quiet line with a neon finish",
-		toneClassName: "from-ll-orange/88 via-ll-system-left/82 to-ll-white/75",
+		imageAlt: "scheduled stream placeholder",
+		imageSrc: "https://placehold.jp/480x270.png",
+		title: "Scheduled Session Two",
 	},
 ] as const;
 
 export const archiveMediaItems: readonly ArchiveMediaItem[] = [
 	{
-		duration: "01:15:00",
+		duration: "26:54",
 		id: "archive-01",
-		releasedAt: "2026.03.30",
-		title: "Live Stage Digest 01",
-		toneClassName: "from-ll-system-left via-ll-white/65 to-ll-pink/80",
+		imageAlt: "archived stream placeholder",
+		imageSrc: "https://placehold.jp/480x270.png",
+		releasedAt: "2024.02.08",
+		title: "Archived Stream One",
 	},
 	{
-		duration: "40:00",
+		duration: "25:00",
 		id: "archive-02",
-		releasedAt: "2026.03.28",
-		title: "After Talk Digest 02",
-		toneClassName: "from-ll-orange/86 via-ll-pink/75 to-ll-system-right/82",
+		imageAlt: "archived stream placeholder",
+		imageSrc: "https://placehold.jp/480x270.png",
+		releasedAt: "2024.02.05",
+		title: "Archived Stream Two",
 	},
 	{
-		duration: "36:00",
+		duration: "24:00",
 		id: "archive-03",
-		releasedAt: "2026.03.26",
-		title: "Story Segment 03",
-		toneClassName: "from-ll-system-right/82 via-ll-white/72 to-ll-system-left",
+		imageAlt: "archived stream placeholder",
+		imageSrc: "https://placehold.jp/480x270.png",
+		releasedAt: "2024.02.03",
+		title: "Archived Stream Three",
 	},
 	{
-		duration: "31:00",
+		duration: "52:14",
 		id: "archive-04",
-		releasedAt: "2026.03.23",
-		title: "Theme Digest 04",
-		toneClassName: "from-ll-pink/82 via-ll-orange/75 to-ll-white/72",
+		imageAlt: "archived stream placeholder",
+		imageSrc: "https://placehold.jp/480x270.png",
+		releasedAt: "2024.01.31",
+		title: "Archived Stream Four",
 	},
 	{
-		duration: "34:00",
+		duration: "16:00",
 		id: "archive-05",
-		releasedAt: "2026.03.21",
-		title: "Closing Note 05",
-		toneClassName: "from-ll-white/70 via-ll-system-left/80 to-ll-pink/88",
+		imageAlt: "archived stream placeholder",
+		imageSrc: "https://placehold.jp/480x270.png",
+		releasedAt: "2024.01.29",
+		title: "Archived Stream Five",
 	},
 	{
-		duration: "34:00",
+		duration: "19:00",
 		id: "archive-06",
-		releasedAt: "2026.03.19",
-		title: "Dream Scene 06",
-		toneClassName: "from-ll-system-left/82 via-ll-orange/82 to-ll-system-right",
+		imageAlt: "archived stream placeholder",
+		imageSrc: "https://placehold.jp/480x270.png",
+		releasedAt: "2024.01.27",
+		title: "Archived Stream Six",
+	},
+	{
+		duration: "21:00",
+		id: "archive-07",
+		imageAlt: "archived stream placeholder",
+		imageSrc: "https://placehold.jp/480x270.png",
+		releasedAt: "2024.01.24",
+		title: "Archived Stream Seven",
+	},
+	{
+		duration: "20:00",
+		id: "archive-08",
+		imageAlt: "archived stream placeholder",
+		imageSrc: "https://placehold.jp/480x270.png",
+		releasedAt: "2024.01.20",
+		title: "Archived Stream Eight",
+	},
+	{
+		duration: "19:00",
+		id: "archive-09",
+		imageAlt: "archived stream placeholder",
+		imageSrc: "https://placehold.jp/480x270.png",
+		releasedAt: "2024.01.18",
+		title: "Archived Stream Nine",
+	},
+	{
+		duration: "21:00",
+		id: "archive-10",
+		imageAlt: "archived stream placeholder",
+		imageSrc: "https://placehold.jp/480x270.png",
+		releasedAt: "2024.01.16",
+		title: "Archived Stream Ten",
 	},
 ] as const;
 
 export const mediaPageDefinition: LayoutPageDefinition = {
+	centerContent: <MediaHeaderProfile level="6" name="Sample User" />,
 	content: <MediaPagePreview />,
 	id: "media",
+	rightContent: <MediaHeaderPointAction ariaLabel="Add" count="0" />,
 	showClock: false,
 };
