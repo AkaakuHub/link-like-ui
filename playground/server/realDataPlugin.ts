@@ -42,7 +42,7 @@ export function realDataPlugin(): Plugin {
 
 				try {
 					if (requestUrl.pathname === "/__real-data/media") {
-						sendJson(res, await service.listMedia());
+						sendJson(res, await service.listMedia(readPageOptions(requestUrl)));
 						return;
 					}
 
@@ -64,7 +64,15 @@ export function realDataPlugin(): Plugin {
 						const liveId = decodeURIComponent(
 							requestUrl.pathname.replace("/__real-data/comments/", ""),
 						);
-						sendJson(res, await service.getComments(liveId));
+						sendJson(res, await service.getComments(liveId, readPageOptions(requestUrl)));
+						return;
+					}
+
+					if (requestUrl.pathname.startsWith("/__real-data/rankings/")) {
+						const liveId = decodeURIComponent(
+							requestUrl.pathname.replace("/__real-data/rankings/", ""),
+						);
+						sendJson(res, await service.getRankings(liveId, readPageOptions(requestUrl)));
 						return;
 					}
 
@@ -86,6 +94,18 @@ export function realDataPlugin(): Plugin {
 		},
 		name: "link-like-ui-real-data",
 	};
+}
+
+function readPageOptions(requestUrl: URL) {
+	return {
+		limit: clampNumber(Number(requestUrl.searchParams.get("limit") ?? 60), 1, 200),
+		offset: Math.max(0, Number(requestUrl.searchParams.get("offset") ?? 0)),
+	};
+}
+
+function clampNumber(value: number, min: number, max: number) {
+	if (!Number.isFinite(value)) return min;
+	return Math.min(max, Math.max(min, Math.floor(value)));
 }
 
 function sendJson(res: ServerResponse, value: unknown) {

@@ -41,9 +41,15 @@ const realMediaTabs: readonly MediaTabItemInput<RealMediaPrimaryTab>[] = [
 export function RealMediaPreview() {
 	const [activeTab, setActiveTab] = useState<RealMediaPrimaryTab>("archives");
 	const [items, setItems] = useState<readonly RealMediaItem[]>([]);
+	const [nextOffset, setNextOffset] = useState<number>(0);
+	const [hasMore, setHasMore] = useState<boolean>(false);
 
 	useEffect(() => {
-		void fetchRealMediaItems().then(setItems);
+		void fetchRealMediaItems().then((page) => {
+			setItems(page.items);
+			setNextOffset(page.nextOffset);
+			setHasMore(page.hasMore);
+		});
 	}, []);
 
 	function openWithMeets(item: MediaArchiveItemInput) {
@@ -72,7 +78,29 @@ export function RealMediaPreview() {
 					/>
 					<div className="min-h-0 overflow-y-auto bg-ll-white pb-4">
 						{activeTab === "mypage" || activeTab === "archives" ? (
-							<MediaArchiveList items={items} onItemSelect={openWithMeets} />
+							<>
+								<MediaArchiveList items={items} onItemSelect={openWithMeets} />
+								{hasMore ? (
+									<div className="grid px-3 py-4">
+										<button
+											type="button"
+											className="mx-auto rounded-full bg-ll-label px-5 py-2 text-sm font-semibold text-ll-true-white"
+											onClick={() => {
+												void fetchRealMediaItems(nextOffset).then((page) => {
+													setItems((currentItems) => [
+														...currentItems,
+														...page.items,
+													]);
+													setNextOffset(page.nextOffset);
+													setHasMore(page.hasMore);
+												});
+											}}
+										>
+											More
+										</button>
+									</div>
+								) : null}
+							</>
 						) : null}
 						{activeTab === "channelList" ? <MediaChannelListEmptyPanel /> : null}
 					</div>

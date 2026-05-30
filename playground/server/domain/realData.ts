@@ -32,9 +32,34 @@ export interface RealComment {
 	userName: string;
 }
 
+export interface RealDataPage<TItem> {
+	hasMore: boolean;
+	items: readonly TItem[];
+	nextOffset: number;
+}
+
+export interface RealGiftRanking {
+	amount: string;
+	id: string;
+	label: string;
+	userName: string;
+}
+
 export interface RealDataRepository {
-	getComments(liveId: string): Promise<readonly RealComment[]>;
+	getComments(
+		liveId: string,
+		options: RealDataPageOptions,
+	): Promise<RealDataPage<RealComment>>;
 	getMedia(liveId: string): Promise<RealMediaItem | null>;
-	listMedia(): Promise<readonly RealMediaItem[]>;
+	getRankings(
+		liveId: string,
+		options: RealDataPageOptions,
+	): Promise<RealDataPage<RealGiftRanking>>;
+	listMedia(options: RealDataPageOptions): Promise<RealDataPage<RealMediaItem>>;
 	resolveFilePath(relativePath: string): string;
+}
+
+export interface RealDataPageOptions {
+	limit: number;
+	offset: number;
 }

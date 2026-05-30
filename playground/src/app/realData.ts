@@ -21,14 +21,25 @@ export interface RealComment extends WithMeetsCommentInput {
 	playTimeMs: number;
 }
 
-export async function fetchRealMediaItems(): Promise<RealMediaItem[]> {
-	const response = await fetch("/__real-data/media");
+export interface RealDataPage<TItem> {
+	hasMore: boolean;
+	items: TItem[];
+	nextOffset: number;
+}
+
+export async function fetchRealMediaItems(
+	offset = 0,
+	limit = 40,
+): Promise<RealDataPage<RealMediaItem>> {
+	const response = await fetch(
+		`/__real-data/media?offset=${offset}&limit=${limit}`,
+	);
 
 	if (!response.ok) {
 		throw new Error(`Failed to load real media: ${response.status}`);
 	}
 
-	return (await response.json()) as RealMediaItem[];
+	return (await response.json()) as RealDataPage<RealMediaItem>;
 }
 
 export async function fetchRealMediaItem(
@@ -43,12 +54,44 @@ export async function fetchRealMediaItem(
 	return (await response.json()) as RealMediaItem;
 }
 
-export async function fetchRealComments(liveId: string): Promise<RealComment[]> {
-	const response = await fetch(`/__real-data/comments/${encodeURIComponent(liveId)}`);
+export async function fetchRealComments(
+	liveId: string,
+	offset = 0,
+	limit = 80,
+): Promise<RealDataPage<RealComment>> {
+	const response = await fetch(
+		`/__real-data/comments/${encodeURIComponent(liveId)}?offset=${offset}&limit=${limit}`,
+	);
 
 	if (!response.ok) {
 		throw new Error(`Failed to load real comments: ${response.status}`);
 	}
 
-	return (await response.json()) as RealComment[];
+	return (await response.json()) as RealDataPage<RealComment>;
+}
+
+export async function fetchRealRankings(
+	liveId: string,
+	offset = 0,
+	limit = 80,
+): Promise<RealDataPage<{
+	amount: string;
+	id: string;
+	label: string;
+	userName: string;
+}>> {
+	const response = await fetch(
+		`/__real-data/rankings/${encodeURIComponent(liveId)}?offset=${offset}&limit=${limit}`,
+	);
+
+	if (!response.ok) {
+		throw new Error(`Failed to load real rankings: ${response.status}`);
+	}
+
+	return (await response.json()) as RealDataPage<{
+		amount: string;
+		id: string;
+		label: string;
+		userName: string;
+	}>;
 }

@@ -6,7 +6,10 @@ import { promisify } from "node:util";
 import type {
 	RealComment,
 	RealDataConfig,
+	RealDataPage,
+	RealDataPageOptions,
 	RealDataRepository,
+	RealGiftRanking,
 	RealMediaItem,
 } from "../domain/realData";
 import { resolveInsideRoot, toServedFilePath } from "./pathUtils";
@@ -35,7 +38,9 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 		return resolveInsideRoot(this.#rootDir, relativePath);
 	}
 
-	async listMedia(): Promise<readonly RealMediaItem[]> {
+	async listMedia(
+		options: RealDataPageOptions,
+	): Promise<RealDataPage<RealMediaItem>> {
 		const rows = await this.#queryJson<PostgresMediaRow>(`
 			select coalesce(json_agg(row_to_json(media_rows)), '[]'::json)
 			from (
@@ -53,6 +58,9 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 				left join live_archive_details on live_archive_details.live_id = with_meets.archives_id
 				where with_meets.thumbnail_image_url is not null
 					and live_archive_details.video_url is not null
+				order by coalesce(with_meets.live_start_time, live_archive_details.live_start_time) desc
+				limit ${options.limit + 1}
+				offset ${options.offset}
 			) media_rows
 		`);
 
@@ -77,16 +85,19 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 			});
 		}
 
-		return items;
+		return pageFromLimitPlusOne(items, options);
 	}
 
 	async getMedia(liveId: string): Promise<RealMediaItem | null> {
-		const items = await this.listMedia();
-		return items.find((item) => item.id === liveId) ?? null;
+		const page = await this.listMedia({ limit: 1000, offset: 0 });
+		return page.items.find((item) => item.id === liveId) ?? null;
 	}
 
-	async getComments(liveId: string): Promise<readonly RealComment[]> {
-		return this.#queryJson<RealComment>(`
+	async getComments(
+		liveId: string,
+		options: RealDataPageOptions,
+	): Promise<RealDataPage<RealComment>> {
+		const rows = await this.#queryJson<RealComment>(`
 			select coalesce(json_agg(row_to_json(comment_rows)), '[]'::json)
 			from (
 				select
@@ -97,14 +108,39 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 				from withlive_comments
 				where live_id = ${sqlLiteral(liveId)}
 				order by play_time_ms asc, id asc
+				limit ${options.limit + 1}
+				offset ${options.offset}
 			) comment_rows
 		`);
+		return pageFromLimitPlusOne(rows, options);
+	}
+
+	async getRankings(
+		liveId: string,
+		options: RealDataPageOptions,
+	): Promise<RealDataPage<RealGiftRanking>> {
+		const rows = await this.#queryJson<RealGiftRanking>(`
+			select coalesce(json_agg(row_to_json(ranking_rows)), '[]'::json)
+			from (
+				select
+					(live_id || '-' || ranking::text) as id,
+					gift_pt::text as amount,
+					(ranking::text || '位') as label,
+					user_name as "userName"
+				from withlive_gift_pt_rankings
+				where live_id = ${sqlLiteral(liveId)}
+				order by ranking asc
+				limit ${options.limit + 1}
+				offset ${options.offset}
+			) ranking_rows
+		`);
+		return pageFromLimitPlusOne(rows, options);
 	}
 
 	async #queryJson<T>(sql: string): Promise<T[]> {
 		const container = this.#config.postgresContainer ?? "with-meets-server-db-1";
-		const database = this.#config.postgresDatabase ?? "postgres";
-		const user = this.#config.postgresUser ?? "postgres";
+		const database = this.#config.postgresDatabase ?? "withmeets";
+		const user = this.#config.postgresUser ?? "hinoshita";
 		const { stdout } = await execFileAsync("docker", [
 			"exec",
 			"-i",
@@ -149,6 +185,18 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 
 		return image ? relative(this.#rootDir, join(dir, image.name)) : null;
 	}
+}
+
+function pageFromLimitPlusOne<TItem>(
+	rows: readonly TItem[],
+	options: RealDataPageOptions,
+): RealDataPage<TItem> {
+	const items = rows.slice(0, options.limit);
+	return {
+		hasMore: rows.length > options.limit,
+		items,
+		nextOffset: options.offset + items.length,
+	};
 }
 
 function sqlLiteral(value: string) {

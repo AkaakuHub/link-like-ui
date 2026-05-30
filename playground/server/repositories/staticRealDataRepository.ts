@@ -4,7 +4,10 @@ import { join, relative, resolve } from "node:path";
 import type {
 	RealComment,
 	RealDataConfig,
+	RealDataPage,
+	RealDataPageOptions,
 	RealDataRepository,
+	RealGiftRanking,
 	RealMediaChapter,
 	RealMediaItem,
 } from "../domain/realData";
@@ -50,19 +53,32 @@ export class StaticRealDataRepository implements RealDataRepository {
 		return resolveInsideRoot(this.#rootDir, relativePath);
 	}
 
-	async listMedia(): Promise<readonly RealMediaItem[]> {
+	async listMedia(
+		options: RealDataPageOptions,
+	): Promise<RealDataPage<RealMediaItem>> {
 		this.#mediaItems ??= await this.#listMediaFromMetadata();
-		return this.#mediaItems;
+		return pageItems(this.#mediaItems, options);
 	}
 
 	async getMedia(liveId: string): Promise<RealMediaItem | null> {
-		const items = await this.listMedia();
+		this.#mediaItems ??= await this.#listMediaFromMetadata();
+		const items = this.#mediaItems;
 		return items.find((item) => item.id === liveId) ?? null;
 	}
 
-	async getComments(liveId: string): Promise<readonly RealComment[]> {
+	async getComments(
+		liveId: string,
+		options: RealDataPageOptions,
+	): Promise<RealDataPage<RealComment>> {
 		this.#commentsByLiveId ??= await this.#readComments();
-		return this.#commentsByLiveId[liveId] ?? [];
+		return pageItems(this.#commentsByLiveId[liveId] ?? [], options);
+	}
+
+	async getRankings(
+		_liveId: string,
+		options: RealDataPageOptions,
+	): Promise<RealDataPage<RealGiftRanking>> {
+		return pageItems([], options);
 	}
 
 	async #listMediaFromMetadata(): Promise<readonly RealMediaItem[]> {
@@ -219,6 +235,20 @@ function sortMediaItems(items: readonly RealMediaItem[]) {
 	return [...items].sort((left, right) =>
 		right.releasedAt.localeCompare(left.releasedAt),
 	);
+}
+
+function pageItems<TItem>(
+	items: readonly TItem[],
+	options: RealDataPageOptions,
+): RealDataPage<TItem> {
+	const page = items.slice(options.offset, options.offset + options.limit);
+	const nextOffset = options.offset + page.length;
+
+	return {
+		hasMore: nextOffset < items.length,
+		items: page,
+		nextOffset,
+	};
 }
 
 function normalizeChapters(value: unknown): readonly RealMediaChapter[] {

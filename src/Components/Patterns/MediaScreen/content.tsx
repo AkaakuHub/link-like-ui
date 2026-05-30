@@ -13,6 +13,7 @@ import {
 	MediaArchiveGrid as MediaArchiveGridFrame,
 	MediaArchiveHeading,
 	MediaArchiveImage,
+	MediaArchiveMeta,
 	MediaArchiveRoot,
 	MediaArchiveThumbnail,
 	MediaArchiveTitle,
@@ -259,9 +260,11 @@ export function MediaArchiveList({
 									width={480}
 								/>
 								<MediaArchiveDuration>{item.duration}</MediaArchiveDuration>
-								<MediaArchiveDate>{item.releasedAt}</MediaArchiveDate>
 							</MediaArchiveThumbnail>
-							<MediaArchiveTitle>{item.title}</MediaArchiveTitle>
+							<MediaArchiveMeta>
+								<MediaArchiveDate>{item.releasedAt}</MediaArchiveDate>
+								<MediaArchiveTitle>{item.title}</MediaArchiveTitle>
+							</MediaArchiveMeta>
 						</MediaArchiveCardButton>
 					</MediaArchiveCardRoot>
 				))}

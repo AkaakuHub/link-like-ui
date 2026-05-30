@@ -66,6 +66,10 @@ export interface WithMeetsScreenProps {
 	posterAlt: string;
 	posterSrc: string;
 	title?: string;
+	playbackDuration?: number;
+	playbackTime?: number;
+	onPlaybackToggle?: () => void;
+	onSeek?: (seconds: number) => void;
 	videoRef?: RefObject<HTMLVideoElement | null>;
 	videoSrc?: string;
 }
@@ -99,19 +103,48 @@ function WithMeetsScoreMeter() {
 	);
 }
 
-function WithMeetsPlaybackControls() {
+function WithMeetsPlaybackControls({
+	duration,
+	onSeek,
+	onToggle,
+	time,
+}: {
+	duration: number;
+	onSeek: ((seconds: number) => void) | undefined;
+	onToggle: (() => void) | undefined;
+	time: number;
+}) {
+	const progress = duration > 0 ? Math.min(100, (time / duration) * 100) : 0;
 	return (
 		<WithMeetsProgressArea>
-			<div className="relative h-[0.22em] bg-ll-disabled/88">
-				<div className="h-full w-[8%] bg-ll-red" />
-				<div className="absolute top-1/2 left-[71%] h-full w-[29%] -translate-y-1/2 bg-ll-red" />
-			</div>
+			<button
+				type="button"
+				className="relative h-[0.32em] w-full bg-ll-disabled/88"
+				onClick={(event) => {
+					const rect = event.currentTarget.getBoundingClientRect();
+					const ratio = (event.clientX - rect.left) / rect.width;
+					onSeek?.(Math.max(0, Math.min(duration, duration * ratio)));
+				}}
+			>
+				<span
+					className="block h-full bg-ll-red"
+					style={{ width: `${progress}%` }}
+				/>
+			</button>
 			<WithMeetsControlRow>
 				<div className="inline-flex items-center gap-[1.4em] text-[0.95em] font-semibold">
-					<span className="text-[1.8em] leading-none">II</span>
-					<span>01:05</span>
+					<button
+						type="button"
+						className="text-[1.8em] leading-none"
+						onClick={onToggle}
+					>
+						II
+					</button>
+					<span>{formatPlaybackTime(time)}</span>
 					<span className="text-[1.2em] font-light">/</span>
-					<span className="text-ll-true-white/72">30:00</span>
+					<span className="text-ll-true-white/72">
+						{formatPlaybackTime(duration)}
+					</span>
 				</div>
 				<WithMeetsMenuButton type="button">
 					<LuChevronLeft className="h-[1.25em] w-[1.25em]" />
@@ -462,6 +495,10 @@ export function WithMeetsScreen({
 	posterAlt,
 	posterSrc,
 	title = posterAlt,
+	playbackDuration = 0,
+	playbackTime = 0,
+	onPlaybackToggle,
+	onSeek,
 	videoRef,
 	videoSrc,
 }: WithMeetsScreenProps) {
@@ -575,7 +612,12 @@ export function WithMeetsScreen({
 						</WithMeetsPillButton>
 					</div>
 				) : null}
-				<WithMeetsPlaybackControls />
+				<WithMeetsPlaybackControls
+					duration={playbackDuration}
+					onSeek={onSeek}
+					onToggle={onPlaybackToggle}
+					time={playbackTime}
+				/>
 				{panelMode === "none" ? null : (
 					<WithMeetsSidePanel
 						chapters={chapters}
@@ -605,4 +647,12 @@ function formatChapterTime(seconds: number | null) {
 	const minutes = Math.floor(seconds / 60);
 	const remainingSeconds = Math.floor(seconds % 60);
 	return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
+}
+
+function formatPlaybackTime(seconds: number) {
+	if (!Number.isFinite(seconds) || seconds <= 0) return "00:00";
+
+	const minutes = Math.floor(seconds / 60);
+	const remainingSeconds = Math.floor(seconds % 60);
+	return `${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
 }

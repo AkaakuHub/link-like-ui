@@ -369,7 +369,7 @@ export function MediaArchiveDate({
 	return (
 		<p
 			className={cn(
-				"absolute bottom-2 left-2 text-base leading-none font-bold tracking-[0.04em] text-ll-true-white",
+				"mt-1 text-xs leading-none font-semibold text-ll-gray/70",
 				className,
 			)}
 			{...props}
@@ -387,6 +387,18 @@ export function MediaArchiveTitle({
 				"text-sm leading-tight font-medium text-ll-gray",
 				className,
 			)}
+			{...props}
+		/>
+	);
+}
+
+export function MediaArchiveMeta({
+	className,
+	...props
+}: HTMLAttributes<HTMLDivElement>) {
+	return (
+		<MediaScreenDivBase
+			className={cn("grid gap-1 px-0.5", className)}
 			{...props}
 		/>
 	);
