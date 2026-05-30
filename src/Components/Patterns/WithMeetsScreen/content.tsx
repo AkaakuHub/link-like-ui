@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { type RefObject, useState } from "react";
 import {
 	LuChevronLeft,
 	LuExpand,
@@ -32,6 +32,7 @@ import {
 	WithMeetsScoreTrack,
 	WithMeetsSideActions,
 	WithMeetsStageImage,
+	WithMeetsStageVideo,
 	WithMeetsTopBar,
 	WithMeetsVideoViewport,
 } from "./structure";
@@ -56,6 +57,8 @@ export interface WithMeetsScreenProps {
 	onBack?: () => void;
 	posterAlt: string;
 	posterSrc: string;
+	videoRef?: RefObject<HTMLVideoElement | null>;
+	videoSrc?: string;
 }
 
 type WithMeetsPanelMode = "chapters" | "comments" | "gifts" | "info" | "none";
@@ -446,6 +449,8 @@ export function WithMeetsScreen({
 	onBack,
 	posterAlt,
 	posterSrc,
+	videoRef,
+	videoSrc,
 }: WithMeetsScreenProps) {
 	const [panelMode, setPanelMode] = useState<WithMeetsPanelMode>("comments");
 	const [isPanelSurfaceVisible, setPanelSurfaceVisible] =
@@ -461,7 +466,16 @@ export function WithMeetsScreen({
 						}
 					}}
 				>
-					<WithMeetsStageImage alt={posterAlt} src={posterSrc} />
+					{videoSrc ? (
+						<WithMeetsStageVideo
+							ref={videoRef}
+							poster={posterSrc}
+							src={videoSrc}
+							controls={false}
+						/>
+					) : (
+						<WithMeetsStageImage alt={posterAlt} src={posterSrc} />
+					)}
 				</WithMeetsVideoViewport>
 				<WithMeetsTopBar>
 					<div className="flex items-start gap-[0.75em]">

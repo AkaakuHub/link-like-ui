@@ -1,4 +1,8 @@
-import type { ComponentPropsWithoutRef, HTMLAttributes } from "react";
+import {
+	type ComponentPropsWithoutRef,
+	forwardRef,
+	type HTMLAttributes,
+} from "react";
 import { cn } from "../../../utils";
 import {
 	WithMeetsButtonBase,
@@ -62,6 +66,21 @@ export function WithMeetsStageImage({
 		/>
 	);
 }
+
+export const WithMeetsStageVideo = forwardRef<
+	HTMLVideoElement,
+	ComponentPropsWithoutRef<"video">
+>(function WithMeetsStageVideo({ className, ...props }, ref) {
+	return (
+		<video
+			ref={ref}
+			className={cn("absolute inset-0 h-full w-full object-cover", className)}
+			playsInline
+			preload="metadata"
+			{...props}
+		/>
+	);
+});
 
 export function WithMeetsTopBar({
 	className,
