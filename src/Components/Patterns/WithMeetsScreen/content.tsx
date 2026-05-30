@@ -51,12 +51,21 @@ export interface WithMeetsGiftInput {
 	userName: string;
 }
 
+export interface WithMeetsChapterInput {
+	isExtra: boolean;
+	name: string;
+	playTimeSecond: number | null;
+}
+
 export interface WithMeetsScreenProps {
+	chapters?: readonly WithMeetsChapterInput[];
 	comments: readonly WithMeetsCommentInput[];
+	description?: string;
 	gifts: readonly WithMeetsGiftInput[];
 	onBack?: () => void;
 	posterAlt: string;
 	posterSrc: string;
+	title?: string;
 	videoRef?: RefObject<HTMLVideoElement | null>;
 	videoSrc?: string;
 }
@@ -222,19 +231,25 @@ function WithMeetsVirtualGifts({
 }
 
 function WithMeetsSidePanel({
+	chapters,
 	comments,
+	description,
 	gifts,
 	isSurfaceVisible,
 	mode,
 	onClose,
 	onModeChange,
+	title,
 }: {
+	chapters: readonly WithMeetsChapterInput[];
 	comments: readonly WithMeetsCommentInput[];
+	description: string;
 	gifts: readonly WithMeetsGiftInput[];
 	isSurfaceVisible: boolean;
 	mode: Exclude<WithMeetsPanelMode, "none">;
 	onClose: () => void;
 	onModeChange: (mode: Exclude<WithMeetsPanelMode, "none">) => void;
+	title: string;
 }) {
 	const tabLabels =
 		mode === "comments"
@@ -399,37 +414,32 @@ function WithMeetsSidePanel({
 				{mode === "info" ? (
 					<div className="px-[1.25em] py-[1.6em] text-ll-true-white">
 						<WithMeetsPanelTitle className="text-[1.25em]">
-							Small Voice Championship
+							{title}
 						</WithMeetsPanelTitle>
-						<p className="mt-[1.4em] text-[0.9em] font-semibold">
-							2026/01/17 14:00 Start
-						</p>
 						<div className="my-[1.4em] h-px bg-ll-true-white/28" />
 						<div className="space-y-[0.7em] text-[0.9em] leading-relaxed text-ll-true-white/86">
-							<p>This is a quiet voice streaming event.</p>
-							<p>Messages and rankings are shown in this panel.</p>
-							<p>Use neutral mock text only.</p>
+							{description.split("\n").map((line) => (
+								<p key={line}>{line}</p>
+							))}
 						</div>
 					</div>
 				) : null}
 				{mode === "chapters" ? (
 					<div className="grid gap-[0.6em] p-[1.4em]">
-						{["Main Program", "Intermission", "After Talk"].map(
-							(chapter, index) => (
-								<button
-									key={chapter}
-									className={
-										index === 0
-											? "flex h-[3.2em] items-center justify-between rounded-[0.35em] bg-linear-to-r from-ll-system-left to-ll-system-right px-[1.1em] text-[0.82em] font-semibold"
-											: "flex h-[3.2em] items-center justify-between rounded-[0.35em] bg-ll-table px-[1.1em] text-[0.82em] font-semibold text-ll-true-white/58"
-									}
-									type="button"
-								>
-									<span>{chapter}</span>
-									<span>{index === 0 ? "00:50" : `${22 + index}:00`}</span>
-								</button>
-							),
-						)}
+						{chapters.map((chapter, index) => (
+							<button
+								key={`${chapter.name}-${chapter.playTimeSecond ?? index}`}
+								className={
+									index === 0
+										? "flex h-[3.2em] items-center justify-between rounded-[0.35em] bg-linear-to-r from-ll-system-left to-ll-system-right px-[1.1em] text-[0.82em] font-semibold"
+										: "flex h-[3.2em] items-center justify-between rounded-[0.35em] bg-ll-table px-[1.1em] text-[0.82em] font-semibold text-ll-true-white/58"
+								}
+								type="button"
+							>
+								<span>{chapter.name}</span>
+								<span>{formatChapterTime(chapter.playTimeSecond)}</span>
+							</button>
+						))}
 					</div>
 				) : null}
 				{isSurfaceVisible ? (
@@ -444,11 +454,14 @@ function WithMeetsSidePanel({
 }
 
 export function WithMeetsScreen({
+	chapters = [],
 	comments,
+	description = "",
 	gifts,
 	onBack,
 	posterAlt,
 	posterSrc,
+	title = posterAlt,
 	videoRef,
 	videoSrc,
 }: WithMeetsScreenProps) {
@@ -565,7 +578,9 @@ export function WithMeetsScreen({
 				<WithMeetsPlaybackControls />
 				{panelMode === "none" ? null : (
 					<WithMeetsSidePanel
+						chapters={chapters}
 						comments={comments}
+						description={description}
 						gifts={gifts}
 						isSurfaceVisible={isPanelSurfaceVisible}
 						mode={panelMode}
@@ -576,9 +591,18 @@ export function WithMeetsScreen({
 							setPanelMode(nextMode);
 							setPanelSurfaceVisible(true);
 						}}
+						title={title}
 					/>
 				)}
 			</WithMeetsFrame>
 		</WithMeetsRoot>
 	);
+}
+
+function formatChapterTime(seconds: number | null) {
+	if (seconds === null) return "--:--";
+
+	const minutes = Math.floor(seconds / 60);
+	const remainingSeconds = Math.floor(seconds % 60);
+	return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
 }

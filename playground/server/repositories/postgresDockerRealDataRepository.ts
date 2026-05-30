@@ -65,6 +65,8 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 			if (!hlsRelativePath || !thumbnailRelativePath) continue;
 
 			items.push({
+				chapters: [],
+				description: "",
 				duration: row.duration,
 				hlsPath: toServedFilePath(hlsRelativePath),
 				id: row.id,
@@ -76,6 +78,11 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 		}
 
 		return items;
+	}
+
+	async getMedia(liveId: string): Promise<RealMediaItem | null> {
+		const items = await this.listMedia();
+		return items.find((item) => item.id === liveId) ?? null;
 	}
 
 	async getComments(liveId: string): Promise<readonly RealComment[]> {

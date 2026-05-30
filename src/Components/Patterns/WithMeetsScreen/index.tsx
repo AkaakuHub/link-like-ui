@@ -1,4 +1,5 @@
 export {
+	type WithMeetsChapterInput,
 	type WithMeetsCommentInput,
 	type WithMeetsGiftInput,
 	WithMeetsScreen,

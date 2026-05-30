@@ -6,7 +6,15 @@ import type {
 } from "../../../src/Components/Patterns/WithMeetsScreen";
 
 export interface RealMediaItem extends MediaArchiveItemInput {
+	chapters: readonly RealMediaChapter[];
+	description: string;
 	hlsPath: string;
+}
+
+export interface RealMediaChapter {
+	isExtra: boolean;
+	name: string;
+	playTimeSecond: number | null;
 }
 
 export interface RealComment extends WithMeetsCommentInput {
@@ -21,6 +29,18 @@ export async function fetchRealMediaItems(): Promise<RealMediaItem[]> {
 	}
 
 	return (await response.json()) as RealMediaItem[];
+}
+
+export async function fetchRealMediaItem(
+	liveId: string,
+): Promise<RealMediaItem> {
+	const response = await fetch(`/__real-data/media/${encodeURIComponent(liveId)}`);
+
+	if (!response.ok) {
+		throw new Error(`Failed to load real media item: ${response.status}`);
+	}
+
+	return (await response.json()) as RealMediaItem;
 }
 
 export async function fetchRealComments(liveId: string): Promise<RealComment[]> {

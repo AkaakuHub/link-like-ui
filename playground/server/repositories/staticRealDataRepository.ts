@@ -5,12 +5,14 @@ import type {
 	RealComment,
 	RealDataConfig,
 	RealDataRepository,
+	RealMediaChapter,
 	RealMediaItem,
 } from "../domain/realData";
 import { resolveInsideRoot, toServedFilePath } from "./pathUtils";
 
 interface ArchiveMetadata {
 	archives_id?: unknown;
+	description?: unknown;
 	live_id?: unknown;
 	name?: unknown;
 	thumbnail_image_url?: unknown;
@@ -18,11 +20,29 @@ interface ArchiveMetadata {
 	video_url?: unknown;
 }
 
+interface ArchiveDetailMetadata {
+	chapters?: unknown;
+	description?: unknown;
+	live_id?: unknown;
+	title?: unknown;
+	total_play_time_second?: unknown;
+	video_url?: unknown;
+}
+
+interface ChapterMetadata {
+	is_extra?: unknown;
+	name?: unknown;
+	play_time_second?: unknown;
+}
+
 export class StaticRealDataRepository implements RealDataRepository {
+	readonly #metadataRoot: string;
 	readonly #rootDir: string;
 	#commentsByLiveId: Record<string, readonly RealComment[]> | null = null;
+	#mediaItems: readonly RealMediaItem[] | null = null;
 
 	constructor(config: RealDataConfig) {
+		this.#metadataRoot = resolve(config.metadataRoot);
 		this.#rootDir = resolve(config.rootDir);
 	}
 
@@ -31,13 +51,13 @@ export class StaticRealDataRepository implements RealDataRepository {
 	}
 
 	async listMedia(): Promise<readonly RealMediaItem[]> {
-		const metadataItems = await this.#readMetadataItems();
+		this.#mediaItems ??= await this.#listMediaFromMetadata();
+		return this.#mediaItems;
+	}
 
-		if (metadataItems.length > 0) {
-			return this.#listMediaFromMetadata(metadataItems);
-		}
-
-		return this.#listMediaFromDirectories();
+	async getMedia(liveId: string): Promise<RealMediaItem | null> {
+		const items = await this.listMedia();
+		return items.find((item) => item.id === liveId) ?? null;
 	}
 
 	async getComments(liveId: string): Promise<readonly RealComment[]> {
@@ -45,15 +65,28 @@ export class StaticRealDataRepository implements RealDataRepository {
 		return this.#commentsByLiveId[liveId] ?? [];
 	}
 
-	async #listMediaFromMetadata(
-		metadataItems: readonly ArchiveMetadata[],
-	): Promise<readonly RealMediaItem[]> {
+	async #listMediaFromMetadata(): Promise<readonly RealMediaItem[]> {
+		const archiveRows = await this.#readMetadataItems("archive.json");
+		const withStationRows = await this.#readMetadataItems("with-station.json");
+		const detailRows = await this.#readDetailItems("archive-details.json");
+		const withStationDetailRows = await this.#readDetailItems(
+			"with-station-details.json",
+		);
+		const detailsByTitle = new Map(
+			[...detailRows, ...withStationDetailRows].map((detail) => [
+				stringValue(detail.title) ?? "",
+				detail,
+			]),
+		);
 		const items: RealMediaItem[] = [];
 
-		for (const metadata of metadataItems) {
+		for (const metadata of [...archiveRows, ...withStationRows]) {
 			const id = stringValue(metadata.archives_id) ?? stringValue(metadata.live_id);
-			const title = stringValue(metadata.name) ?? id;
-			const hlsPath = stringValue(metadata.video_url);
+			const listTitle = stringValue(metadata.name) ?? id;
+			const detail = listTitle ? detailsByTitle.get(listTitle) : undefined;
+			const title = stringValue(detail?.title) ?? listTitle;
+			const hlsPath =
+				stringValue(detail?.video_url) ?? stringValue(metadata.video_url);
 
 			if (!id || !title || !hlsPath) continue;
 
@@ -63,7 +96,15 @@ export class StaticRealDataRepository implements RealDataRepository {
 			if (!hlsRelativePath || !thumbnailRelativePath) continue;
 
 			items.push({
-				duration: durationLabel(numberValue(metadata.total_playing_time_second)),
+				chapters: normalizeChapters(detail?.chapters),
+				description:
+					stringValue(detail?.description) ??
+					stringValue(metadata.description) ??
+					"",
+				duration: durationLabel(
+					numberValue(detail?.total_play_time_second) ??
+						numberValue(metadata.total_playing_time_second),
+				),
 				hlsPath: toServedFilePath(hlsRelativePath),
 				id,
 				imageAlt: title,
@@ -76,42 +117,13 @@ export class StaticRealDataRepository implements RealDataRepository {
 		return sortMediaItems(items);
 	}
 
-	async #listMediaFromDirectories(): Promise<readonly RealMediaItem[]> {
-		const hlsRoot = join(this.#rootDir, "with-meets-hls");
-		const entries = await readdir(hlsRoot, { withFileTypes: true }).catch(() => []);
-		const items: RealMediaItem[] = [];
-
-		for (const entry of entries) {
-			if (!entry.isDirectory()) continue;
-
-			const id = entry.name;
-			const hlsRelativePath = join("with-meets-hls", id, "index.m3u8");
-			const thumbnailRelativePath = await this.#resolveThumbnailRelativePath(id);
-
-			if (!existsSync(join(this.#rootDir, hlsRelativePath)) || !thumbnailRelativePath) {
-				continue;
-			}
-
-			items.push({
-				duration: "",
-				hlsPath: toServedFilePath(hlsRelativePath),
-				id,
-				imageAlt: id,
-				imageSrc: toServedFilePath(thumbnailRelativePath),
-				releasedAt: dateLabelFromId(id),
-				title: id,
-			});
-		}
-
-		return sortMediaItems(items);
-	}
-
-	async #readMetadataItems(): Promise<readonly ArchiveMetadata[]> {
+	async #readJsonArray(
+		fileName: string,
+	): Promise<readonly Record<string, unknown>[]> {
 		const candidates = [
-			join(this.#rootDir, "linkura-live-data", "data", "archive.json"),
-			join(this.#rootDir, "data", "archive.json"),
+			join(this.#rootDir, "linkura-live-data", "data", fileName),
+			join(this.#metadataRoot, "data", fileName),
 		];
-
 		for (const candidate of candidates) {
 			const content = await readFile(candidate, "utf8").catch(() => null);
 
@@ -124,6 +136,18 @@ export class StaticRealDataRepository implements RealDataRepository {
 		}
 
 		return [];
+	}
+
+	async #readMetadataItems(
+		fileName: string,
+	): Promise<readonly ArchiveMetadata[]> {
+		return this.#readJsonArray(fileName);
+	}
+
+	async #readDetailItems(
+		fileName: string,
+	): Promise<readonly ArchiveDetailMetadata[]> {
+		return this.#readJsonArray(fileName);
 	}
 
 	async #readComments(): Promise<Record<string, readonly RealComment[]>> {
@@ -195,6 +219,27 @@ function sortMediaItems(items: readonly RealMediaItem[]) {
 	return [...items].sort((left, right) =>
 		right.releasedAt.localeCompare(left.releasedAt),
 	);
+}
+
+function normalizeChapters(value: unknown): readonly RealMediaChapter[] {
+	if (!Array.isArray(value)) return [];
+
+	return value.filter(isObject).flatMap((chapter: ChapterMetadata) => {
+		const name = stringValue(chapter.name);
+
+		if (!name) return [];
+
+		return [
+			{
+				isExtra: chapter.is_extra === true,
+				name,
+				playTimeSecond:
+					typeof chapter.play_time_second === "number"
+						? chapter.play_time_second
+						: null,
+			},
+		];
+	});
 }
 
 function firstPathSegment(pathname: string) {

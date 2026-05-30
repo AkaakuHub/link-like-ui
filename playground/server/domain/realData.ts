@@ -1,4 +1,5 @@
 export interface RealDataConfig {
+	metadataRoot: string;
 	rootDir: string;
 	source: "postgresDocker" | "static";
 	postgresContainer?: string;
@@ -7,6 +8,8 @@ export interface RealDataConfig {
 }
 
 export interface RealMediaItem {
+	chapters: readonly RealMediaChapter[];
+	description: string;
 	duration: string;
 	hlsPath: string;
 	id: string;
@@ -14,6 +17,12 @@ export interface RealMediaItem {
 	imageSrc: string;
 	releasedAt: string;
 	title: string;
+}
+
+export interface RealMediaChapter {
+	isExtra: boolean;
+	name: string;
+	playTimeSecond: number | null;
 }
 
 export interface RealComment {
@@ -25,6 +34,7 @@ export interface RealComment {
 
 export interface RealDataRepository {
 	getComments(liveId: string): Promise<readonly RealComment[]>;
+	getMedia(liveId: string): Promise<RealMediaItem | null>;
 	listMedia(): Promise<readonly RealMediaItem[]>;
 	resolveFilePath(relativePath: string): string;
 }

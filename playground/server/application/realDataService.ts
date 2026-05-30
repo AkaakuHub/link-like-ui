@@ -15,6 +15,10 @@ export class RealDataService {
 		return this.#repository.getComments(liveId);
 	}
 
+	getMedia(liveId: string): Promise<RealMediaItem | null> {
+		return this.#repository.getMedia(liveId);
+	}
+
 	listMedia(): Promise<readonly RealMediaItem[]> {
 		return this.#repository.listMedia();
 	}

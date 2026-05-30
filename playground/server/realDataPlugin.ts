@@ -17,6 +17,9 @@ export function realDataPlugin(): Plugin {
 	}
 
 	const config: RealDataConfig = {
+		metadataRoot: resolve(
+			process.env["LINK_LIKE_UI_METADATA_ROOT"] ?? "../linkura-live-data",
+		),
 		rootDir: resolve(rootDir),
 		source:
 			process.env["LINK_LIKE_UI_REAL_DATA_SOURCE"] === "postgresDocker"
@@ -40,6 +43,20 @@ export function realDataPlugin(): Plugin {
 				try {
 					if (requestUrl.pathname === "/__real-data/media") {
 						sendJson(res, await service.listMedia());
+						return;
+					}
+
+					if (requestUrl.pathname.startsWith("/__real-data/media/")) {
+						const liveId = decodeURIComponent(
+							requestUrl.pathname.replace("/__real-data/media/", ""),
+						);
+						const media = await service.getMedia(liveId);
+						if (!media) {
+							res.statusCode = 404;
+							res.end("Not found");
+							return;
+						}
+						sendJson(res, media);
 						return;
 					}
 

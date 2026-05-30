@@ -1,7 +1,12 @@
 import Hls from "hls.js";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { WithMeetsScreen } from "../../../src/Components/Patterns/WithMeetsScreen";
-import { fetchRealComments, type RealComment } from "./realData";
+import {
+	fetchRealComments,
+	fetchRealMediaItem,
+	type RealComment,
+	type RealMediaItem,
+} from "./realData";
 
 export function RealWithMeetsPreview() {
 	const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -14,11 +19,13 @@ export function RealWithMeetsPreview() {
 	const posterSrc = params.get("poster") ?? "";
 	const title = params.get("title") ?? id;
 	const [comments, setComments] = useState<readonly RealComment[]>([]);
+	const [mediaItem, setMediaItem] = useState<RealMediaItem | null>(null);
 
 	useEffect(() => {
 		if (!id) return;
 
 		void fetchRealComments(id).then(setComments);
+		void fetchRealMediaItem(id).then(setMediaItem);
 	}, [id]);
 
 	useEffect(() => {
@@ -58,13 +65,16 @@ export function RealWithMeetsPreview() {
 
 	return (
 		<WithMeetsScreen
+			chapters={mediaItem?.chapters ?? []}
 			comments={comments}
+			description={mediaItem?.description ?? ""}
 			gifts={[]}
 			onBack={backToRealMedia}
-			posterAlt={title}
-			posterSrc={posterSrc}
+			posterAlt={mediaItem?.imageAlt ?? title}
+			posterSrc={mediaItem?.imageSrc ?? posterSrc}
+			title={mediaItem?.title ?? title}
 			videoRef={videoRef}
-			videoSrc={hlsPath}
+			videoSrc={mediaItem?.hlsPath ?? hlsPath}
 		/>
 	);
 }
