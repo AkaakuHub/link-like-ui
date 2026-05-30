@@ -4,3 +4,7 @@ declare module "*.svg" {
 	const ReactComponent: FC<SVGProps<SVGSVGElement>>;
 	export default ReactComponent;
 }
+
+interface ImportMeta {
+	readonly env: Record<string, string | undefined>;
+}

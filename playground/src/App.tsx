@@ -6,6 +6,7 @@ import { WithMeetsPreview } from "./app/WithMeetsPreview";
 
 export function App() {
 	const pathname = globalThis.location.pathname;
+	const isRealDataMode = import.meta.env["VITE_LINK_LIKE_UI_REAL_DATA"] === "1";
 
 	if (pathname === "/with-meets") {
 		return <WithMeetsPreview />;
@@ -17,6 +18,10 @@ export function App() {
 
 	if (pathname === "/real-with-meets") {
 		return <RealWithMeetsPreview />;
+	}
+
+	if (isRealDataMode && pathname === "/media") {
+		return <RealMediaPreview />;
 	}
 
 	if (pathname !== "/components") {

@@ -22,6 +22,7 @@ const child = spawn(
 		env: {
 			...process.env,
 			LINK_LIKE_UI_REAL_DATA_ROOT: rootDir,
+			VITE_LINK_LIKE_UI_REAL_DATA: "1",
 		},
 		stdio: "inherit",
 	},
