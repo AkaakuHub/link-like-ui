@@ -6,6 +6,7 @@ import {
 	ModalTabTrigger,
 } from "../../System/ModalTab";
 import {
+	MediaArchiveCardButton,
 	MediaArchiveCardRoot,
 	MediaArchiveDate,
 	MediaArchiveDuration,
@@ -31,6 +32,7 @@ import {
 	MediaSectionHeadingRoot,
 	MediaSectionHeadingText,
 	MediaSectionHeadingTitle,
+	MediaUpcomingActionButton,
 	MediaUpcomingArticle,
 	MediaUpcomingImage,
 	MediaUpcomingTitle,
@@ -193,8 +195,10 @@ export function MediaSectionHeading({
 
 export function MediaUpcomingList({
 	items,
+	onItemSelect,
 }: {
 	items: readonly MediaUpcomingItemInput[];
+	onItemSelect?: (item: MediaUpcomingItemInput) => void;
 }) {
 	return (
 		<div>
@@ -203,13 +207,20 @@ export function MediaUpcomingList({
 					<MediaSectionHeading rightText={item.availability}>
 						Upcoming
 					</MediaSectionHeading>
-					<MediaUpcomingImage
-						alt={item.imageAlt}
-						height={270}
-						src={item.imageSrc}
-						width={480}
-					/>
-					<MediaUpcomingTitle>{item.title}</MediaUpcomingTitle>
+					<MediaUpcomingActionButton
+						type="button"
+						onClick={() => {
+							onItemSelect?.(item);
+						}}
+					>
+						<MediaUpcomingImage
+							alt={item.imageAlt}
+							height={270}
+							src={item.imageSrc}
+							width={480}
+						/>
+						<MediaUpcomingTitle>{item.title}</MediaUpcomingTitle>
+					</MediaUpcomingActionButton>
 				</MediaUpcomingArticle>
 			))}
 		</div>
@@ -218,9 +229,11 @@ export function MediaUpcomingList({
 
 export function MediaArchiveList({
 	items,
+	onItemSelect,
 	title = "Archive",
 }: {
 	items: readonly MediaArchiveItemInput[];
+	onItemSelect?: (item: MediaArchiveItemInput) => void;
 	title?: string;
 }) {
 	return (
@@ -232,17 +245,24 @@ export function MediaArchiveList({
 			<MediaArchiveGridFrame>
 				{items.map((item) => (
 					<MediaArchiveCardRoot key={item.id}>
-						<MediaArchiveThumbnail>
-							<MediaArchiveImage
-								alt={item.imageAlt}
-								height={270}
-								src={item.imageSrc}
-								width={480}
-							/>
-							<MediaArchiveDuration>{item.duration}</MediaArchiveDuration>
-							<MediaArchiveDate>{item.releasedAt}</MediaArchiveDate>
-						</MediaArchiveThumbnail>
-						<MediaArchiveTitle>{item.title}</MediaArchiveTitle>
+						<MediaArchiveCardButton
+							type="button"
+							onClick={() => {
+								onItemSelect?.(item);
+							}}
+						>
+							<MediaArchiveThumbnail>
+								<MediaArchiveImage
+									alt={item.imageAlt}
+									height={270}
+									src={item.imageSrc}
+									width={480}
+								/>
+								<MediaArchiveDuration>{item.duration}</MediaArchiveDuration>
+								<MediaArchiveDate>{item.releasedAt}</MediaArchiveDate>
+							</MediaArchiveThumbnail>
+							<MediaArchiveTitle>{item.title}</MediaArchiveTitle>
+						</MediaArchiveCardButton>
 					</MediaArchiveCardRoot>
 				))}
 			</MediaArchiveGridFrame>

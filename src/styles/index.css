@@ -47,6 +47,7 @@
 	--color-ll-badge-orange: #fc9060;
 	--color-ll-badge-red: #fa575e;
 	--color-ll-true-white: #ffffff;
+	--color-ll-black: #000000;
 }
 
 @layer utilities {

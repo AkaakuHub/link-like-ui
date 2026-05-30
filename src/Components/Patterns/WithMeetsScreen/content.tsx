@@ -1,0 +1,570 @@
+import { useState } from "react";
+import {
+	LuChevronLeft,
+	LuExpand,
+	LuGift,
+	LuList,
+	LuMail,
+	LuMessageCircle,
+	LuMinimize,
+	LuPlay,
+	LuRadio,
+	LuSend,
+	LuSettings2,
+	LuSmile,
+	LuStar,
+	LuTrophy,
+	LuX,
+} from "react-icons/lu";
+import {
+	WithMeetsControlRow,
+	WithMeetsFrame,
+	WithMeetsIconButton,
+	WithMeetsMenuButton,
+	WithMeetsPanel,
+	WithMeetsPanelBody,
+	WithMeetsPanelHeader,
+	WithMeetsPanelTitle,
+	WithMeetsPillButton,
+	WithMeetsPlayBadge,
+	WithMeetsProgressArea,
+	WithMeetsRoot,
+	WithMeetsScoreTrack,
+	WithMeetsSideActions,
+	WithMeetsStageImage,
+	WithMeetsTopBar,
+	WithMeetsVideoViewport,
+} from "./structure";
+import { useWithMeetsVirtualList } from "./virtualList";
+
+export interface WithMeetsCommentInput {
+	id: string;
+	message: string;
+	userName: string;
+}
+
+export interface WithMeetsGiftInput {
+	amount: string;
+	id: string;
+	label: string;
+	userName: string;
+}
+
+export interface WithMeetsScreenProps {
+	comments: readonly WithMeetsCommentInput[];
+	gifts: readonly WithMeetsGiftInput[];
+	onBack?: () => void;
+	posterAlt: string;
+	posterSrc: string;
+}
+
+type WithMeetsPanelMode = "chapters" | "comments" | "gifts" | "info" | "none";
+
+function WithMeetsScoreMeter() {
+	const stars = ["current", "one", "two", "three"] as const;
+
+	return (
+		<WithMeetsScoreTrack>
+			<div className="absolute top-[0.7em] right-0 left-0 h-[0.22em] rounded-full bg-ll-true-white/76" />
+			<div className="absolute top-0 left-[6%] rounded-full bg-ll-true-white px-[0.7em] py-[0.25em] text-[0.68em] leading-none font-semibold text-ll-gray">
+				AFTER
+			</div>
+			<div className="absolute inset-x-0 top-[0.35em] flex justify-around">
+				{stars.map((star) => (
+					<LuStar
+						key={star}
+						className="h-[1.7em] w-[1.7em] fill-ll-label stroke-ll-true-white stroke-[1.5] drop-shadow-[0_1px_2px_var(--color-ll-gray)]"
+					/>
+				))}
+			</div>
+			<div className="absolute top-[2.1em] left-0 flex w-full items-center justify-between text-[0.9em] leading-none font-semibold text-ll-true-white">
+				<span>Current</span>
+				<span>0 pt</span>
+				<span>Next star</span>
+				<span>10,000 pt</span>
+			</div>
+		</WithMeetsScoreTrack>
+	);
+}
+
+function WithMeetsPlaybackControls() {
+	return (
+		<WithMeetsProgressArea>
+			<div className="relative h-[0.22em] bg-ll-disabled/88">
+				<div className="h-full w-[8%] bg-ll-red" />
+				<div className="absolute top-1/2 left-[71%] h-full w-[29%] -translate-y-1/2 bg-ll-red" />
+			</div>
+			<WithMeetsControlRow>
+				<div className="inline-flex items-center gap-[1.4em] text-[0.95em] font-semibold">
+					<span className="text-[1.8em] leading-none">II</span>
+					<span>01:05</span>
+					<span className="text-[1.2em] font-light">/</span>
+					<span className="text-ll-true-white/72">30:00</span>
+				</div>
+				<WithMeetsMenuButton type="button">
+					<LuChevronLeft className="h-[1.25em] w-[1.25em]" />
+					<span>MENU</span>
+				</WithMeetsMenuButton>
+			</WithMeetsControlRow>
+		</WithMeetsProgressArea>
+	);
+}
+
+function WithMeetsVirtualTimeline({
+	comments,
+}: {
+	comments: readonly WithMeetsCommentInput[];
+}) {
+	const [scrollTop, setScrollTop] = useState<number>(0);
+	const viewportHeight = 610;
+	const itemHeight = 46;
+	const { items, totalHeight } = useWithMeetsVirtualList({
+		itemCount: comments.length,
+		itemHeight,
+		overscan: 6,
+		scrollTop,
+		viewportHeight,
+	});
+
+	return (
+		<div
+			className="h-full overflow-y-auto px-[1em]"
+			onScroll={(event) => {
+				setScrollTop(event.currentTarget.scrollTop);
+			}}
+		>
+			<div className="relative" style={{ height: totalHeight }}>
+				{items.map((virtualItem) => {
+					const comment = comments[virtualItem.index];
+
+					if (!comment) {
+						return null;
+					}
+
+					return (
+						<div
+							key={comment.id}
+							className="absolute right-0 left-0 grid content-center text-[0.78em] leading-tight"
+							style={{
+								height: itemHeight,
+								transform: `translateY(${virtualItem.offsetTop}px)`,
+							}}
+						>
+							<p className="truncate text-ll-true-white/88">
+								<span className="font-semibold">{comment.userName}: </span>
+								{comment.message}
+							</p>
+						</div>
+					);
+				})}
+			</div>
+		</div>
+	);
+}
+
+function WithMeetsVirtualGifts({
+	gifts,
+}: {
+	gifts: readonly WithMeetsGiftInput[];
+}) {
+	const [scrollTop, setScrollTop] = useState<number>(0);
+	const viewportHeight = 610;
+	const itemHeight = 64;
+	const { items, totalHeight } = useWithMeetsVirtualList({
+		itemCount: gifts.length,
+		itemHeight,
+		overscan: 5,
+		scrollTop,
+		viewportHeight,
+	});
+
+	return (
+		<div
+			className="h-full overflow-y-auto px-[1em] py-[0.8em]"
+			onScroll={(event) => {
+				setScrollTop(event.currentTarget.scrollTop);
+			}}
+		>
+			<div className="relative" style={{ height: totalHeight }}>
+				{items.map((virtualItem) => {
+					const gift = gifts[virtualItem.index];
+
+					if (!gift) {
+						return null;
+					}
+
+					return (
+						<div
+							key={gift.id}
+							className="absolute right-0 left-0 flex items-center gap-[0.75em] rounded-[0.45em] bg-ll-badge-orange px-[0.8em] text-[0.74em] leading-tight"
+							style={{
+								height: itemHeight - 10,
+								transform: `translateY(${virtualItem.offsetTop}px)`,
+							}}
+						>
+							<div className="grid h-[2.2em] w-[2.2em] place-items-center rounded-full bg-ll-true-white text-ll-badge-orange">
+								<LuGift className="h-[1.25em] w-[1.25em]" />
+							</div>
+							<div className="min-w-0 flex-1">
+								<p className="truncate font-semibold">{gift.userName}</p>
+								<p className="truncate text-ll-true-white/88">{gift.label}</p>
+							</div>
+							<p className="font-semibold">{gift.amount}</p>
+						</div>
+					);
+				})}
+			</div>
+		</div>
+	);
+}
+
+function WithMeetsSidePanel({
+	comments,
+	gifts,
+	isSurfaceVisible,
+	mode,
+	onClose,
+	onModeChange,
+}: {
+	comments: readonly WithMeetsCommentInput[];
+	gifts: readonly WithMeetsGiftInput[];
+	isSurfaceVisible: boolean;
+	mode: Exclude<WithMeetsPanelMode, "none">;
+	onClose: () => void;
+	onModeChange: (mode: Exclude<WithMeetsPanelMode, "none">) => void;
+}) {
+	const tabLabels =
+		mode === "comments"
+			? ["Timeline", "Comments", "Gifts", "Cards"]
+			: mode === "info"
+				? ["Overview", "Ranking"]
+				: mode === "chapters"
+					? ["Chapter Select"]
+					: ["Gift Log"];
+
+	return (
+		<WithMeetsPanel
+			className={
+				isSurfaceVisible
+					? undefined
+					: "bg-transparent shadow-none backdrop-blur-none"
+			}
+		>
+			<div
+				className={
+					isSurfaceVisible
+						? "absolute inset-0 bg-ll-gray/48 opacity-100 backdrop-blur-[0.26em] transition-opacity duration-200"
+						: "absolute inset-0 bg-ll-gray/48 opacity-0 backdrop-blur-[0.26em] transition-opacity duration-200"
+				}
+			/>
+			<div
+				className={
+					isSurfaceVisible
+						? "absolute top-0 right-0 bottom-0 w-[4.8em] bg-ll-black/78 opacity-100 transition-opacity duration-200"
+						: "absolute top-0 right-0 bottom-0 w-[4.8em] bg-ll-black/78 opacity-0 transition-opacity duration-200"
+				}
+			/>
+			<WithMeetsPanelHeader
+				className={
+					isSurfaceVisible
+						? "relative z-10 h-[3.7em] grid-cols-[1fr_auto] bg-ll-gray/54 pr-[5.7em] opacity-100 transition-opacity duration-200"
+						: "pointer-events-none absolute inset-x-0 top-0 z-10 h-[3.7em] grid-cols-[1fr_auto] bg-ll-gray/54 pr-[5.7em] opacity-0 transition-opacity duration-200"
+				}
+			>
+				<div className="flex items-center justify-around text-ll-true-white/52">
+					<button
+						aria-label="Show comments"
+						className={
+							mode === "comments"
+								? "text-ll-true-white"
+								: "text-ll-true-white/54"
+						}
+						type="button"
+						onClick={() => {
+							onModeChange("comments");
+						}}
+					>
+						<LuMessageCircle className="h-[1.55em] w-[1.55em]" />
+					</button>
+					<button
+						aria-label="Show info"
+						className={
+							mode === "info" ? "text-ll-true-white" : "text-ll-true-white/54"
+						}
+						type="button"
+						onClick={() => {
+							onModeChange("info");
+						}}
+					>
+						<LuTrophy className="h-[1.55em] w-[1.55em]" />
+					</button>
+					<button
+						aria-label="Show gifts"
+						className={
+							mode === "gifts" ? "text-ll-true-white" : "text-ll-true-white/54"
+						}
+						type="button"
+						onClick={() => {
+							onModeChange("gifts");
+						}}
+					>
+						<LuRadio className="h-[1.55em] w-[1.55em]" />
+					</button>
+					<button
+						aria-label="Show chapters"
+						className={
+							mode === "chapters"
+								? "text-ll-true-white"
+								: "text-ll-true-white/54"
+						}
+						type="button"
+						onClick={() => {
+							onModeChange("chapters");
+						}}
+					>
+						<LuList className="h-[1.55em] w-[1.55em]" />
+					</button>
+				</div>
+				<WithMeetsIconButton type="button" onClick={onClose}>
+					<LuX className="h-[1.75em] w-[1.75em]" />
+				</WithMeetsIconButton>
+			</WithMeetsPanelHeader>
+			<div
+				className={
+					isSurfaceVisible
+						? "relative z-10 flex h-[3.05em] items-end gap-[1.7em] bg-ll-tab-active/72 px-[1.3em] pr-[6em] text-[0.92em] font-semibold text-ll-true-white/58 opacity-100 transition-opacity duration-200"
+						: "pointer-events-none absolute inset-x-0 top-[3.7em] z-10 flex h-[3.05em] items-end gap-[1.7em] bg-ll-tab-active/72 px-[1.3em] pr-[6em] text-[0.92em] font-semibold text-ll-true-white/58 opacity-0 transition-opacity duration-200"
+				}
+			>
+				{tabLabels.map((label, index) => (
+					<span
+						key={label}
+						className={
+							index === 0
+								? "relative pb-[0.65em] text-ll-true-white after:absolute after:right-0 after:bottom-0 after:left-0 after:h-[0.16em] after:bg-ll-true-white"
+								: "pb-[0.65em]"
+						}
+					>
+						{label}
+					</span>
+				))}
+			</div>
+			<WithMeetsPanelBody
+				className={
+					isSurfaceVisible
+						? "relative z-10 h-[calc(100%-6.75em)] pr-[4.8em]"
+						: "relative z-10 h-full pr-[0.7em] pt-[1em]"
+				}
+			>
+				{mode === "comments" ? (
+					<div
+						className={
+							isSurfaceVisible
+								? "grid h-full grid-rows-[auto_1fr_auto]"
+								: "grid h-full grid-rows-[auto_1fr]"
+						}
+					>
+						<div className="mx-[1em] mt-[0.7em] flex items-center rounded-[0.45em] bg-ll-badge-orange px-[0.55em] py-[0.5em]">
+							<img
+								alt="support avatar"
+								className="h-[2.3em] w-[2.3em] rounded-full border border-ll-true-white"
+								src="https://placehold.jp/150x150.png"
+							/>
+							<div className="ml-[0.7em] flex-1 text-[0.82em] font-semibold leading-tight">
+								<p>Viewer 001:</p>
+								<p>10,000 pt</p>
+							</div>
+							<span className="rounded-full bg-ll-badge-red px-[0.5em] py-[0.2em] text-[0.68em] font-semibold">
+								x100
+							</span>
+						</div>
+						<WithMeetsVirtualTimeline comments={comments} />
+						{isSurfaceVisible ? (
+							<div className="flex items-center gap-[0.55em] p-[0.8em]">
+								<button type="button" className="text-ll-true-white/55">
+									<LuSmile className="h-[2em] w-[2em]" />
+								</button>
+								<div className="flex h-[2.8em] flex-1 items-center justify-between rounded-full bg-ll-tab-active/95 px-[1.2em] text-[0.8em] font-semibold text-ll-true-white/42">
+									<span>Enter comment</span>
+									<LuSend className="h-[1.4em] w-[1.4em] text-ll-label/72" />
+								</div>
+							</div>
+						) : null}
+					</div>
+				) : null}
+				{mode === "gifts" ? <WithMeetsVirtualGifts gifts={gifts} /> : null}
+				{mode === "info" ? (
+					<div className="px-[1.25em] py-[1.6em] text-ll-true-white">
+						<WithMeetsPanelTitle className="text-[1.25em]">
+							Small Voice Championship
+						</WithMeetsPanelTitle>
+						<p className="mt-[1.4em] text-[0.9em] font-semibold">
+							2026/01/17 14:00 Start
+						</p>
+						<div className="my-[1.4em] h-px bg-ll-true-white/28" />
+						<div className="space-y-[0.7em] text-[0.9em] leading-relaxed text-ll-true-white/86">
+							<p>This is a quiet voice streaming event.</p>
+							<p>Messages and rankings are shown in this panel.</p>
+							<p>Use neutral mock text only.</p>
+						</div>
+					</div>
+				) : null}
+				{mode === "chapters" ? (
+					<div className="grid gap-[0.6em] p-[1.4em]">
+						{["Main Program", "Intermission", "After Talk"].map(
+							(chapter, index) => (
+								<button
+									key={chapter}
+									className={
+										index === 0
+											? "flex h-[3.2em] items-center justify-between rounded-[0.35em] bg-linear-to-r from-ll-system-left to-ll-system-right px-[1.1em] text-[0.82em] font-semibold"
+											: "flex h-[3.2em] items-center justify-between rounded-[0.35em] bg-ll-table px-[1.1em] text-[0.82em] font-semibold text-ll-true-white/58"
+									}
+									type="button"
+								>
+									<span>{chapter}</span>
+									<span>{index === 0 ? "00:50" : `${22 + index}:00`}</span>
+								</button>
+							),
+						)}
+					</div>
+				) : null}
+				{isSurfaceVisible ? (
+					<div className="absolute right-0 bottom-[0.6em] grid w-[4.8em] justify-items-center gap-[1.2em] text-ll-true-white">
+						<LuMail className="h-[1.9em] w-[1.9em] text-ll-true-white/62" />
+						<LuGift className="h-[2em] w-[2em]" />
+					</div>
+				) : null}
+			</WithMeetsPanelBody>
+		</WithMeetsPanel>
+	);
+}
+
+export function WithMeetsScreen({
+	comments,
+	gifts,
+	onBack,
+	posterAlt,
+	posterSrc,
+}: WithMeetsScreenProps) {
+	const [panelMode, setPanelMode] = useState<WithMeetsPanelMode>("comments");
+	const [isPanelSurfaceVisible, setPanelSurfaceVisible] =
+		useState<boolean>(true);
+
+	return (
+		<WithMeetsRoot>
+			<WithMeetsFrame>
+				<WithMeetsVideoViewport
+					onClick={() => {
+						if (panelMode !== "none") {
+							setPanelSurfaceVisible((currentValue) => !currentValue);
+						}
+					}}
+				>
+					<WithMeetsStageImage alt={posterAlt} src={posterSrc} />
+				</WithMeetsVideoViewport>
+				<WithMeetsTopBar>
+					<div className="flex items-start gap-[0.75em]">
+						<WithMeetsIconButton
+							type="button"
+							aria-label="Back"
+							onClick={onBack}
+						>
+							<LuChevronLeft className="h-[1.7em] w-[1.7em]" />
+						</WithMeetsIconButton>
+						<WithMeetsPlayBadge>
+							<LuPlay className="h-[0.8em] w-[0.8em] fill-ll-true-white" />
+							<span>PLAY</span>
+						</WithMeetsPlayBadge>
+					</div>
+					<WithMeetsScoreMeter />
+				</WithMeetsTopBar>
+				<WithMeetsSideActions>
+					<WithMeetsIconButton type="button" aria-label="Fullscreen">
+						<LuExpand className="h-[1.75em] w-[1.75em]" />
+					</WithMeetsIconButton>
+					<WithMeetsIconButton
+						type="button"
+						aria-label="Comments"
+						onClick={() => {
+							setPanelMode("comments");
+							setPanelSurfaceVisible(true);
+						}}
+					>
+						<LuMessageCircle className="h-[1.75em] w-[1.75em]" />
+					</WithMeetsIconButton>
+					<WithMeetsIconButton
+						type="button"
+						aria-label="Gift log"
+						onClick={() => {
+							setPanelMode("gifts");
+							setPanelSurfaceVisible(true);
+						}}
+					>
+						<LuGift className="h-[1.75em] w-[1.75em]" />
+					</WithMeetsIconButton>
+					<WithMeetsIconButton
+						type="button"
+						aria-label="Info"
+						onClick={() => {
+							setPanelMode("info");
+							setPanelSurfaceVisible(true);
+						}}
+					>
+						<LuSettings2 className="h-[1.75em] w-[1.75em]" />
+					</WithMeetsIconButton>
+					<WithMeetsIconButton
+						type="button"
+						aria-label="Chapter select"
+						onClick={() => {
+							setPanelMode("chapters");
+							setPanelSurfaceVisible(true);
+						}}
+					>
+						<LuMinimize className="h-[1.75em] w-[1.75em]" />
+					</WithMeetsIconButton>
+				</WithMeetsSideActions>
+				{panelMode === "none" ? (
+					<div className="absolute right-[4.6%] bottom-[5.5%] flex flex-col gap-[0.6em]">
+						<WithMeetsPillButton
+							type="button"
+							onClick={() => {
+								setPanelMode("comments");
+								setPanelSurfaceVisible(true);
+							}}
+						>
+							<LuMessageCircle className="mr-[0.25em] inline h-[1em] w-[1em]" />
+							Comment
+						</WithMeetsPillButton>
+						<WithMeetsPillButton
+							type="button"
+							onClick={() => {
+								setPanelMode("gifts");
+								setPanelSurfaceVisible(true);
+							}}
+						>
+							<LuList className="mr-[0.25em] inline h-[1em] w-[1em]" />
+							Log
+						</WithMeetsPillButton>
+					</div>
+				) : null}
+				<WithMeetsPlaybackControls />
+				{panelMode === "none" ? null : (
+					<WithMeetsSidePanel
+						comments={comments}
+						gifts={gifts}
+						isSurfaceVisible={isPanelSurfaceVisible}
+						mode={panelMode}
+						onClose={() => {
+							setPanelMode("none");
+						}}
+						onModeChange={(nextMode) => {
+							setPanelMode(nextMode);
+							setPanelSurfaceVisible(true);
+						}}
+					/>
+				)}
+			</WithMeetsFrame>
+		</WithMeetsRoot>
+	);
+}

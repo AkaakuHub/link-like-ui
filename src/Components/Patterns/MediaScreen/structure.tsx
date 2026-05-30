@@ -221,6 +221,18 @@ export function MediaUpcomingArticle({
 	return <MediaScreenArticleBase className={cn(className)} {...props} />;
 }
 
+export function MediaUpcomingActionButton({
+	className,
+	...props
+}: ComponentPropsWithoutRef<typeof MediaScreenButtonBase>) {
+	return (
+		<MediaScreenButtonBase
+			className={cn("block w-full text-left", className)}
+			{...props}
+		/>
+	);
+}
+
 export function MediaUpcomingImage({
 	className,
 	...props
@@ -294,6 +306,18 @@ export function MediaArchiveCardRoot({
 	return (
 		<MediaScreenArticleBase
 			className={cn("grid gap-1", className)}
+			{...props}
+		/>
+	);
+}
+
+export function MediaArchiveCardButton({
+	className,
+	...props
+}: ComponentPropsWithoutRef<typeof MediaScreenButtonBase>) {
+	return (
+		<MediaScreenButtonBase
+			className={cn("grid w-full gap-1 text-left", className)}
 			{...props}
 		/>
 	);

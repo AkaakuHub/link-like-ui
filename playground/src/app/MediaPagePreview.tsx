@@ -39,6 +39,9 @@ const mediaTabs: readonly MediaTabItemInput<MediaPrimaryTab>[] = [
 
 export function MediaPagePreview() {
 	const [activeTab, setActiveTab] = useState<MediaPrimaryTab>("mypage");
+	function openWithMeets() {
+		globalThis.location.assign("/with-meets");
+	}
 
 	return (
 		<ScreenPageRoot className="bottom-(--ll-home-dock-height)">
@@ -52,10 +55,16 @@ export function MediaPagePreview() {
 					/>
 					<div className="min-h-0 overflow-y-auto bg-ll-white pb-4">
 						{activeTab === "mypage" ? (
-							<MediaUpcomingList items={recentMediaItems} />
+							<MediaUpcomingList
+								items={recentMediaItems}
+								onItemSelect={openWithMeets}
+							/>
 						) : null}
 						{activeTab === "archives" ? (
-							<MediaArchiveList items={archiveMediaItems} />
+							<MediaArchiveList
+								items={archiveMediaItems}
+								onItemSelect={openWithMeets}
+							/>
 						) : null}
 						{activeTab === "channelList" ? <MediaChannelListEmptyPanel /> : null}
 					</div>
