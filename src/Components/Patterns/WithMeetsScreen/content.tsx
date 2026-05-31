@@ -121,17 +121,19 @@ function WithMeetsPlaybackControls({
 	isPlaying,
 	onSeek,
 	onToggle,
+	orientation,
 	time,
 }: {
 	duration: number;
 	isPlaying: boolean;
 	onSeek: ((seconds: number) => void) | undefined;
 	onToggle: (() => void) | undefined;
+	orientation: "horizontal" | "vertical";
 	time: number;
 }) {
 	const progress = duration > 0 ? Math.min(100, (time / duration) * 100) : 0;
 	return (
-		<WithMeetsProgressArea>
+		<WithMeetsProgressArea data-orientation={orientation}>
 			<button
 				type="button"
 				className="relative grid h-[1.4em] w-full items-center"
@@ -781,6 +783,7 @@ export function WithMeetsScreen({
 						isPlaying={isPlaying}
 						onSeek={onSeek}
 						onToggle={onPlaybackToggle}
+						orientation={orientation}
 						time={playbackTime}
 					/>
 				</div>

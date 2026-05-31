@@ -57,7 +57,7 @@ export function WithMeetsVideoViewport({
 		<WithMeetsDivBase
 			className={cn(
 				dataOrientation === "vertical"
-					? "absolute inset-x-[5%] top-[3%] bottom-[27%] overflow-hidden bg-ll-black"
+					? "absolute inset-x-[5%] top-[3%] bottom-[3%] overflow-hidden bg-ll-black"
 					: "absolute top-[5.4%] bottom-[3.8%] left-[13.4%] w-[73.2%] overflow-hidden bg-ll-black",
 				className,
 			)}
@@ -171,11 +171,20 @@ export function WithMeetsSideActions({
 
 export function WithMeetsProgressArea({
 	className,
+	"data-orientation": dataOrientation,
 	...props
-}: HTMLAttributes<HTMLDivElement>) {
+}: HTMLAttributes<HTMLDivElement> & {
+	"data-orientation"?: "horizontal" | "vertical";
+}) {
 	return (
 		<WithMeetsDivBase
-			className={cn("absolute inset-x-[7%] bottom-[8%]", className)}
+			className={cn(
+				dataOrientation === "vertical"
+					? "absolute inset-x-[7%] bottom-[31%]"
+					: "absolute inset-x-[7%] bottom-[8%]",
+				className,
+			)}
+			data-orientation={dataOrientation}
 			{...props}
 		/>
 	);
