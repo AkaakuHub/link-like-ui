@@ -264,7 +264,7 @@ function WithMeetsVirtualTimeline({
 							return (
 								<div
 									key={comment.id}
-									className="absolute right-0 left-0 grid content-center text-[0.7em] leading-none"
+									className="absolute right-0 left-0 grid content-center leading-none"
 									style={{
 										height: itemHeight,
 										transform: `translateY(${virtualItem.offsetTop}px)`,
@@ -618,7 +618,6 @@ export function WithMeetsScreen({
 		const timeoutId = globalThis.setTimeout(() => {
 			if (interactionStartedAt !== lastChromeInteractionAt) return;
 			setChromeVisible(false);
-			setPanelSurfaceVisible(false);
 		}, 3200);
 
 		return () => {
@@ -759,7 +758,7 @@ export function WithMeetsScreen({
 						comments={comments}
 						description={description}
 						gifts={gifts}
-						isSurfaceVisible={isChromeVisible && isPanelSurfaceVisible}
+						isSurfaceVisible={isPanelSurfaceVisible}
 						mode={panelMode}
 						onClose={() => {
 							setPanelMode("none");
