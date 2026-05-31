@@ -70,7 +70,9 @@ export interface WithMeetsScreenProps {
 	playbackTime?: number;
 	onPlaybackToggle?: () => void;
 	onSeek?: (seconds: number) => void;
+	showSupportSummary?: boolean;
 	videoRef?: RefObject<HTMLVideoElement | null>;
+	videoMuted?: boolean;
 	videoSrc?: string;
 }
 
@@ -167,7 +169,7 @@ function WithMeetsVirtualTimeline({
 }) {
 	const [scrollTop, setScrollTop] = useState<number>(0);
 	const viewportHeight = 610;
-	const itemHeight = 46;
+	const itemHeight = 24;
 	const { items, totalHeight } = useWithMeetsVirtualList({
 		itemCount: comments.length,
 		itemHeight,
@@ -194,7 +196,7 @@ function WithMeetsVirtualTimeline({
 					return (
 						<div
 							key={comment.id}
-							className="absolute right-0 left-0 grid content-center text-[0.78em] leading-tight"
+							className="absolute right-0 left-0 grid content-center text-[0.7em] leading-none"
 							style={{
 								height: itemHeight,
 								transform: `translateY(${virtualItem.offsetTop}px)`,
@@ -277,6 +279,7 @@ function WithMeetsSidePanel({
 	mode,
 	onClose,
 	onModeChange,
+	showSupportSummary,
 	title,
 }: {
 	chapters: readonly WithMeetsChapterInput[];
@@ -287,6 +290,7 @@ function WithMeetsSidePanel({
 	mode: Exclude<WithMeetsPanelMode, "none">;
 	onClose: () => void;
 	onModeChange: (mode: Exclude<WithMeetsPanelMode, "none">) => void;
+	showSupportSummary: boolean;
 	title: string;
 }) {
 	const tabLabels =
@@ -416,24 +420,30 @@ function WithMeetsSidePanel({
 					<div
 						className={
 							isSurfaceVisible
-								? "grid h-full grid-rows-[auto_1fr_auto]"
-								: "grid h-full grid-rows-[auto_1fr]"
+								? showSupportSummary
+									? "grid h-full grid-rows-[auto_1fr_auto]"
+									: "grid h-full grid-rows-[1fr_auto]"
+								: showSupportSummary
+									? "grid h-full grid-rows-[auto_1fr]"
+									: "grid h-full grid-rows-[1fr]"
 						}
 					>
-						<div className="mx-[1em] mt-[0.7em] flex items-center rounded-[0.45em] bg-ll-badge-orange px-[0.55em] py-[0.5em]">
-							<img
-								alt="support avatar"
-								className="h-[2.3em] w-[2.3em] rounded-full border border-ll-true-white"
-								src="https://placehold.jp/150x150.png"
-							/>
-							<div className="ml-[0.7em] flex-1 text-[0.82em] font-semibold leading-tight">
-								<p>Viewer 001:</p>
-								<p>10,000 pt</p>
+						{showSupportSummary ? (
+							<div className="mx-[1em] mt-[0.7em] flex items-center rounded-[0.45em] bg-ll-badge-orange px-[0.55em] py-[0.5em]">
+								<img
+									alt="support avatar"
+									className="h-[2.3em] w-[2.3em] rounded-full border border-ll-true-white"
+									src="https://placehold.jp/150x150.png"
+								/>
+								<div className="ml-[0.7em] flex-1 text-[0.82em] font-semibold leading-tight">
+									<p>Viewer 001:</p>
+									<p>10,000 pt</p>
+								</div>
+								<span className="rounded-full bg-ll-badge-red px-[0.5em] py-[0.2em] text-[0.68em] font-semibold">
+									x100
+								</span>
 							</div>
-							<span className="rounded-full bg-ll-badge-red px-[0.5em] py-[0.2em] text-[0.68em] font-semibold">
-								x100
-							</span>
-						</div>
+						) : null}
 						<WithMeetsVirtualTimeline comments={comments} />
 						{isSurfaceVisible ? (
 							<div className="flex items-center gap-[0.55em] p-[0.8em]">
@@ -504,7 +514,9 @@ export function WithMeetsScreen({
 	playbackTime = 0,
 	onPlaybackToggle,
 	onSeek,
+	showSupportSummary = true,
 	videoRef,
+	videoMuted = false,
 	videoSrc,
 }: WithMeetsScreenProps) {
 	const [panelMode, setPanelMode] = useState<WithMeetsPanelMode>("comments");
@@ -526,6 +538,7 @@ export function WithMeetsScreen({
 							ref={videoRef}
 							poster={posterSrc}
 							controls={false}
+							muted={videoMuted}
 						/>
 					) : (
 						<WithMeetsStageImage alt={posterAlt} src={posterSrc} />
@@ -637,6 +650,7 @@ export function WithMeetsScreen({
 							setPanelMode(nextMode);
 							setPanelSurfaceVisible(true);
 						}}
+						showSupportSummary={showSupportSummary}
 						title={title}
 					/>
 				)}

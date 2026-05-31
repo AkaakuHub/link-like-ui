@@ -1,5 +1,5 @@
 import Hls from "hls.js";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { WithMeetsScreen } from "../../../src/Components/Patterns/WithMeetsScreen";
 import { LoadingOverlay } from "../../../src/Components/System/Loading";
 import {
@@ -12,14 +12,14 @@ import {
 
 export function RealWithMeetsPreview() {
 	const videoRef = useRef<HTMLVideoElement | null>(null);
+	const commentRequestIdRef = useRef<number>(0);
+	const lastCommentFetchSecondRef = useRef<number>(-1);
 	const params = useMemo(
 		() => new URLSearchParams(globalThis.location.search),
 		[],
 	);
 	const id = params.get("id") ?? "";
 	const hlsPath = params.get("hls") ?? "";
-	const posterSrc = params.get("poster") ?? "";
-	const title = params.get("title") ?? id;
 	const [comments, setComments] = useState<readonly RealComment[]>([]);
 	const [gifts, setGifts] = useState<
 		readonly { amount: string; id: string; label: string; userName: string }[]
@@ -27,39 +27,105 @@ export function RealWithMeetsPreview() {
 	const [mediaItem, setMediaItem] = useState<RealMediaItem | null>(null);
 	const [playbackTime, setPlaybackTime] = useState<number>(0);
 	const [playbackDuration, setPlaybackDuration] = useState<number>(0);
-	const [isLoading, setIsLoading] = useState<boolean>(true);
+	const [isInitialDataLoading, setInitialDataLoading] = useState<boolean>(true);
+	const [, setCommentsLoading] = useState<boolean>(true);
+	const [, setVideoLoading] = useState<boolean>(true);
+	const [isMuted, setIsMuted] = useState<boolean>(false);
 	const videoSource = mediaItem?.hlsPath ?? hlsPath;
+	const isLoading = isInitialDataLoading || !mediaItem;
+	const commentFetchSecond = Math.floor(playbackTime / 5) * 5;
+
+	const loadComments = useCallback(
+		async (
+			playTimeSecond: number,
+			{ showLoading }: { showLoading: boolean },
+		) => {
+			if (!id) return;
+
+			const requestId = commentRequestIdRef.current + 1;
+			commentRequestIdRef.current = requestId;
+			if (showLoading) {
+				setCommentsLoading(true);
+			}
+
+			try {
+				const page = await fetchRealComments(
+					id,
+					0,
+					80,
+					playTimeSecond * 1000,
+				);
+
+				if (commentRequestIdRef.current === requestId) {
+					setComments(page.items);
+				}
+			} finally {
+				if (showLoading && commentRequestIdRef.current === requestId) {
+					setCommentsLoading(false);
+				}
+			}
+		},
+		[id],
+	);
+
+	const startPlayback = useCallback(async () => {
+		const video = videoRef.current;
+
+		if (!video) return;
+
+		try {
+			video.muted = false;
+			setIsMuted(false);
+			await video.play();
+			return;
+		} catch {
+			video.muted = true;
+			setIsMuted(true);
+			await video.play().catch(() => {});
+		}
+	}, []);
+
+	const enableAudioAfterInteraction = useCallback(() => {
+		const video = videoRef.current;
+
+		if (!video || !video.muted) return;
+
+		video.muted = false;
+		setIsMuted(false);
+		void video.play().catch(() => {
+			video.muted = true;
+			setIsMuted(true);
+		});
+	}, []);
 
 	useEffect(() => {
 		if (!id) return;
 
-		setIsLoading(true);
-		void Promise.all([
-			fetchRealComments(id, 0, 80, 0).then((page) => {
-				setComments(page.items);
-			}),
-			fetchRealRankings(id).then((page) => {
-				setGifts(page.items);
-			}),
-			fetchRealMediaItem(id).then(setMediaItem),
-		]).finally(() => {
-			setIsLoading(false);
+		setInitialDataLoading(true);
+		setVideoLoading(true);
+		void fetchRealMediaItem(id)
+			.then(setMediaItem)
+			.finally(() => {
+				setInitialDataLoading(false);
+			});
+		void loadComments(0, { showLoading: false });
+		void fetchRealRankings(id).then((page) => {
+			setGifts(page.items);
 		});
-	}, [id]);
+	}, [id, loadComments]);
 
 	useEffect(() => {
-		if (!id || playbackTime <= 0) return;
+		if (
+			!id ||
+			commentFetchSecond <= 0 ||
+			commentFetchSecond === lastCommentFetchSecondRef.current
+		) {
+			return;
+		}
 
-		const timeoutId = globalThis.setTimeout(() => {
-			void fetchRealComments(id, 0, 80, playbackTime * 1000).then((page) => {
-				setComments(page.items);
-			});
-		}, 350);
-
-		return () => {
-			globalThis.clearTimeout(timeoutId);
-		};
-	}, [id, playbackTime]);
+		lastCommentFetchSecondRef.current = commentFetchSecond;
+		void loadComments(commentFetchSecond, { showLoading: false });
+	}, [commentFetchSecond, id, loadComments]);
 
 	useEffect(() => {
 		const video = videoRef.current;
@@ -69,57 +135,106 @@ export function RealWithMeetsPreview() {
 			setPlaybackTime(video.currentTime);
 			setPlaybackDuration(video.duration);
 		};
+		const showVideoLoading = () => {
+			setVideoLoading(true);
+		};
+		const hideVideoLoading = () => {
+			if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+				setVideoLoading(false);
+			}
+		};
 
 		video.addEventListener("timeupdate", updatePlaybackState);
 		video.addEventListener("durationchange", updatePlaybackState);
+		video.addEventListener("loadeddata", hideVideoLoading);
+		video.addEventListener("canplay", startPlayback, { once: true });
+		video.addEventListener("canplay", hideVideoLoading);
+		video.addEventListener("playing", hideVideoLoading);
+		video.addEventListener("seeking", showVideoLoading);
+		video.addEventListener("seeked", hideVideoLoading);
+		video.addEventListener("waiting", showVideoLoading);
 
 		if (video.canPlayType("application/vnd.apple.mpegurl")) {
+			setVideoLoading(true);
 			video.src = videoSource;
+			video.load();
 			return () => {
 				video.removeEventListener("timeupdate", updatePlaybackState);
 				video.removeEventListener("durationchange", updatePlaybackState);
+				video.removeEventListener("loadeddata", hideVideoLoading);
+				video.removeEventListener("canplay", startPlayback);
+				video.removeEventListener("canplay", hideVideoLoading);
+				video.removeEventListener("playing", hideVideoLoading);
+				video.removeEventListener("seeking", showVideoLoading);
+				video.removeEventListener("seeked", hideVideoLoading);
+				video.removeEventListener("waiting", showVideoLoading);
 			};
 		}
 
 		const hls = new Hls({
-			backBufferLength: 18,
+			abrEwmaDefaultEstimate: 2_000_000,
+			abrEwmaFastVoD: 3,
+			abrEwmaSlowVoD: 9,
+			backBufferLength: 30,
 			capLevelToPlayerSize: true,
 			enableWorker: true,
-			fragLoadingMaxRetry: 8,
-			fragLoadingRetryDelay: 1200,
-			fragLoadingTimeOut: 30000,
+			fragLoadingMaxRetry: 12,
+			fragLoadingRetryDelay: 1600,
+			fragLoadingTimeOut: 45000,
 			lowLatencyMode: false,
-			maxBufferLength: 18,
-			maxMaxBufferLength: 36,
-			startLevel: 0,
+			manifestLoadingMaxRetry: 8,
+			manifestLoadingRetryDelay: 1600,
+			manifestLoadingTimeOut: 30000,
+			maxBufferLength: 45,
+			maxBufferSize: 90 * 1000 * 1000,
+			maxMaxBufferLength: 90,
+			startLevel: -1,
 		});
 
+		setVideoLoading(true);
 		hls.loadSource(videoSource);
 		hls.attachMedia(video);
+		hls.on(Hls.Events.MANIFEST_PARSED, () => {
+			void startPlayback();
+		});
 
 		return () => {
 			video.removeEventListener("timeupdate", updatePlaybackState);
 			video.removeEventListener("durationchange", updatePlaybackState);
+			video.removeEventListener("loadeddata", hideVideoLoading);
+			video.removeEventListener("canplay", startPlayback);
+			video.removeEventListener("canplay", hideVideoLoading);
+			video.removeEventListener("playing", hideVideoLoading);
+			video.removeEventListener("seeking", showVideoLoading);
+			video.removeEventListener("seeked", hideVideoLoading);
+			video.removeEventListener("waiting", showVideoLoading);
 			hls.destroy();
 		};
-	}, [videoSource]);
+	}, [startPlayback, videoSource]);
 
 	function backToRealMedia() {
 		globalThis.location.assign("/real-media");
 	}
 
+	if (!mediaItem) {
+		return <LoadingOverlay text="Loading..." />;
+	}
+
 	return (
-		<>
+		<div
+			onClick={enableAudioAfterInteraction}
+			onKeyDown={enableAudioAfterInteraction}
+		>
 			<WithMeetsScreen
-				chapters={mediaItem?.chapters ?? []}
+				chapters={mediaItem.chapters}
 				comments={comments}
-				description={mediaItem?.description ?? ""}
+				description={mediaItem.description}
 				gifts={gifts}
 				onPlaybackToggle={() => {
 					const video = videoRef.current;
 					if (!video) return;
 					if (video.paused) {
-						void video.play();
+						void startPlayback();
 						return;
 					}
 					video.pause();
@@ -127,18 +242,22 @@ export function RealWithMeetsPreview() {
 				onSeek={(seconds) => {
 					const video = videoRef.current;
 					if (!video) return;
+					setVideoLoading(true);
+					void loadComments(seconds, { showLoading: false });
 					video.currentTime = seconds;
 				}}
 				onBack={backToRealMedia}
-				posterAlt={mediaItem?.imageAlt ?? title}
-				posterSrc={mediaItem?.imageSrc ?? posterSrc}
+				posterAlt={mediaItem.imageAlt}
+				posterSrc={mediaItem.imageSrc}
 				playbackDuration={playbackDuration}
 				playbackTime={playbackTime}
-				title={mediaItem?.title ?? title}
+				title={mediaItem.title}
 				videoRef={videoRef}
+				videoMuted={isMuted}
 				videoSrc={videoSource}
+				showSupportSummary={false}
 			/>
 			{isLoading ? <LoadingOverlay text="Loading..." /> : null}
-		</>
+		</div>
 	);
 }

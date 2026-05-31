@@ -15,6 +15,10 @@ const forwardedArgs = [];
 for (let index = 0; index < args.length; index += 1) {
 	const arg = args[index];
 
+	if (arg === "--") {
+		continue;
+	}
+
 	if (!optionNames.has(arg)) {
 		forwardedArgs.push(arg);
 		continue;
