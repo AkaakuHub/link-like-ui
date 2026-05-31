@@ -361,6 +361,7 @@ function WithMeetsSidePanel({
 	onClose,
 	onSeek,
 	onModeChange,
+	orientation,
 	showSupportSummary,
 	title,
 }: {
