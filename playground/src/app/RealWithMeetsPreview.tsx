@@ -394,6 +394,7 @@ export function RealWithMeetsPreview() {
 				comments={comments}
 				description={mediaItem.description}
 				gifts={gifts}
+				isHorizontal={mediaItem.isHorizontal}
 				onPlaybackToggle={() => {
 					const video = videoRef.current;
 					if (!video) return;

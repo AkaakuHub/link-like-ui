@@ -1,6 +1,6 @@
 import { execFile } from "node:child_process";
 import { existsSync } from "node:fs";
-import { readdir } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 import { promisify } from "node:util";
 import type {
@@ -10,6 +10,7 @@ import type {
 	RealDataPageOptions,
 	RealDataRepository,
 	RealGiftRanking,
+	RealMediaChapter,
 	RealMediaItem,
 } from "../domain/realData";
 import { resolveInsideRoot, toServedFilePath } from "./pathUtils";
@@ -21,9 +22,23 @@ interface PostgresMediaRow {
 	duration: string;
 	id: string;
 	imageAlt: string;
+	isHorizontal: boolean;
 	releasedAt: string;
 	title: string;
 	videoUrl: string;
+}
+
+interface ArchiveDetailMetadata {
+	chapters?: unknown;
+	is_horizontal?: unknown;
+	live_id?: unknown;
+	title?: unknown;
+}
+
+interface ChapterMetadata {
+	is_extra?: unknown;
+	name?: unknown;
+	play_time_second?: unknown;
 }
 
 export class PostgresDockerRealDataRepository implements RealDataRepository {
@@ -50,6 +65,7 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 					coalesce(live_archive_details.title, with_meets.name, with_meets.archives_id) as title,
 					coalesce(live_archive_details.title, with_meets.name, with_meets.archives_id) as "imageAlt",
 					coalesce(live_archive_details.description, '') as description,
+					coalesce(live_archive_details.is_horizontal, true) as "isHorizontal",
 					to_char(coalesce(with_meets.live_start_time, live_archive_details.live_start_time), 'YYYY.MM.DD') as "releasedAt",
 					case
 						when coalesce(live_archive_details.total_play_time_second, with_meets.total_playing_time_second) is null then ''
@@ -87,6 +103,7 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 					coalesce(live_archive_details.title, with_meets.name, with_meets.archives_id) as title,
 					coalesce(live_archive_details.title, with_meets.name, with_meets.archives_id) as "imageAlt",
 					coalesce(live_archive_details.description, '') as description,
+					coalesce(live_archive_details.is_horizontal, true) as "isHorizontal",
 					to_char(coalesce(with_meets.live_start_time, live_archive_details.live_start_time), 'YYYY.MM.DD') as "releasedAt",
 					case
 						when coalesce(live_archive_details.total_play_time_second, with_meets.total_playing_time_second) is null then ''
@@ -223,17 +240,39 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 
 		if (!hlsRelativePath || !thumbnailRelativePath) return null;
 
+		const detail = await this.#readDetail(row.id);
+
 		return {
-			chapters: [],
+			chapters: normalizeChapters(detail?.chapters),
 			description: row.description,
 			duration: row.duration,
 			hlsPath: toServedFilePath(hlsRelativePath),
 			id: row.id,
 			imageAlt: row.imageAlt,
 			imageSrc: toServedFilePath(thumbnailRelativePath),
+			isHorizontal: detail?.is_horizontal === false ? false : row.isHorizontal,
 			releasedAt: row.releasedAt,
 			title: row.title,
 		};
+	}
+
+	async #readDetail(liveId: string): Promise<ArchiveDetailMetadata | null> {
+		for (const fileName of ["archive-details.json", "with-station-details.json"]) {
+			const content = await readFile(
+				join(this.#rootDir, "linkura-live-data", "data", fileName),
+				"utf8",
+			).catch(() => null);
+
+			if (!content) continue;
+
+			const parsed = JSON.parse(content) as unknown;
+			if (!isObject(parsed)) continue;
+
+			const detail = parsed[liveId];
+			if (isObject(detail)) return detail;
+		}
+
+		return null;
 	}
 }
 
@@ -251,4 +290,29 @@ function pageFromLimitPlusOne<TItem>(
 
 function sqlLiteral(value: string) {
 	return `'${value.replaceAll("'", "''")}'`;
+}
+
+function isObject(value: unknown): value is Record<string, unknown> {
+	return typeof value === "object" && value !== null;
+}
+
+function normalizeChapters(value: unknown): readonly RealMediaChapter[] {
+	if (!Array.isArray(value)) return [];
+
+	return value.filter(isObject).flatMap((chapter: ChapterMetadata) => {
+		const name = typeof chapter.name === "string" ? chapter.name : null;
+
+		if (!name) return [];
+
+		return [
+			{
+				isExtra: chapter.is_extra === true,
+				name,
+				playTimeSecond:
+					typeof chapter.play_time_second === "number"
+						? chapter.play_time_second
+						: null,
+			},
+		];
+	});
 }

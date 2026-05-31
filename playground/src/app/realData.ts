@@ -9,6 +9,7 @@ export interface RealMediaItem extends MediaArchiveItemInput {
 	chapters: readonly RealMediaChapter[];
 	description: string;
 	hlsPath: string;
+	isHorizontal: boolean;
 }
 
 export interface RealMediaChapter {

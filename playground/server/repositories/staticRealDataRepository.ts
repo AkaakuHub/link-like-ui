@@ -26,6 +26,7 @@ interface ArchiveMetadata {
 interface ArchiveDetailMetadata {
 	chapters?: unknown;
 	description?: unknown;
+	is_horizontal?: unknown;
 	live_id?: unknown;
 	title?: unknown;
 	total_play_time_second?: unknown;
@@ -137,6 +138,7 @@ export class StaticRealDataRepository implements RealDataRepository {
 				id,
 				imageAlt: title,
 				imageSrc: toServedFilePath(thumbnailRelativePath),
+				isHorizontal: detail?.is_horizontal !== false,
 				releasedAt: dateLabelFromHlsPath(hlsPath),
 				title,
 			});

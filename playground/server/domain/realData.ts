@@ -15,6 +15,7 @@ export interface RealMediaItem {
 	id: string;
 	imageAlt: string;
 	imageSrc: string;
+	isHorizontal: boolean;
 	releasedAt: string;
 	title: string;
 }

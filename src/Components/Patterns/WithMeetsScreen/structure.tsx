@@ -74,7 +74,7 @@ export const WithMeetsStageVideo = forwardRef<
 	return (
 		<video
 			ref={ref}
-			className={cn("absolute inset-0 h-full w-full object-cover", className)}
+			className={cn("absolute inset-0 h-full w-full", className)}
 			playsInline
 			preload="metadata"
 			{...props}

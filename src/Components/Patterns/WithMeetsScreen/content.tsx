@@ -71,6 +71,7 @@ export interface WithMeetsScreenProps {
 	comments: readonly WithMeetsCommentInput[];
 	description?: string;
 	gifts: readonly WithMeetsGiftInput[];
+	isHorizontal?: boolean;
 	onBack?: () => void;
 	posterAlt: string;
 	posterSrc: string;
@@ -358,6 +359,7 @@ function WithMeetsSidePanel({
 	isSurfaceVisible,
 	mode,
 	onClose,
+	onSeek,
 	onModeChange,
 	showSupportSummary,
 	title,
@@ -369,6 +371,7 @@ function WithMeetsSidePanel({
 	isSurfaceVisible: boolean;
 	mode: Exclude<WithMeetsPanelMode, "none">;
 	onClose: () => void;
+	onSeek: ((seconds: number) => void) | undefined;
 	onModeChange: (mode: Exclude<WithMeetsPanelMode, "none">) => void;
 	showSupportSummary: boolean;
 	title: string;
@@ -563,6 +566,10 @@ function WithMeetsSidePanel({
 										: "flex h-[3.2em] items-center justify-between rounded-[0.35em] bg-ll-table px-[1.1em] text-[0.82em] font-semibold text-ll-true-white/58"
 								}
 								type="button"
+								onClick={() => {
+									if (chapter.playTimeSecond === null) return;
+									onSeek?.(chapter.playTimeSecond);
+								}}
 							>
 								<span>{chapter.name}</span>
 								<span>{formatChapterTime(chapter.playTimeSecond)}</span>
@@ -586,6 +593,7 @@ export function WithMeetsScreen({
 	comments,
 	description = "",
 	gifts,
+	isHorizontal = true,
 	onBack,
 	posterAlt,
 	posterSrc,
@@ -648,6 +656,7 @@ export function WithMeetsScreen({
 					{videoSrc ? (
 						<WithMeetsStageVideo
 							ref={videoRef}
+							className={isHorizontal ? "object-cover" : "object-contain"}
 							poster={posterSrc}
 							controls={false}
 							muted={videoMuted}
@@ -763,6 +772,7 @@ export function WithMeetsScreen({
 						onClose={() => {
 							setPanelMode("none");
 						}}
+						onSeek={onSeek}
 						onModeChange={(nextMode) => {
 							setPanelMode(nextMode);
 							setPanelSurfaceVisible(true);
