@@ -15,6 +15,9 @@ export function RealWithMeetsPreview() {
 	const commentLoadPromiseRef = useRef<Promise<void>>(Promise.resolve());
 	const lastCommentFetchSecondRef = useRef<number>(-1);
 	const lastFetchedCommentTimeMsRef = useRef<number>(0);
+	const displayedCommentIdsRef = useRef<ReadonlySet<string>>(new Set());
+	const queuedCommentIdsRef = useRef<ReadonlySet<string>>(new Set());
+	const commentDisplayQueueRef = useRef<readonly RealComment[]>([]);
 	const params = useMemo(
 		() => new URLSearchParams(globalThis.location.search),
 		[],
@@ -147,6 +150,9 @@ export function RealWithMeetsPreview() {
 		commentLoadPromiseRef.current = Promise.resolve();
 		lastFetchedCommentTimeMsRef.current = 0;
 		bufferedCommentsRef.current = [];
+		displayedCommentIdsRef.current = new Set();
+		queuedCommentIdsRef.current = new Set();
+		commentDisplayQueueRef.current = [];
 		setComments([]);
 		void fetchRealMediaItem(id)
 			.then(setMediaItem)
@@ -171,22 +177,6 @@ export function RealWithMeetsPreview() {
 		lastCommentFetchSecondRef.current = commentFetchSecond;
 		void loadComments(commentFetchSecond, { mode: "append", showLoading: false });
 	}, [commentFetchSecond, id, loadComments]);
-
-	useEffect(() => {
-		const visibleTimeMs = Math.floor(playbackTime * 1000);
-		setComments((currentComments) => {
-			const visibleComments = bufferedCommentsRef.current.filter(
-				(comment) => comment.playTimeMs <= visibleTimeMs,
-			);
-			if (
-				visibleComments.length === currentComments.length &&
-				visibleComments.at(-1)?.id === currentComments.at(-1)?.id
-			) {
-				return currentComments;
-			}
-			return visibleComments;
-		});
-	}, [playbackTime]);
 
 	useEffect(() => {
 		const video = videoRef.current;
@@ -217,6 +207,54 @@ export function RealWithMeetsPreview() {
 		video.addEventListener("waiting", showVideoLoading);
 		video.addEventListener("pause", updatePlaybackState);
 		video.addEventListener("play", updatePlaybackState);
+		let animationFrameId = 0;
+		let lastCommentFlushAt = 0;
+		const updateFrameState = (now: number) => {
+			setPlaybackTime(video.currentTime);
+			setPlaybackDuration(video.duration);
+			setIsPlaying(!video.paused);
+
+			const visibleTimeMs = Math.floor(video.currentTime * 1000);
+			const displayedCommentIds = displayedCommentIdsRef.current;
+			const queuedCommentIds = queuedCommentIdsRef.current;
+			const dueComments = bufferedCommentsRef.current.filter(
+				(comment) =>
+					comment.playTimeMs <= visibleTimeMs &&
+					!displayedCommentIds.has(comment.id) &&
+					!queuedCommentIds.has(comment.id),
+			);
+			if (dueComments.length > 0) {
+				queuedCommentIdsRef.current = new Set([
+					...queuedCommentIds,
+					...dueComments.map((comment) => comment.id),
+				]);
+				commentDisplayQueueRef.current = [
+					...commentDisplayQueueRef.current,
+					...dueComments,
+				].sort(
+					(firstComment, secondComment) =>
+						firstComment.playTimeMs - secondComment.playTimeMs,
+				);
+			}
+
+			if (
+				commentDisplayQueueRef.current.length > 0 &&
+				now - lastCommentFlushAt >= 32
+			) {
+				lastCommentFlushAt = now;
+				const nextComments = commentDisplayQueueRef.current.slice(0, 2);
+				commentDisplayQueueRef.current =
+					commentDisplayQueueRef.current.slice(2);
+				displayedCommentIdsRef.current = new Set([
+					...displayedCommentIdsRef.current,
+					...nextComments.map((comment) => comment.id),
+				]);
+				setComments((currentComments) => [...currentComments, ...nextComments]);
+			}
+
+			animationFrameId = requestAnimationFrame(updateFrameState);
+		};
+		animationFrameId = requestAnimationFrame(updateFrameState);
 
 		if (video.canPlayType("application/vnd.apple.mpegurl")) {
 			setVideoLoading(true);
@@ -237,6 +275,7 @@ export function RealWithMeetsPreview() {
 				video.removeEventListener("waiting", showVideoLoading);
 				video.removeEventListener("pause", updatePlaybackState);
 				video.removeEventListener("play", updatePlaybackState);
+				cancelAnimationFrame(animationFrameId);
 			};
 		}
 
@@ -302,6 +341,7 @@ export function RealWithMeetsPreview() {
 			video.removeEventListener("waiting", showVideoLoading);
 			video.removeEventListener("pause", updatePlaybackState);
 			video.removeEventListener("play", updatePlaybackState);
+			cancelAnimationFrame(animationFrameId);
 			hls.destroy();
 		};
 	}, [mediaItem, startPlayback, videoSource]);
@@ -340,6 +380,9 @@ export function RealWithMeetsPreview() {
 					setVideoLoading(true);
 					lastFetchedCommentTimeMsRef.current = 0;
 					bufferedCommentsRef.current = [];
+					displayedCommentIdsRef.current = new Set();
+					queuedCommentIdsRef.current = new Set();
+					commentDisplayQueueRef.current = [];
 					setComments([]);
 					void loadComments(seconds + 8, { mode: "replace", showLoading: false });
 					video.currentTime = seconds;
