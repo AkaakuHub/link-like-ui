@@ -77,6 +77,9 @@ export function RealWithMeetsPreview() {
 		if (!video) return;
 
 		try {
+			video.autoplay = true;
+			video.muted = true;
+			video.playsInline = true;
 			await video.play();
 			return;
 		} catch {
@@ -158,6 +161,9 @@ export function RealWithMeetsPreview() {
 
 		if (video.canPlayType("application/vnd.apple.mpegurl")) {
 			setVideoLoading(true);
+			video.autoplay = true;
+			video.muted = true;
+			video.playsInline = true;
 			video.src = videoSource;
 			video.load();
 			return () => {
@@ -194,12 +200,33 @@ export function RealWithMeetsPreview() {
 		});
 
 		setVideoLoading(true);
-		hls.loadSource(videoSource);
+		video.autoplay = true;
+		video.muted = true;
+		video.playsInline = true;
 		hls.attachMedia(video);
+		hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+			hls.loadSource(videoSource);
+		});
 		hls.on(Hls.Events.MANIFEST_PARSED, () => {
 			video.muted = true;
 			setIsMuted(true);
 			void startPlayback();
+		});
+		hls.on(Hls.Events.FRAG_BUFFERED, () => {
+			setVideoLoading(false);
+			void startPlayback();
+		});
+		hls.on(Hls.Events.ERROR, (_event, data) => {
+			if (!data.fatal) return;
+
+			setVideoLoading(false);
+			if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+				hls.startLoad();
+				return;
+			}
+			if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+				hls.recoverMediaError();
+			}
 		});
 
 		return () => {
