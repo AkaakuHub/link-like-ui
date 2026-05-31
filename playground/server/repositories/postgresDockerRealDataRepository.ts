@@ -241,9 +241,10 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 		if (!hlsRelativePath || !thumbnailRelativePath) return null;
 
 		const detail = await this.#readDetail(row.id);
+		const chapters = await this.#readChapters(row.id);
 
 		return {
-			chapters: normalizeChapters(detail?.chapters),
+			chapters: chapters.length > 0 ? chapters : normalizeChapters(detail?.chapters),
 			description: row.description,
 			duration: row.duration,
 			hlsPath: toServedFilePath(hlsRelativePath),
@@ -273,6 +274,21 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 		}
 
 		return null;
+	}
+
+	async #readChapters(liveId: string): Promise<readonly RealMediaChapter[]> {
+		return this.#queryJson<RealMediaChapter>(`
+			select coalesce(json_agg(row_to_json(chapter_rows)), '[]'::json)
+			from (
+				select
+					is_extra as "isExtra",
+					name,
+					play_time_second as "playTimeSecond"
+				from live_archive_chapters
+				where live_id = ${sqlLiteral(liveId)}
+				order by chapter_index asc
+			) chapter_rows
+		`);
 	}
 }
 

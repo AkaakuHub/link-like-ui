@@ -27,14 +27,20 @@ export function WithMeetsRoot({
 
 export function WithMeetsFrame({
 	className,
+	"data-orientation": dataOrientation,
 	...props
-}: HTMLAttributes<HTMLDivElement>) {
+}: HTMLAttributes<HTMLDivElement> & {
+	"data-orientation"?: "horizontal" | "vertical";
+}) {
 	return (
 		<WithMeetsDivBase
 			className={cn(
-				"relative aspect-2532/1170 h-auto max-h-dvh w-dvw max-w-[calc(100dvh*2532/1170)] overflow-hidden bg-ll-black text-[clamp(0.5rem,0.68vw,0.78rem)]",
+				dataOrientation === "vertical"
+					? "relative aspect-1170/2532 h-dvh max-h-dvh w-auto max-w-dvw overflow-hidden bg-ll-black text-[clamp(0.5rem,1.3vw,0.78rem)]"
+					: "relative aspect-2532/1170 h-auto max-h-dvh w-dvw max-w-[calc(100dvh*2532/1170)] overflow-hidden bg-ll-black text-[clamp(0.5rem,0.68vw,0.78rem)]",
 				className,
 			)}
+			data-orientation={dataOrientation}
 			{...props}
 		/>
 	);
@@ -42,14 +48,20 @@ export function WithMeetsFrame({
 
 export function WithMeetsVideoViewport({
 	className,
+	"data-orientation": dataOrientation,
 	...props
-}: HTMLAttributes<HTMLDivElement>) {
+}: HTMLAttributes<HTMLDivElement> & {
+	"data-orientation"?: "horizontal" | "vertical";
+}) {
 	return (
 		<WithMeetsDivBase
 			className={cn(
-				"absolute top-[5.4%] bottom-[3.8%] left-[13.4%] w-[73.2%] overflow-hidden bg-ll-black",
+				dataOrientation === "vertical"
+					? "absolute inset-x-[5%] top-[3%] bottom-[27%] overflow-hidden bg-ll-black"
+					: "absolute top-[5.4%] bottom-[3.8%] left-[13.4%] w-[73.2%] overflow-hidden bg-ll-black",
 				className,
 			)}
+			data-orientation={dataOrientation}
 			{...props}
 		/>
 	);
@@ -198,14 +210,20 @@ export function WithMeetsMenuButton({
 
 export function WithMeetsPanel({
 	className,
+	"data-orientation": dataOrientation,
 	...props
-}: HTMLAttributes<HTMLDivElement>) {
+}: HTMLAttributes<HTMLDivElement> & {
+	"data-orientation"?: "horizontal" | "vertical";
+}) {
 	return (
 		<WithMeetsDivBase
 			className={cn(
-				"absolute top-[5.4%] right-[5%] bottom-[3.8%] w-[29%] overflow-hidden rounded-l-[1.35em] bg-ll-gray/58 text-ll-true-white shadow-[0_0_16px_color-mix(in_srgb,var(--color-ll-black)_45%,transparent)] backdrop-blur-[0.26em] transition-[background-color,box-shadow,backdrop-filter] duration-200",
+				dataOrientation === "vertical"
+					? "absolute inset-x-[5%] bottom-[3%] h-[26%] overflow-hidden rounded-t-[1.35em] bg-ll-gray/58 text-ll-true-white shadow-[0_0_16px_color-mix(in_srgb,var(--color-ll-black)_45%,transparent)] backdrop-blur-[0.26em] transition-[background-color,box-shadow,backdrop-filter] duration-200"
+					: "absolute top-[5.4%] right-[5%] bottom-[3.8%] w-[29%] overflow-hidden rounded-l-[1.35em] bg-ll-gray/58 text-ll-true-white shadow-[0_0_16px_color-mix(in_srgb,var(--color-ll-black)_45%,transparent)] backdrop-blur-[0.26em] transition-[background-color,box-shadow,backdrop-filter] duration-200",
 				className,
 			)}
+			data-orientation={dataOrientation}
 			{...props}
 		/>
 	);

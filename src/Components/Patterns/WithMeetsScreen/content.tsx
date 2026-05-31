@@ -375,7 +375,11 @@ function WithMeetsSidePanel({
 	onModeChange: (mode: Exclude<WithMeetsPanelMode, "none">) => void;
 	showSupportSummary: boolean;
 	title: string;
+	orientation: "horizontal" | "vertical";
 }) {
+	const firstChapterTimeSecond =
+		chapters.find((chapter) => chapter.playTimeSecond !== null)
+			?.playTimeSecond ?? 0;
 	const tabLabels =
 		mode === "comments"
 			? ["Timeline", "Comments", "Gifts", "Cards"]
@@ -387,6 +391,7 @@ function WithMeetsSidePanel({
 
 	return (
 		<WithMeetsPanel
+			data-orientation={orientation}
 			className={
 				isSurfaceVisible
 					? undefined
@@ -568,11 +573,25 @@ function WithMeetsSidePanel({
 								type="button"
 								onClick={() => {
 									if (chapter.playTimeSecond === null) return;
-									onSeek?.(chapter.playTimeSecond);
+									onSeek?.(
+										Math.max(
+											0,
+											chapter.playTimeSecond - firstChapterTimeSecond,
+										),
+									);
 								}}
 							>
 								<span>{chapter.name}</span>
-								<span>{formatChapterTime(chapter.playTimeSecond)}</span>
+								<span>
+									{formatChapterTime(
+										chapter.playTimeSecond === null
+											? null
+											: Math.max(
+													0,
+													chapter.playTimeSecond - firstChapterTimeSecond,
+												),
+									)}
+								</span>
 							</button>
 						))}
 					</div>
@@ -636,16 +655,19 @@ export function WithMeetsScreen({
 	const chromeVisibilityClass = isChromeVisible
 		? "opacity-100 transition-opacity duration-300"
 		: "pointer-events-none opacity-0 transition-opacity duration-500";
+	const orientation = isHorizontal ? "horizontal" : "vertical";
 
 	return (
 		<WithMeetsRoot>
 			<WithMeetsFrame
+				data-orientation={orientation}
 				onKeyDown={revealChrome}
 				onPointerDown={revealChrome}
 				onPointerMove={revealChrome}
 				onTouchStart={revealChrome}
 			>
 				<WithMeetsVideoViewport
+					data-orientation={orientation}
 					onClick={() => {
 						setChromeVisible(true);
 						if (panelMode !== "none") {
@@ -769,6 +791,7 @@ export function WithMeetsScreen({
 						gifts={gifts}
 						isSurfaceVisible={isPanelSurfaceVisible}
 						mode={panelMode}
+						orientation={orientation}
 						onClose={() => {
 							setPanelMode("none");
 						}}
