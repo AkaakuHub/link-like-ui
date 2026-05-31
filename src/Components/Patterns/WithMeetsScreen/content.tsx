@@ -77,9 +77,11 @@ export interface WithMeetsScreenProps {
 	posterSrc: string;
 	title?: string;
 	playbackDuration?: number;
+	playbackRate?: number;
 	isPlaying?: boolean;
 	playbackTime?: number;
 	onPlaybackToggle?: () => void;
+	onPlaybackRateChange?: (rate: number) => void;
 	onSeek?: (seconds: number) => void;
 	showSupportSummary?: boolean;
 	videoRef?: RefObject<HTMLVideoElement | null>;
@@ -121,17 +123,22 @@ function WithMeetsPlaybackControls({
 	isPlaying,
 	onSeek,
 	onToggle,
+	onRateChange,
 	orientation,
+	rate,
 	time,
 }: {
 	duration: number;
 	isPlaying: boolean;
+	onRateChange: ((rate: number) => void) | undefined;
 	onSeek: ((seconds: number) => void) | undefined;
 	onToggle: (() => void) | undefined;
 	orientation: "horizontal" | "vertical";
+	rate: number;
 	time: number;
 }) {
 	const progress = duration > 0 ? Math.min(100, (time / duration) * 100) : 0;
+	const playbackRates = [1, 1.5, 2, 3, 4] as const;
 	return (
 		<WithMeetsProgressArea data-orientation={orientation}>
 			<button
@@ -171,6 +178,18 @@ function WithMeetsPlaybackControls({
 					<span className="text-ll-true-white/72">
 						{formatPlaybackTime(duration)}
 					</span>
+					<button
+						type="button"
+						className="rounded-full border border-ll-true-white/42 px-[0.65em] py-[0.25em] text-[0.82em] leading-none text-ll-true-white"
+						onClick={() => {
+							const currentIndex = playbackRates.indexOf(rate);
+							const nextRate =
+								playbackRates[(currentIndex + 1) % playbackRates.length] ?? 1;
+							onRateChange?.(nextRate);
+						}}
+					>
+						{formatPlaybackRate(rate)}
+					</button>
 				</div>
 				<WithMeetsMenuButton type="button">
 					<LuChevronLeft className="h-[1.25em] w-[1.25em]" />
@@ -192,7 +211,7 @@ function WithMeetsVirtualTimeline({
 	const [scrollTop, setScrollTop] = useState<number>(0);
 	const [isFollowingLatest, setFollowingLatest] = useState<boolean>(true);
 	const viewportHeight = 610;
-	const itemHeight = 24;
+	const itemHeight = 52;
 	const commentCount = comments.length;
 	const { items, totalHeight } = useWithMeetsVirtualList({
 		itemCount: commentCount,
@@ -267,13 +286,13 @@ function WithMeetsVirtualTimeline({
 							return (
 								<div
 									key={comment.id}
-									className="absolute right-0 left-0 grid content-center leading-none"
+									className="absolute right-0 left-0 grid content-center leading-tight"
 									style={{
 										height: itemHeight,
 										transform: `translateY(${virtualItem.offsetTop}px)`,
 									}}
 								>
-									<p className="truncate text-ll-true-white/88">
+									<p className="wrap-break-word text-ll-true-white/88">
 										<span className="font-semibold">{comment.userName}: </span>
 										{comment.message}
 									</p>
@@ -622,8 +641,10 @@ export function WithMeetsScreen({
 	title = posterAlt,
 	isPlaying = false,
 	playbackDuration = 0,
+	playbackRate = 1,
 	playbackTime = 0,
 	onPlaybackToggle,
+	onPlaybackRateChange,
 	onSeek,
 	showSupportSummary = true,
 	videoRef,
@@ -781,9 +802,11 @@ export function WithMeetsScreen({
 					<WithMeetsPlaybackControls
 						duration={playbackDuration}
 						isPlaying={isPlaying}
+						onRateChange={onPlaybackRateChange}
 						onSeek={onSeek}
 						onToggle={onPlaybackToggle}
 						orientation={orientation}
+						rate={playbackRate}
 						time={playbackTime}
 					/>
 				</div>
@@ -827,4 +850,8 @@ function formatPlaybackTime(seconds: number) {
 	const minutes = Math.floor(seconds / 60);
 	const remainingSeconds = Math.floor(seconds % 60);
 	return `${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
+}
+
+function formatPlaybackRate(rate: number) {
+	return `${rate.toFixed(Number.isInteger(rate) ? 0 : 1)}x`;
 }

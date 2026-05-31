@@ -35,6 +35,7 @@ export function RealWithMeetsPreview() {
 		readonly { amount: string; id: string; label: string; userName: string }[]
 	>([]);
 	const [mediaItem, setMediaItem] = useState<RealMediaItem | null>(null);
+	const [playbackRate, setPlaybackRate] = useState<number>(1);
 	const [playbackTime, setPlaybackTime] = useState<number>(0);
 	const [playbackDuration, setPlaybackDuration] = useState<number>(0);
 	const [isInitialDataLoading, setInitialDataLoading] = useState<boolean>(true);
@@ -188,6 +189,7 @@ export function RealWithMeetsPreview() {
 		const video = videoRef.current;
 
 		if (!mediaItem || !video || !videoSource) return;
+		video.playbackRate = playbackRate;
 		const updatePlaybackState = () => {
 			setPlaybackTime(video.currentTime);
 			setPlaybackDuration(video.duration);
@@ -374,7 +376,7 @@ export function RealWithMeetsPreview() {
 			cancelAnimationFrame(animationFrameId);
 			hls.destroy();
 		};
-	}, [mediaItem, startPlayback, videoSource]);
+	}, [mediaItem, playbackRate, startPlayback, videoSource]);
 
 	function backToRealMedia() {
 		globalThis.location.assign("/real-media");
@@ -425,7 +427,15 @@ export function RealWithMeetsPreview() {
 				posterSrc={mediaItem.imageSrc}
 				isPlaying={isPlaying}
 				playbackDuration={playbackDuration}
+				playbackRate={playbackRate}
 				playbackTime={playbackTime}
+				onPlaybackRateChange={(rate) => {
+					const video = videoRef.current;
+					setPlaybackRate(rate);
+					if (video) {
+						video.playbackRate = rate;
+					}
+				}}
 				title={mediaItem.title}
 				videoRef={videoRef}
 				videoMuted={isMuted}
