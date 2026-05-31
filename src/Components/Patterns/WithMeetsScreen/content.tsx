@@ -17,6 +17,7 @@ import {
 	LuTrophy,
 	LuX,
 } from "react-icons/lu";
+import SimpleBar from "simplebar-react";
 import {
 	WithMeetsControlRow,
 	WithMeetsFrame,
@@ -169,6 +170,8 @@ function WithMeetsVirtualTimeline({
 	comments: readonly WithMeetsCommentInput[];
 }) {
 	const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+	const previousCommentCountRef = useRef<number>(0);
+	const isProgrammaticScrollRef = useRef<boolean>(false);
 	const [scrollTop, setScrollTop] = useState<number>(0);
 	const [isFollowingLatest, setFollowingLatest] = useState<boolean>(true);
 	const viewportHeight = 610;
@@ -183,65 +186,84 @@ function WithMeetsVirtualTimeline({
 	});
 
 	useEffect(() => {
+		const hasNewComment = commentCount !== previousCommentCountRef.current;
+		previousCommentCountRef.current = commentCount;
+
+		if (!hasNewComment) return;
 		if (!isFollowingLatest) return;
 
 		const scrollContainer = scrollContainerRef.current;
 		if (!scrollContainer) return;
 
+		isProgrammaticScrollRef.current = true;
 		scrollContainer.scrollTop = scrollContainer.scrollHeight;
 		setScrollTop(scrollContainer.scrollTop);
-	});
+		requestAnimationFrame(() => {
+			isProgrammaticScrollRef.current = false;
+		});
+	}, [commentCount, isFollowingLatest]);
 
 	function scrollToLatest() {
 		const scrollContainer = scrollContainerRef.current;
 		if (!scrollContainer) return;
 
 		setFollowingLatest(true);
+		isProgrammaticScrollRef.current = true;
 		scrollContainer.scrollTop = scrollContainer.scrollHeight;
 		setScrollTop(scrollContainer.scrollTop);
+		requestAnimationFrame(() => {
+			isProgrammaticScrollRef.current = false;
+		});
 	}
 
 	return (
 		<div className="relative h-full">
-			<div
-				ref={scrollContainerRef}
-				className="h-full overflow-y-auto px-[1em]"
-				onScroll={(event) => {
-					const scrollContainer = event.currentTarget;
-					const distanceFromBottom =
-						scrollContainer.scrollHeight -
-						scrollContainer.clientHeight -
-						scrollContainer.scrollTop;
-					setScrollTop(scrollContainer.scrollTop);
-					setFollowingLatest(distanceFromBottom < 48);
+			<SimpleBar
+				autoHide={false}
+				className="ll-system-modal-scrollbar h-full"
+				scrollableNodeProps={{
+					onScroll: (event) => {
+						const scrollContainer = event.currentTarget;
+						const distanceFromBottom =
+							scrollContainer.scrollHeight -
+							scrollContainer.clientHeight -
+							scrollContainer.scrollTop;
+						setScrollTop(scrollContainer.scrollTop);
+						if (!isProgrammaticScrollRef.current) {
+							setFollowingLatest(distanceFromBottom < 48);
+						}
+					},
+					ref: scrollContainerRef,
 				}}
 			>
-				<div className="relative" style={{ height: totalHeight }}>
-					{items.map((virtualItem) => {
-						const comment = comments[virtualItem.index];
+				<div className="px-[1em]">
+					<div className="relative" style={{ height: totalHeight }}>
+						{items.map((virtualItem) => {
+							const comment = comments[virtualItem.index];
 
-						if (!comment) {
-							return null;
-						}
+							if (!comment) {
+								return null;
+							}
 
-						return (
-							<div
-								key={comment.id}
-								className="absolute right-0 left-0 grid content-center text-[0.7em] leading-none"
-								style={{
-									height: itemHeight,
-									transform: `translateY(${virtualItem.offsetTop}px)`,
-								}}
-							>
-								<p className="truncate text-ll-true-white/88">
-									<span className="font-semibold">{comment.userName}: </span>
-									{comment.message}
-								</p>
-							</div>
-						);
-					})}
+							return (
+								<div
+									key={comment.id}
+									className="absolute right-0 left-0 grid content-center text-[0.7em] leading-none"
+									style={{
+										height: itemHeight,
+										transform: `translateY(${virtualItem.offsetTop}px)`,
+									}}
+								>
+									<p className="truncate text-ll-true-white/88">
+										<span className="font-semibold">{comment.userName}: </span>
+										{comment.message}
+									</p>
+								</div>
+							);
+						})}
+					</div>
 				</div>
-			</div>
+			</SimpleBar>
 			{isFollowingLatest ? null : (
 				<button
 					type="button"
