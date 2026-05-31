@@ -135,7 +135,7 @@ export function RealWithMeetsPreview() {
 	useEffect(() => {
 		const video = videoRef.current;
 
-		if (!video || !videoSource) return;
+		if (!mediaItem || !video || !videoSource) return;
 		const updatePlaybackState = () => {
 			setPlaybackTime(video.currentTime);
 			setPlaybackDuration(video.duration);
@@ -241,7 +241,7 @@ export function RealWithMeetsPreview() {
 			video.removeEventListener("waiting", showVideoLoading);
 			hls.destroy();
 		};
-	}, [startPlayback, videoSource]);
+	}, [mediaItem, startPlayback, videoSource]);
 
 	function backToRealMedia() {
 		globalThis.location.assign("/real-media");
