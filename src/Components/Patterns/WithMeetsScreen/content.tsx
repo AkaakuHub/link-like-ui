@@ -632,7 +632,12 @@ export function WithMeetsScreen({
 
 	return (
 		<WithMeetsRoot>
-			<WithMeetsFrame onPointerDown={revealChrome}>
+			<WithMeetsFrame
+				onKeyDown={revealChrome}
+				onPointerDown={revealChrome}
+				onPointerMove={revealChrome}
+				onTouchStart={revealChrome}
+			>
 				<WithMeetsVideoViewport
 					onClick={() => {
 						setChromeVisible(true);

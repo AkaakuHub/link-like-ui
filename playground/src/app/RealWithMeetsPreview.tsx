@@ -21,6 +21,7 @@ export function RealWithMeetsPreview() {
 	);
 	const id = params.get("id") ?? "";
 	const hlsPath = params.get("hls") ?? "";
+	const bufferedCommentsRef = useRef<readonly RealComment[]>([]);
 	const [comments, setComments] = useState<readonly RealComment[]>([]);
 	const [gifts, setGifts] = useState<
 		readonly { amount: string; id: string; label: string; userName: string }[]
@@ -40,7 +41,7 @@ export function RealWithMeetsPreview() {
 		isInitialCommentsLoading ||
 		isVideoLoading ||
 		!mediaItem;
-	const commentFetchSecond = Math.floor(playbackTime);
+	const commentFetchSecond = Math.floor(playbackTime + 8);
 
 	const loadComments = useCallback(
 		(
@@ -82,10 +83,10 @@ export function RealWithMeetsPreview() {
 							lastFetchedCommentTimeMsRef.current,
 							playTimeMs,
 						);
-						setComments((currentComments) => {
+						const nextBufferedComments = (() => {
 							const nextComments =
 								mode === "append"
-									? [...currentComments, ...page.items]
+									? [...bufferedCommentsRef.current, ...page.items]
 									: page.items;
 							const dedupedComments = new Map(
 								nextComments.map((comment) => [comment.id, comment]),
@@ -94,7 +95,8 @@ export function RealWithMeetsPreview() {
 								(firstComment, secondComment) =>
 									firstComment.playTimeMs - secondComment.playTimeMs,
 							);
-						});
+						})();
+						bufferedCommentsRef.current = nextBufferedComments;
 					} finally {
 						if (showLoading) {
 							setInitialCommentsLoading(false);
@@ -144,6 +146,7 @@ export function RealWithMeetsPreview() {
 		setVideoLoading(true);
 		commentLoadPromiseRef.current = Promise.resolve();
 		lastFetchedCommentTimeMsRef.current = 0;
+		bufferedCommentsRef.current = [];
 		setComments([]);
 		void fetchRealMediaItem(id)
 			.then(setMediaItem)
@@ -168,6 +171,22 @@ export function RealWithMeetsPreview() {
 		lastCommentFetchSecondRef.current = commentFetchSecond;
 		void loadComments(commentFetchSecond, { mode: "append", showLoading: false });
 	}, [commentFetchSecond, id, loadComments]);
+
+	useEffect(() => {
+		const visibleTimeMs = Math.floor(playbackTime * 1000);
+		setComments((currentComments) => {
+			const visibleComments = bufferedCommentsRef.current.filter(
+				(comment) => comment.playTimeMs <= visibleTimeMs,
+			);
+			if (
+				visibleComments.length === currentComments.length &&
+				visibleComments.at(-1)?.id === currentComments.at(-1)?.id
+			) {
+				return currentComments;
+			}
+			return visibleComments;
+		});
+	}, [playbackTime]);
 
 	useEffect(() => {
 		const video = videoRef.current;
@@ -320,8 +339,9 @@ export function RealWithMeetsPreview() {
 					if (!video) return;
 					setVideoLoading(true);
 					lastFetchedCommentTimeMsRef.current = 0;
+					bufferedCommentsRef.current = [];
 					setComments([]);
-					void loadComments(seconds, { mode: "replace", showLoading: false });
+					void loadComments(seconds + 8, { mode: "replace", showLoading: false });
 					video.currentTime = seconds;
 				}}
 				onBack={backToRealMedia}
