@@ -125,14 +125,16 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 			select coalesce(json_agg(row_to_json(comment_rows)), '[]'::json)
 			from (
 				select
-					(timeline_id || '-' || play_time_ms::text || '-' || coalesce(user_player_id, '')) as id,
-					body as message,
+					(timeline_id || '-' || play_time_ms::text || '-' || coalesce(type, '') || '-' || coalesce(user_player_id, '')) as id,
+					case
+						when body is not null and body <> '' then body
+						when type = 'gift' then 'Gift item ' || coalesce(item_id::text, 'unknown') || ' x' || coalesce(amount::text, '1') || ' / ' || coalesce(gift_pt::text, '0') || ' pt'
+						else '[' || coalesce(type, 'event') || ']'
+					end as message,
 					coalesce(play_time_ms, 0) as "playTimeMs",
 					user_name as "userName"
 				from withlive_comments
 				where live_id = ${sqlLiteral(liveId)}
-					and body is not null
-					and body <> ''
 					${fromPlayTimeCondition}
 					${playTimeCondition}
 				order by ${orderBy}
@@ -151,13 +153,14 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 			select coalesce(json_agg(row_to_json(ranking_rows)), '[]'::json)
 			from (
 				select
-					(live_id || '-' || ranking::text) as id,
-					gift_pt::text as amount,
-					(ranking::text || '位') as label,
+					timeline_id as id,
+					coalesce(gift_pt::text, '0') || ' pt' as amount,
+					'item ' || coalesce(item_id::text, 'unknown') || ' x' || coalesce(amount::text, '1') as label,
 					user_name as "userName"
-				from withlive_gift_pt_rankings
+				from withlive_comments
 				where live_id = ${sqlLiteral(liveId)}
-				order by ranking asc
+					and type = 'gift'
+				order by play_time_ms asc, timeline_id asc
 				limit ${options.limit + 1}
 				offset ${options.offset}
 			) ranking_rows

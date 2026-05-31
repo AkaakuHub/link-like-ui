@@ -12,7 +12,7 @@ import {
 
 export function RealWithMeetsPreview() {
 	const videoRef = useRef<HTMLVideoElement | null>(null);
-	const commentRequestIdRef = useRef<number>(0);
+	const commentLoadPromiseRef = useRef<Promise<void>>(Promise.resolve());
 	const lastCommentFetchSecondRef = useRef<number>(-1);
 	const lastFetchedCommentTimeMsRef = useRef<number>(0);
 	const params = useMemo(
@@ -43,7 +43,7 @@ export function RealWithMeetsPreview() {
 	const commentFetchSecond = Math.floor(playbackTime);
 
 	const loadComments = useCallback(
-		async (
+		(
 			playTimeSecond: number,
 			{
 				mode,
@@ -52,43 +52,55 @@ export function RealWithMeetsPreview() {
 		) => {
 			if (!id) return;
 
-			const playTimeMs = Math.max(0, Math.floor(playTimeSecond * 1000));
-			const fromPlayTimeMs =
-				mode === "append" ? lastFetchedCommentTimeMsRef.current : undefined;
-			const requestId = commentRequestIdRef.current + 1;
-			commentRequestIdRef.current = requestId;
-			if (showLoading) setInitialCommentsLoading(true);
+			commentLoadPromiseRef.current = commentLoadPromiseRef.current.then(
+				async () => {
+					const playTimeMs = Math.max(0, Math.floor(playTimeSecond * 1000));
+					const fromPlayTimeMs =
+						mode === "append"
+							? lastFetchedCommentTimeMsRef.current
+							: undefined;
+					if (
+						mode === "append" &&
+						typeof fromPlayTimeMs === "number" &&
+						playTimeMs <= fromPlayTimeMs
+					) {
+						return;
+					}
+					if (showLoading) setInitialCommentsLoading(true);
 
-			try {
-				const page = await fetchRealComments(
-					id,
-					0,
-					5000,
-					playTimeMs,
-					fromPlayTimeMs,
-				);
+					try {
+						const page = await fetchRealComments(
+							id,
+							0,
+							5000,
+							playTimeMs,
+							fromPlayTimeMs,
+						);
 
-				if (commentRequestIdRef.current === requestId) {
-					lastFetchedCommentTimeMsRef.current = playTimeMs;
-					setComments((currentComments) => {
-						const nextComments =
-							mode === "append"
-								? [...currentComments, ...page.items]
-								: page.items;
-						const dedupedComments = new Map(
-							nextComments.map((comment) => [comment.id, comment]),
+						lastFetchedCommentTimeMsRef.current = Math.max(
+							lastFetchedCommentTimeMsRef.current,
+							playTimeMs,
 						);
-						return [...dedupedComments.values()].sort(
-							(firstComment, secondComment) =>
-								firstComment.playTimeMs - secondComment.playTimeMs,
-						);
-					});
-				}
-			} finally {
-				if (showLoading) {
-					setInitialCommentsLoading(false);
-				}
-			}
+						setComments((currentComments) => {
+							const nextComments =
+								mode === "append"
+									? [...currentComments, ...page.items]
+									: page.items;
+							const dedupedComments = new Map(
+								nextComments.map((comment) => [comment.id, comment]),
+							);
+							return [...dedupedComments.values()].sort(
+								(firstComment, secondComment) =>
+									firstComment.playTimeMs - secondComment.playTimeMs,
+							);
+						});
+					} finally {
+						if (showLoading) {
+							setInitialCommentsLoading(false);
+						}
+					}
+				},
+			);
 		},
 		[id],
 	);
@@ -130,6 +142,7 @@ export function RealWithMeetsPreview() {
 		setInitialDataLoading(true);
 		setInitialCommentsLoading(true);
 		setVideoLoading(true);
+		commentLoadPromiseRef.current = Promise.resolve();
 		lastFetchedCommentTimeMsRef.current = 0;
 		setComments([]);
 		void fetchRealMediaItem(id)
