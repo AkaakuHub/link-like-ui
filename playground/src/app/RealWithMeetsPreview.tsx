@@ -15,6 +15,7 @@ export function RealWithMeetsPreview() {
 	const commentLoadPromiseRef = useRef<Promise<void>>(Promise.resolve());
 	const lastCommentFetchSecondRef = useRef<number>(-1);
 	const lastFetchedCommentTimeMsRef = useRef<number>(0);
+	const seekBaseCommentTimeMsRef = useRef<number>(0);
 	const displayedCommentIdsRef = useRef<ReadonlySet<string>>(new Set());
 	const queuedCommentIdsRef = useRef<ReadonlySet<string>>(new Set());
 	const commentDisplayQueueRef = useRef<readonly RealComment[]>([]);
@@ -63,7 +64,7 @@ export function RealWithMeetsPreview() {
 					const fromPlayTimeMs =
 						mode === "append"
 							? lastFetchedCommentTimeMsRef.current
-							: undefined;
+							: seekBaseCommentTimeMsRef.current;
 					if (
 						mode === "append" &&
 						typeof fromPlayTimeMs === "number" &&
@@ -149,6 +150,7 @@ export function RealWithMeetsPreview() {
 		setVideoLoading(true);
 		commentLoadPromiseRef.current = Promise.resolve();
 		lastFetchedCommentTimeMsRef.current = 0;
+		seekBaseCommentTimeMsRef.current = 0;
 		bufferedCommentsRef.current = [];
 		displayedCommentIdsRef.current = new Set();
 		queuedCommentIdsRef.current = new Set();
@@ -238,6 +240,7 @@ export function RealWithMeetsPreview() {
 			}
 
 			if (
+				!video.paused &&
 				commentDisplayQueueRef.current.length > 0 &&
 				now - lastCommentFlushAt >= 32
 			) {
@@ -378,7 +381,9 @@ export function RealWithMeetsPreview() {
 					const video = videoRef.current;
 					if (!video) return;
 					setVideoLoading(true);
+					const seekTimeMs = Math.max(0, Math.floor(seconds * 1000));
 					lastFetchedCommentTimeMsRef.current = 0;
+					seekBaseCommentTimeMsRef.current = seekTimeMs;
 					bufferedCommentsRef.current = [];
 					displayedCommentIdsRef.current = new Set();
 					queuedCommentIdsRef.current = new Set();
