@@ -1,5 +1,6 @@
-import { type RefObject, useState } from "react";
+import { type RefObject, useEffect, useRef, useState } from "react";
 import {
+	LuChevronDown,
 	LuChevronLeft,
 	LuExpand,
 	LuGift,
@@ -167,49 +168,90 @@ function WithMeetsVirtualTimeline({
 }: {
 	comments: readonly WithMeetsCommentInput[];
 }) {
+	const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 	const [scrollTop, setScrollTop] = useState<number>(0);
+	const [isFollowingLatest, setFollowingLatest] = useState<boolean>(true);
 	const viewportHeight = 610;
 	const itemHeight = 24;
+	const commentCount = comments.length;
 	const { items, totalHeight } = useWithMeetsVirtualList({
-		itemCount: comments.length,
+		itemCount: commentCount,
 		itemHeight,
 		overscan: 6,
 		scrollTop,
 		viewportHeight,
 	});
 
+	useEffect(() => {
+		if (!isFollowingLatest) return;
+
+		const scrollContainer = scrollContainerRef.current;
+		if (!scrollContainer) return;
+
+		scrollContainer.scrollTop = scrollContainer.scrollHeight;
+		setScrollTop(scrollContainer.scrollTop);
+	});
+
+	function scrollToLatest() {
+		const scrollContainer = scrollContainerRef.current;
+		if (!scrollContainer) return;
+
+		setFollowingLatest(true);
+		scrollContainer.scrollTop = scrollContainer.scrollHeight;
+		setScrollTop(scrollContainer.scrollTop);
+	}
+
 	return (
-		<div
-			className="h-full overflow-y-auto px-[1em]"
-			onScroll={(event) => {
-				setScrollTop(event.currentTarget.scrollTop);
-			}}
-		>
-			<div className="relative" style={{ height: totalHeight }}>
-				{items.map((virtualItem) => {
-					const comment = comments[virtualItem.index];
+		<div className="relative h-full">
+			<div
+				ref={scrollContainerRef}
+				className="h-full overflow-y-auto px-[1em]"
+				onScroll={(event) => {
+					const scrollContainer = event.currentTarget;
+					const distanceFromBottom =
+						scrollContainer.scrollHeight -
+						scrollContainer.clientHeight -
+						scrollContainer.scrollTop;
+					setScrollTop(scrollContainer.scrollTop);
+					setFollowingLatest(distanceFromBottom < 48);
+				}}
+			>
+				<div className="relative" style={{ height: totalHeight }}>
+					{items.map((virtualItem) => {
+						const comment = comments[virtualItem.index];
 
-					if (!comment) {
-						return null;
-					}
+						if (!comment) {
+							return null;
+						}
 
-					return (
-						<div
-							key={comment.id}
-							className="absolute right-0 left-0 grid content-center text-[0.7em] leading-none"
-							style={{
-								height: itemHeight,
-								transform: `translateY(${virtualItem.offsetTop}px)`,
-							}}
-						>
-							<p className="truncate text-ll-true-white/88">
-								<span className="font-semibold">{comment.userName}: </span>
-								{comment.message}
-							</p>
-						</div>
-					);
-				})}
+						return (
+							<div
+								key={comment.id}
+								className="absolute right-0 left-0 grid content-center text-[0.7em] leading-none"
+								style={{
+									height: itemHeight,
+									transform: `translateY(${virtualItem.offsetTop}px)`,
+								}}
+							>
+								<p className="truncate text-ll-true-white/88">
+									<span className="font-semibold">{comment.userName}: </span>
+									{comment.message}
+								</p>
+							</div>
+						);
+					})}
+				</div>
 			</div>
+			{isFollowingLatest ? null : (
+				<button
+					type="button"
+					className="absolute right-[1em] bottom-[0.8em] inline-flex items-center gap-[0.35em] rounded-full bg-ll-red px-[0.85em] py-[0.45em] text-[0.72em] font-semibold text-ll-true-white shadow-[0_0.35em_1em_color-mix(in_srgb,var(--color-ll-black)_35%,transparent)]"
+					onClick={scrollToLatest}
+				>
+					<LuChevronDown className="h-[1.1em] w-[1.1em]" />
+					<span>最新へ</span>
+				</button>
+			)}
 		</div>
 	);
 }
