@@ -22,7 +22,7 @@ interface PostgresMediaRow {
 	duration: string;
 	id: string;
 	imageAlt: string;
-	isHorizontal: boolean;
+	isHorizontal: boolean | null;
 	releasedAt: string;
 	title: string;
 	videoUrl: string;
@@ -65,7 +65,7 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 					coalesce(live_archive_details.title, with_meets.name, with_meets.archives_id) as title,
 					coalesce(live_archive_details.title, with_meets.name, with_meets.archives_id) as "imageAlt",
 					coalesce(live_archive_details.description, '') as description,
-					coalesce(live_archive_details.is_horizontal, true) as "isHorizontal",
+					live_archive_details.is_horizontal as "isHorizontal",
 					to_char(coalesce(with_meets.live_start_time, live_archive_details.live_start_time), 'YYYY.MM.DD') as "releasedAt",
 					case
 						when coalesce(live_archive_details.total_play_time_second, with_meets.total_playing_time_second) is null then ''
@@ -103,7 +103,7 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 					coalesce(live_archive_details.title, with_meets.name, with_meets.archives_id) as title,
 					coalesce(live_archive_details.title, with_meets.name, with_meets.archives_id) as "imageAlt",
 					coalesce(live_archive_details.description, '') as description,
-					coalesce(live_archive_details.is_horizontal, true) as "isHorizontal",
+					live_archive_details.is_horizontal as "isHorizontal",
 					to_char(coalesce(with_meets.live_start_time, live_archive_details.live_start_time), 'YYYY.MM.DD') as "releasedAt",
 					case
 						when coalesce(live_archive_details.total_play_time_second, with_meets.total_playing_time_second) is null then ''
@@ -251,7 +251,10 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 			id: row.id,
 			imageAlt: row.imageAlt,
 			imageSrc: toServedFilePath(thumbnailRelativePath),
-			isHorizontal: detail?.is_horizontal === false ? false : row.isHorizontal,
+			isHorizontal:
+				typeof detail?.is_horizontal === "boolean"
+					? detail.is_horizontal
+					: row.isHorizontal ?? inferHorizontal(row.title),
 			releasedAt: row.releasedAt,
 			title: row.title,
 		};
@@ -331,4 +334,8 @@ function normalizeChapters(value: unknown): readonly RealMediaChapter[] {
 			},
 		];
 	});
+}
+
+function inferHorizontal(title: string) {
+	return title.includes("Fes×LIVE") || title.includes("Fes x LIVE");
 }

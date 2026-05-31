@@ -138,7 +138,10 @@ export class StaticRealDataRepository implements RealDataRepository {
 				id,
 				imageAlt: title,
 				imageSrc: toServedFilePath(thumbnailRelativePath),
-				isHorizontal: detail?.is_horizontal !== false,
+				isHorizontal:
+					typeof detail?.is_horizontal === "boolean"
+						? detail.is_horizontal
+						: inferHorizontal(title),
 				releasedAt: dateLabelFromHlsPath(hlsPath),
 				title,
 			});
@@ -288,4 +291,8 @@ function normalizeChapters(value: unknown): readonly RealMediaChapter[] {
 
 function firstPathSegment(pathname: string) {
 	return pathname.split("/")[0] ?? "";
+}
+
+function inferHorizontal(title: string) {
+	return title.includes("Fes×LIVE") || title.includes("Fes x LIVE");
 }
