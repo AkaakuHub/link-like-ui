@@ -1,4 +1,10 @@
-import { type RefObject, useEffect, useRef, useState } from "react";
+import {
+	type RefObject,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import {
 	LuChevronDown,
 	LuChevronLeft,
@@ -597,12 +603,39 @@ export function WithMeetsScreen({
 	const [panelMode, setPanelMode] = useState<WithMeetsPanelMode>("comments");
 	const [isPanelSurfaceVisible, setPanelSurfaceVisible] =
 		useState<boolean>(true);
+	const [isChromeVisible, setChromeVisible] = useState<boolean>(true);
+	const [lastChromeInteractionAt, setLastChromeInteractionAt] =
+		useState<number>(Date.now());
+	const revealChrome = useCallback(() => {
+		setChromeVisible(true);
+		setLastChromeInteractionAt(Date.now());
+	}, []);
+
+	useEffect(() => {
+		if (!isChromeVisible) return;
+		const interactionStartedAt = lastChromeInteractionAt;
+
+		const timeoutId = globalThis.setTimeout(() => {
+			if (interactionStartedAt !== lastChromeInteractionAt) return;
+			setChromeVisible(false);
+			setPanelSurfaceVisible(false);
+		}, 3200);
+
+		return () => {
+			globalThis.clearTimeout(timeoutId);
+		};
+	}, [isChromeVisible, lastChromeInteractionAt]);
+
+	const chromeVisibilityClass = isChromeVisible
+		? "opacity-100 transition-opacity duration-300"
+		: "pointer-events-none opacity-0 transition-opacity duration-500";
 
 	return (
 		<WithMeetsRoot>
-			<WithMeetsFrame>
+			<WithMeetsFrame onPointerDown={revealChrome}>
 				<WithMeetsVideoViewport
 					onClick={() => {
+						setChromeVisible(true);
 						if (panelMode !== "none") {
 							setPanelSurfaceVisible((currentValue) => !currentValue);
 						}
@@ -619,7 +652,7 @@ export function WithMeetsScreen({
 						<WithMeetsStageImage alt={posterAlt} src={posterSrc} />
 					)}
 				</WithMeetsVideoViewport>
-				<WithMeetsTopBar>
+				<WithMeetsTopBar className={chromeVisibilityClass}>
 					<div className="flex items-start gap-[0.75em]">
 						<WithMeetsIconButton
 							type="button"
@@ -635,7 +668,7 @@ export function WithMeetsScreen({
 					</div>
 					<WithMeetsScoreMeter />
 				</WithMeetsTopBar>
-				<WithMeetsSideActions>
+				<WithMeetsSideActions className={chromeVisibilityClass}>
 					<WithMeetsIconButton type="button" aria-label="Fullscreen">
 						<LuExpand className="h-[1.75em] w-[1.75em]" />
 					</WithMeetsIconButton>
@@ -681,7 +714,9 @@ export function WithMeetsScreen({
 					</WithMeetsIconButton>
 				</WithMeetsSideActions>
 				{panelMode === "none" ? (
-					<div className="absolute right-[4.6%] bottom-[5.5%] flex flex-col gap-[0.6em]">
+					<div
+						className={`absolute right-[4.6%] bottom-[5.5%] flex flex-col gap-[0.6em] ${chromeVisibilityClass}`}
+					>
 						<WithMeetsPillButton
 							type="button"
 							onClick={() => {
@@ -704,20 +739,22 @@ export function WithMeetsScreen({
 						</WithMeetsPillButton>
 					</div>
 				) : null}
-				<WithMeetsPlaybackControls
-					duration={playbackDuration}
-					isPlaying={isPlaying}
-					onSeek={onSeek}
-					onToggle={onPlaybackToggle}
-					time={playbackTime}
-				/>
+				<div className={chromeVisibilityClass}>
+					<WithMeetsPlaybackControls
+						duration={playbackDuration}
+						isPlaying={isPlaying}
+						onSeek={onSeek}
+						onToggle={onPlaybackToggle}
+						time={playbackTime}
+					/>
+				</div>
 				{panelMode === "none" ? null : (
 					<WithMeetsSidePanel
 						chapters={chapters}
 						comments={comments}
 						description={description}
 						gifts={gifts}
-						isSurfaceVisible={isPanelSurfaceVisible}
+						isSurfaceVisible={isChromeVisible && isPanelSurfaceVisible}
 						mode={panelMode}
 						onClose={() => {
 							setPanelMode("none");

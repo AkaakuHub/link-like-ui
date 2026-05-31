@@ -52,8 +52,9 @@ export function RealWithMeetsPreview() {
 		) => {
 			if (!id) return;
 
-			commentLoadPromiseRef.current = commentLoadPromiseRef.current.then(
-				async () => {
+			commentLoadPromiseRef.current = commentLoadPromiseRef.current
+				.catch(() => {})
+				.then(async () => {
 					const playTimeMs = Math.max(0, Math.floor(playTimeSecond * 1000));
 					const fromPlayTimeMs =
 						mode === "append"
@@ -99,8 +100,7 @@ export function RealWithMeetsPreview() {
 							setInitialCommentsLoading(false);
 						}
 					}
-				},
-			);
+				});
 		},
 		[id],
 	);
