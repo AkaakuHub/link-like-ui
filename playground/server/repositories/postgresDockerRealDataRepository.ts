@@ -17,6 +17,7 @@ import { resolveInsideRoot, toServedFilePath } from "./pathUtils";
 const execFileAsync = promisify(execFile);
 
 interface PostgresMediaRow {
+	description: string;
 	duration: string;
 	id: string;
 	imageAlt: string;
@@ -48,10 +49,11 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 					with_meets.archives_id as id,
 					coalesce(live_archive_details.title, with_meets.name, with_meets.archives_id) as title,
 					coalesce(live_archive_details.title, with_meets.name, with_meets.archives_id) as "imageAlt",
+					coalesce(live_archive_details.description, '') as description,
 					to_char(coalesce(with_meets.live_start_time, live_archive_details.live_start_time), 'YYYY.MM.DD') as "releasedAt",
 					case
-						when with_meets.total_playing_time_second is null then ''
-						else floor(with_meets.total_playing_time_second / 60)::text || ':' || lpad((with_meets.total_playing_time_second % 60)::text, 2, '0')
+						when coalesce(live_archive_details.total_play_time_second, with_meets.total_playing_time_second) is null then ''
+						else floor(coalesce(live_archive_details.total_play_time_second, with_meets.total_playing_time_second) / 60)::text || ':' || lpad((coalesce(live_archive_details.total_play_time_second, with_meets.total_playing_time_second) % 60)::text, 2, '0')
 					end as duration,
 					live_archive_details.video_url as "videoUrl"
 				from with_meets
@@ -67,30 +69,40 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 		const items: RealMediaItem[] = [];
 
 		for (const row of rows) {
-			const hlsRelativePath = this.#resolveHlsRelativePath(row.videoUrl);
-			const thumbnailRelativePath = await this.#resolveThumbnailRelativePath(row.id);
-
-			if (!hlsRelativePath || !thumbnailRelativePath) continue;
-
-			items.push({
-				chapters: [],
-				description: "",
-				duration: row.duration,
-				hlsPath: toServedFilePath(hlsRelativePath),
-				id: row.id,
-				imageAlt: row.imageAlt,
-				imageSrc: toServedFilePath(thumbnailRelativePath),
-				releasedAt: row.releasedAt,
-				title: row.title,
-			});
+			const item = await this.#toMediaItem(row);
+			if (item) {
+				items.push(item);
+			}
 		}
 
 		return pageFromLimitPlusOne(items, options);
 	}
 
 	async getMedia(liveId: string): Promise<RealMediaItem | null> {
-		const page = await this.listMedia({ limit: 1000, offset: 0 });
-		return page.items.find((item) => item.id === liveId) ?? null;
+		const rows = await this.#queryJson<PostgresMediaRow>(`
+			select coalesce(json_agg(row_to_json(media_rows)), '[]'::json)
+			from (
+				select
+					with_meets.archives_id as id,
+					coalesce(live_archive_details.title, with_meets.name, with_meets.archives_id) as title,
+					coalesce(live_archive_details.title, with_meets.name, with_meets.archives_id) as "imageAlt",
+					coalesce(live_archive_details.description, '') as description,
+					to_char(coalesce(with_meets.live_start_time, live_archive_details.live_start_time), 'YYYY.MM.DD') as "releasedAt",
+					case
+						when coalesce(live_archive_details.total_play_time_second, with_meets.total_playing_time_second) is null then ''
+						else floor(coalesce(live_archive_details.total_play_time_second, with_meets.total_playing_time_second) / 60)::text || ':' || lpad((coalesce(live_archive_details.total_play_time_second, with_meets.total_playing_time_second) % 60)::text, 2, '0')
+					end as duration,
+					live_archive_details.video_url as "videoUrl"
+				from with_meets
+				left join live_archive_details on live_archive_details.live_id = with_meets.archives_id
+				where with_meets.archives_id = ${sqlLiteral(liveId)}
+					and with_meets.thumbnail_image_url is not null
+					and live_archive_details.video_url is not null
+				limit 1
+			) media_rows
+		`);
+		const row = rows[0];
+		return row ? await this.#toMediaItem(row) : null;
 	}
 
 	async getComments(
@@ -201,6 +213,25 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 		);
 
 		return image ? relative(this.#rootDir, join(dir, image.name)) : null;
+	}
+
+	async #toMediaItem(row: PostgresMediaRow): Promise<RealMediaItem | null> {
+		const hlsRelativePath = this.#resolveHlsRelativePath(row.videoUrl);
+		const thumbnailRelativePath = await this.#resolveThumbnailRelativePath(row.id);
+
+		if (!hlsRelativePath || !thumbnailRelativePath) return null;
+
+		return {
+			chapters: [],
+			description: row.description,
+			duration: row.duration,
+			hlsPath: toServedFilePath(hlsRelativePath),
+			id: row.id,
+			imageAlt: row.imageAlt,
+			imageSrc: toServedFilePath(thumbnailRelativePath),
+			releasedAt: row.releasedAt,
+			title: row.title,
+		};
 	}
 }
 

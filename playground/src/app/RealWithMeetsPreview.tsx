@@ -28,11 +28,16 @@ export function RealWithMeetsPreview() {
 	const [playbackTime, setPlaybackTime] = useState<number>(0);
 	const [playbackDuration, setPlaybackDuration] = useState<number>(0);
 	const [isInitialDataLoading, setInitialDataLoading] = useState<boolean>(true);
-	const [, setCommentsLoading] = useState<boolean>(true);
-	const [, setVideoLoading] = useState<boolean>(true);
-	const [isMuted, setIsMuted] = useState<boolean>(false);
+	const [isInitialCommentsLoading, setInitialCommentsLoading] =
+		useState<boolean>(true);
+	const [isVideoLoading, setVideoLoading] = useState<boolean>(true);
+	const [isMuted, setIsMuted] = useState<boolean>(true);
 	const videoSource = mediaItem?.hlsPath ?? hlsPath;
-	const isLoading = isInitialDataLoading || !mediaItem;
+	const isLoading =
+		isInitialDataLoading ||
+		isInitialCommentsLoading ||
+		isVideoLoading ||
+		!mediaItem;
 	const commentFetchSecond = Math.floor(playbackTime / 5) * 5;
 
 	const loadComments = useCallback(
@@ -44,9 +49,7 @@ export function RealWithMeetsPreview() {
 
 			const requestId = commentRequestIdRef.current + 1;
 			commentRequestIdRef.current = requestId;
-			if (showLoading) {
-				setCommentsLoading(true);
-			}
+			if (showLoading) setInitialCommentsLoading(true);
 
 			try {
 				const page = await fetchRealComments(
@@ -60,8 +63,8 @@ export function RealWithMeetsPreview() {
 					setComments(page.items);
 				}
 			} finally {
-				if (showLoading && commentRequestIdRef.current === requestId) {
-					setCommentsLoading(false);
+				if (showLoading) {
+					setInitialCommentsLoading(false);
 				}
 			}
 		},
@@ -74,8 +77,6 @@ export function RealWithMeetsPreview() {
 		if (!video) return;
 
 		try {
-			video.muted = false;
-			setIsMuted(false);
 			await video.play();
 			return;
 		} catch {
@@ -102,13 +103,14 @@ export function RealWithMeetsPreview() {
 		if (!id) return;
 
 		setInitialDataLoading(true);
+		setInitialCommentsLoading(true);
 		setVideoLoading(true);
 		void fetchRealMediaItem(id)
 			.then(setMediaItem)
 			.finally(() => {
 				setInitialDataLoading(false);
 			});
-		void loadComments(0, { showLoading: false });
+		void loadComments(0, { showLoading: true });
 		void fetchRealRankings(id).then((page) => {
 			setGifts(page.items);
 		});
@@ -195,6 +197,8 @@ export function RealWithMeetsPreview() {
 		hls.loadSource(videoSource);
 		hls.attachMedia(video);
 		hls.on(Hls.Events.MANIFEST_PARSED, () => {
+			video.muted = true;
+			setIsMuted(true);
 			void startPlayback();
 		});
 
