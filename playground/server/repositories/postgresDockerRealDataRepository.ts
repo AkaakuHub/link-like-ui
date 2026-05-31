@@ -113,9 +113,13 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 			typeof options.playTimeMs === "number"
 				? `and play_time_ms <= ${Math.floor(options.playTimeMs)}`
 				: "";
+		const fromPlayTimeCondition =
+			typeof options.fromPlayTimeMs === "number"
+				? `and play_time_ms > ${Math.floor(options.fromPlayTimeMs)}`
+				: "";
 		const orderBy =
 			typeof options.playTimeMs === "number"
-				? "play_time_ms desc, timeline_id desc"
+				? "play_time_ms asc, timeline_id asc"
 				: "play_time_ms asc, timeline_id asc";
 		const rows = await this.#queryJson<RealComment>(`
 			select coalesce(json_agg(row_to_json(comment_rows)), '[]'::json)
@@ -129,19 +133,14 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 				where live_id = ${sqlLiteral(liveId)}
 					and body is not null
 					and body <> ''
+					${fromPlayTimeCondition}
 					${playTimeCondition}
 				order by ${orderBy}
 				limit ${options.limit + 1}
 				offset ${options.offset}
 			) comment_rows
 		`);
-		const page = pageFromLimitPlusOne(rows, options);
-		return typeof options.playTimeMs === "number"
-			? {
-					...page,
-					items: [...page.items].reverse(),
-				}
-			: page;
+		return pageFromLimitPlusOne(rows, options);
 	}
 
 	async getRankings(

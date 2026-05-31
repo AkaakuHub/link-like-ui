@@ -71,7 +71,19 @@ export class StaticRealDataRepository implements RealDataRepository {
 		options: RealDataPageOptions,
 	): Promise<RealDataPage<RealComment>> {
 		this.#commentsByLiveId ??= await this.#readComments();
-		return pageItems(this.#commentsByLiveId[liveId] ?? [], options);
+		const comments = (this.#commentsByLiveId[liveId] ?? []).filter((comment) => {
+			if (
+				typeof options.fromPlayTimeMs === "number" &&
+				comment.playTimeMs <= options.fromPlayTimeMs
+			) {
+				return false;
+			}
+			return (
+				typeof options.playTimeMs !== "number" ||
+				comment.playTimeMs <= options.playTimeMs
+			);
+		});
+		return pageItems(comments, options);
 	}
 
 	async getRankings(

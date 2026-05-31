@@ -57,8 +57,9 @@ export async function fetchRealMediaItem(
 export async function fetchRealComments(
 	liveId: string,
 	offset = 0,
-	limit = 80,
+	limit = 1000,
 	playTimeMs?: number,
+	fromPlayTimeMs?: number,
 ): Promise<RealDataPage<RealComment>> {
 	const params = new URLSearchParams({
 		limit: String(limit),
@@ -67,6 +68,9 @@ export async function fetchRealComments(
 
 	if (playTimeMs !== undefined) {
 		params.set("playTimeMs", String(Math.floor(playTimeMs)));
+	}
+	if (fromPlayTimeMs !== undefined) {
+		params.set("fromPlayTimeMs", String(Math.floor(fromPlayTimeMs)));
 	}
 
 	const response = await fetch(

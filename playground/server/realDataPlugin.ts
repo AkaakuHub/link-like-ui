@@ -97,17 +97,25 @@ export function realDataPlugin(): Plugin {
 }
 
 function readPageOptions(requestUrl: URL) {
+	const fromPlayTimeMs = requestUrl.searchParams.get("fromPlayTimeMs");
 	const playTimeMs = requestUrl.searchParams.get("playTimeMs");
 	const options = {
-		limit: clampNumber(Number(requestUrl.searchParams.get("limit") ?? 60), 1, 200),
+		limit: clampNumber(
+			Number(requestUrl.searchParams.get("limit") ?? 60),
+			1,
+			5000,
+		),
 		offset: Math.max(0, Number(requestUrl.searchParams.get("offset") ?? 0)),
 	};
-	return playTimeMs === null
-		? options
-		: {
-				...options,
-				playTimeMs: Math.max(0, Number(playTimeMs)),
-			};
+	return {
+		...options,
+		...(fromPlayTimeMs === null
+			? {}
+			: { fromPlayTimeMs: Math.max(0, Number(fromPlayTimeMs)) }),
+		...(playTimeMs === null
+			? {}
+			: { playTimeMs: Math.max(0, Number(playTimeMs)) }),
+	};
 }
 
 function clampNumber(value: number, min: number, max: number) {

@@ -14,6 +14,7 @@ export function RealWithMeetsPreview() {
 	const videoRef = useRef<HTMLVideoElement | null>(null);
 	const commentRequestIdRef = useRef<number>(0);
 	const lastCommentFetchSecondRef = useRef<number>(-1);
+	const lastFetchedCommentTimeMsRef = useRef<number>(0);
 	const params = useMemo(
 		() => new URLSearchParams(globalThis.location.search),
 		[],
@@ -32,21 +33,28 @@ export function RealWithMeetsPreview() {
 		useState<boolean>(true);
 	const [isVideoLoading, setVideoLoading] = useState<boolean>(true);
 	const [isMuted, setIsMuted] = useState<boolean>(true);
+	const [isPlaying, setIsPlaying] = useState<boolean>(false);
 	const videoSource = mediaItem?.hlsPath ?? hlsPath;
 	const isLoading =
 		isInitialDataLoading ||
 		isInitialCommentsLoading ||
 		isVideoLoading ||
 		!mediaItem;
-	const commentFetchSecond = Math.floor(playbackTime / 5) * 5;
+	const commentFetchSecond = Math.floor(playbackTime);
 
 	const loadComments = useCallback(
 		async (
 			playTimeSecond: number,
-			{ showLoading }: { showLoading: boolean },
+			{
+				mode,
+				showLoading,
+			}: { mode: "append" | "replace"; showLoading: boolean },
 		) => {
 			if (!id) return;
 
+			const playTimeMs = Math.max(0, Math.floor(playTimeSecond * 1000));
+			const fromPlayTimeMs =
+				mode === "append" ? lastFetchedCommentTimeMsRef.current : undefined;
 			const requestId = commentRequestIdRef.current + 1;
 			commentRequestIdRef.current = requestId;
 			if (showLoading) setInitialCommentsLoading(true);
@@ -55,12 +63,26 @@ export function RealWithMeetsPreview() {
 				const page = await fetchRealComments(
 					id,
 					0,
-					80,
-					playTimeSecond * 1000,
+					5000,
+					playTimeMs,
+					fromPlayTimeMs,
 				);
 
 				if (commentRequestIdRef.current === requestId) {
-					setComments(page.items);
+					lastFetchedCommentTimeMsRef.current = playTimeMs;
+					setComments((currentComments) => {
+						const nextComments =
+							mode === "append"
+								? [...currentComments, ...page.items]
+								: page.items;
+						const dedupedComments = new Map(
+							nextComments.map((comment) => [comment.id, comment]),
+						);
+						return [...dedupedComments.values()].sort(
+							(firstComment, secondComment) =>
+								firstComment.playTimeMs - secondComment.playTimeMs,
+						);
+					});
 				}
 			} finally {
 				if (showLoading) {
@@ -108,12 +130,14 @@ export function RealWithMeetsPreview() {
 		setInitialDataLoading(true);
 		setInitialCommentsLoading(true);
 		setVideoLoading(true);
+		lastFetchedCommentTimeMsRef.current = 0;
+		setComments([]);
 		void fetchRealMediaItem(id)
 			.then(setMediaItem)
 			.finally(() => {
 				setInitialDataLoading(false);
 			});
-		void loadComments(0, { showLoading: true });
+		void loadComments(0, { mode: "replace", showLoading: true });
 		void fetchRealRankings(id).then((page) => {
 			setGifts(page.items);
 		});
@@ -129,7 +153,7 @@ export function RealWithMeetsPreview() {
 		}
 
 		lastCommentFetchSecondRef.current = commentFetchSecond;
-		void loadComments(commentFetchSecond, { showLoading: false });
+		void loadComments(commentFetchSecond, { mode: "append", showLoading: false });
 	}, [commentFetchSecond, id, loadComments]);
 
 	useEffect(() => {
@@ -139,6 +163,7 @@ export function RealWithMeetsPreview() {
 		const updatePlaybackState = () => {
 			setPlaybackTime(video.currentTime);
 			setPlaybackDuration(video.duration);
+			setIsPlaying(!video.paused);
 		};
 		const showVideoLoading = () => {
 			setVideoLoading(true);
@@ -158,6 +183,8 @@ export function RealWithMeetsPreview() {
 		video.addEventListener("seeking", showVideoLoading);
 		video.addEventListener("seeked", hideVideoLoading);
 		video.addEventListener("waiting", showVideoLoading);
+		video.addEventListener("pause", updatePlaybackState);
+		video.addEventListener("play", updatePlaybackState);
 
 		if (video.canPlayType("application/vnd.apple.mpegurl")) {
 			setVideoLoading(true);
@@ -176,6 +203,8 @@ export function RealWithMeetsPreview() {
 				video.removeEventListener("seeking", showVideoLoading);
 				video.removeEventListener("seeked", hideVideoLoading);
 				video.removeEventListener("waiting", showVideoLoading);
+				video.removeEventListener("pause", updatePlaybackState);
+				video.removeEventListener("play", updatePlaybackState);
 			};
 		}
 
@@ -239,6 +268,8 @@ export function RealWithMeetsPreview() {
 			video.removeEventListener("seeking", showVideoLoading);
 			video.removeEventListener("seeked", hideVideoLoading);
 			video.removeEventListener("waiting", showVideoLoading);
+			video.removeEventListener("pause", updatePlaybackState);
+			video.removeEventListener("play", updatePlaybackState);
 			hls.destroy();
 		};
 	}, [mediaItem, startPlayback, videoSource]);
@@ -269,17 +300,21 @@ export function RealWithMeetsPreview() {
 						return;
 					}
 					video.pause();
+					setIsPlaying(false);
 				}}
 				onSeek={(seconds) => {
 					const video = videoRef.current;
 					if (!video) return;
 					setVideoLoading(true);
-					void loadComments(seconds, { showLoading: false });
+					lastFetchedCommentTimeMsRef.current = 0;
+					setComments([]);
+					void loadComments(seconds, { mode: "replace", showLoading: false });
 					video.currentTime = seconds;
 				}}
 				onBack={backToRealMedia}
 				posterAlt={mediaItem.imageAlt}
 				posterSrc={mediaItem.imageSrc}
+				isPlaying={isPlaying}
 				playbackDuration={playbackDuration}
 				playbackTime={playbackTime}
 				title={mediaItem.title}

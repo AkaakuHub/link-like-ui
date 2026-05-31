@@ -8,6 +8,7 @@ import {
 	LuMail,
 	LuMessageCircle,
 	LuMinimize,
+	LuPause,
 	LuPlay,
 	LuRadio,
 	LuSend,
@@ -69,6 +70,7 @@ export interface WithMeetsScreenProps {
 	posterSrc: string;
 	title?: string;
 	playbackDuration?: number;
+	isPlaying?: boolean;
 	playbackTime?: number;
 	onPlaybackToggle?: () => void;
 	onSeek?: (seconds: number) => void;
@@ -109,11 +111,13 @@ function WithMeetsScoreMeter() {
 
 function WithMeetsPlaybackControls({
 	duration,
+	isPlaying,
 	onSeek,
 	onToggle,
 	time,
 }: {
 	duration: number;
+	isPlaying: boolean;
 	onSeek: ((seconds: number) => void) | undefined;
 	onToggle: (() => void) | undefined;
 	time: number;
@@ -144,10 +148,14 @@ function WithMeetsPlaybackControls({
 				<div className="inline-flex items-center gap-[1.4em] text-[0.95em] font-semibold">
 					<button
 						type="button"
-						className="text-[1.8em] leading-none"
+						className="grid h-[1.8em] w-[1.8em] place-items-center text-[1.8em] leading-none"
 						onClick={onToggle}
 					>
-						II
+						{isPlaying ? (
+							<LuPause className="h-[0.82em] w-[0.82em] fill-ll-true-white" />
+						) : (
+							<LuPlay className="h-[0.82em] w-[0.82em] fill-ll-true-white" />
+						)}
 					</button>
 					<span>{formatPlaybackTime(time)}</span>
 					<span className="text-[1.2em] font-light">/</span>
@@ -576,6 +584,7 @@ export function WithMeetsScreen({
 	posterAlt,
 	posterSrc,
 	title = posterAlt,
+	isPlaying = false,
 	playbackDuration = 0,
 	playbackTime = 0,
 	onPlaybackToggle,
@@ -697,6 +706,7 @@ export function WithMeetsScreen({
 				) : null}
 				<WithMeetsPlaybackControls
 					duration={playbackDuration}
+					isPlaying={isPlaying}
 					onSeek={onSeek}
 					onToggle={onPlaybackToggle}
 					time={playbackTime}
