@@ -217,10 +217,11 @@ function WithMeetsVirtualTimeline({
 	}
 
 	return (
-		<div className="relative h-full">
+		<div className="relative h-full min-h-0 overflow-hidden">
 			<SimpleBar
 				autoHide={false}
-				className="ll-system-modal-scrollbar h-full"
+				className="ll-system-modal-scrollbar h-full min-h-0"
+				style={{ height: "100%" }}
 				scrollableNodeProps={{
 					onScroll: (event) => {
 						const scrollContainer = event.currentTarget;
@@ -234,6 +235,7 @@ function WithMeetsVirtualTimeline({
 						}
 					},
 					ref: scrollContainerRef,
+					style: { height: "100%", overscrollBehavior: "contain" },
 				}}
 			>
 				<div className="px-[1em]">
@@ -485,11 +487,11 @@ function WithMeetsSidePanel({
 						className={
 							isSurfaceVisible
 								? showSupportSummary
-									? "grid h-full grid-rows-[auto_1fr_auto]"
-									: "grid h-full grid-rows-[1fr_auto]"
+									? "grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)_auto]"
+									: "grid h-full min-h-0 grid-rows-[minmax(0,1fr)_auto]"
 								: showSupportSummary
-									? "grid h-full grid-rows-[auto_1fr]"
-									: "grid h-full grid-rows-[1fr]"
+									? "grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)]"
+									: "grid h-full min-h-0 grid-rows-[minmax(0,1fr)]"
 						}
 					>
 						{showSupportSummary ? (
