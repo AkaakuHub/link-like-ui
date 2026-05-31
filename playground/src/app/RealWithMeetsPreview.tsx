@@ -189,7 +189,6 @@ export function RealWithMeetsPreview() {
 		const video = videoRef.current;
 
 		if (!mediaItem || !video || !videoSource) return;
-		video.playbackRate = playbackRate;
 		const updatePlaybackState = () => {
 			setPlaybackTime(video.currentTime);
 			setPlaybackDuration(video.duration);
@@ -376,7 +375,17 @@ export function RealWithMeetsPreview() {
 			cancelAnimationFrame(animationFrameId);
 			hls.destroy();
 		};
-	}, [mediaItem, playbackRate, startPlayback, videoSource]);
+	}, [mediaItem, startPlayback, videoSource]);
+
+	useEffect(() => {
+		const video = videoRef.current;
+		if (!video) {
+			return;
+		}
+
+		video.playbackRate = playbackRate;
+		video.defaultPlaybackRate = playbackRate;
+	}, [playbackRate]);
 
 	function backToRealMedia() {
 		globalThis.location.assign("/real-media");
@@ -430,11 +439,7 @@ export function RealWithMeetsPreview() {
 				playbackRate={playbackRate}
 				playbackTime={playbackTime}
 				onPlaybackRateChange={(rate) => {
-					const video = videoRef.current;
 					setPlaybackRate(rate);
-					if (video) {
-						video.playbackRate = rate;
-					}
 				}}
 				title={mediaItem.title}
 				videoRef={videoRef}
