@@ -10,6 +10,10 @@ import {
 	type RealMediaItem,
 } from "./realData";
 
+type QueuedRealComment = RealComment & {
+	displayAt: number;
+};
+
 export function RealWithMeetsPreview() {
 	const videoRef = useRef<HTMLVideoElement | null>(null);
 	const commentLoadPromiseRef = useRef<Promise<void>>(Promise.resolve());
@@ -18,7 +22,9 @@ export function RealWithMeetsPreview() {
 	const seekBaseCommentTimeMsRef = useRef<number>(0);
 	const displayedCommentIdsRef = useRef<ReadonlySet<string>>(new Set());
 	const queuedCommentIdsRef = useRef<ReadonlySet<string>>(new Set());
-	const commentDisplayQueueRef = useRef<readonly RealComment[]>([]);
+	const commentDisplayQueueRef = useRef<readonly QueuedRealComment[]>([]);
+	const nextCommentDisplayAtRef = useRef<number>(0);
+	const previousQueuedCommentTimeMsRef = useRef<number | null>(null);
 	const params = useMemo(
 		() => new URLSearchParams(globalThis.location.search),
 		[],
@@ -155,6 +161,8 @@ export function RealWithMeetsPreview() {
 		displayedCommentIdsRef.current = new Set();
 		queuedCommentIdsRef.current = new Set();
 		commentDisplayQueueRef.current = [];
+		nextCommentDisplayAtRef.current = 0;
+		previousQueuedCommentTimeMsRef.current = null;
 		setComments([]);
 		void fetchRealMediaItem(id)
 			.then(setMediaItem)
@@ -210,7 +218,6 @@ export function RealWithMeetsPreview() {
 		video.addEventListener("pause", updatePlaybackState);
 		video.addEventListener("play", updatePlaybackState);
 		let animationFrameId = 0;
-		let lastCommentFlushAt = 0;
 		const updateFrameState = (now: number) => {
 			setPlaybackTime(video.currentTime);
 			setPlaybackDuration(video.duration);
@@ -226,33 +233,62 @@ export function RealWithMeetsPreview() {
 					!queuedCommentIds.has(comment.id),
 			);
 			if (dueComments.length > 0) {
+				let scheduledDisplayAt = Math.max(nextCommentDisplayAtRef.current, now);
 				queuedCommentIdsRef.current = new Set([
 					...queuedCommentIds,
 					...dueComments.map((comment) => comment.id),
 				]);
 				commentDisplayQueueRef.current = [
 					...commentDisplayQueueRef.current,
-					...dueComments,
+					...dueComments.map((comment) => {
+						const previousQueuedCommentTimeMs =
+							previousQueuedCommentTimeMsRef.current;
+						const sourceIntervalMs =
+							previousQueuedCommentTimeMs === null
+								? 48
+								: comment.playTimeMs - previousQueuedCommentTimeMs;
+						const displayIntervalMs = Math.min(
+							180,
+							Math.max(24, sourceIntervalMs * 0.45),
+						);
+						scheduledDisplayAt += displayIntervalMs;
+						previousQueuedCommentTimeMsRef.current = comment.playTimeMs;
+						return {
+							...comment,
+							displayAt: scheduledDisplayAt,
+						};
+					}),
 				].sort(
 					(firstComment, secondComment) =>
-						firstComment.playTimeMs - secondComment.playTimeMs,
+						firstComment.displayAt - secondComment.displayAt,
 				);
+				nextCommentDisplayAtRef.current = scheduledDisplayAt;
 			}
 
 			if (
 				!video.paused &&
 				commentDisplayQueueRef.current.length > 0 &&
-				now - lastCommentFlushAt >= 32
+				(commentDisplayQueueRef.current[0]?.displayAt ?? Number.POSITIVE_INFINITY) <=
+					now
 			) {
-				lastCommentFlushAt = now;
-				const nextComments = commentDisplayQueueRef.current.slice(0, 2);
+				const nextComments = commentDisplayQueueRef.current.filter(
+					(comment) => comment.displayAt <= now,
+				);
 				commentDisplayQueueRef.current =
-					commentDisplayQueueRef.current.slice(2);
+					commentDisplayQueueRef.current.slice(nextComments.length);
 				displayedCommentIdsRef.current = new Set([
 					...displayedCommentIdsRef.current,
 					...nextComments.map((comment) => comment.id),
 				]);
-				setComments((currentComments) => [...currentComments, ...nextComments]);
+				setComments((currentComments) => [
+					...currentComments,
+					...nextComments.map((comment) => ({
+						id: comment.id,
+						message: comment.message,
+						playTimeMs: comment.playTimeMs,
+						userName: comment.userName,
+					})),
+				]);
 			}
 
 			animationFrameId = requestAnimationFrame(updateFrameState);
@@ -388,6 +424,8 @@ export function RealWithMeetsPreview() {
 					displayedCommentIdsRef.current = new Set();
 					queuedCommentIdsRef.current = new Set();
 					commentDisplayQueueRef.current = [];
+					nextCommentDisplayAtRef.current = 0;
+					previousQueuedCommentTimeMsRef.current = null;
 					setComments([]);
 					void loadComments(seconds + 8, { mode: "replace", showLoading: false });
 					video.currentTime = seconds;
