@@ -326,13 +326,8 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 				select
 					live_archive_chapters.is_extra as "isExtra",
 					live_archive_chapters.name,
-					case
-						when live_archive_chapters.play_time_second is null then null
-						when live_archive_details.unixtime_live_rec_started is null or live_archive_details.live_start_time is null then live_archive_chapters.play_time_second
-						else greatest(0, live_archive_chapters.play_time_second - extract(epoch from (live_archive_details.live_start_time - to_timestamp(live_archive_details.unixtime_live_rec_started)))::integer)
-					end as "playTimeSecond"
+					live_archive_chapters.play_time_second as "playTimeSecond"
 				from live_archive_chapters
-				left join live_archive_details on live_archive_details.live_id = live_archive_chapters.live_id
 				where live_archive_chapters.live_id = ${sqlLiteral(liveId)}
 				order by live_archive_chapters.chapter_index asc
 			) chapter_rows
