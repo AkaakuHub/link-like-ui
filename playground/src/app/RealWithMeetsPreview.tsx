@@ -313,6 +313,7 @@ export function RealWithMeetsPreview() {
 		const hls = new Hls({
 			abrEwmaDefaultEstimate: 2_000_000,
 			abrEwmaFastVoD: 3,
+			abrMaxWithRealBitrate: true,
 			abrEwmaSlowVoD: 9,
 			backBufferLength: 30,
 			capLevelToPlayerSize: true,
@@ -328,6 +329,7 @@ export function RealWithMeetsPreview() {
 			maxBufferSize: 90 * 1000 * 1000,
 			maxMaxBufferLength: 90,
 			startLevel: -1,
+			testBandwidth: true,
 		});
 
 		setVideoLoading(true);
@@ -339,6 +341,8 @@ export function RealWithMeetsPreview() {
 			hls.loadSource(videoSource);
 		});
 		hls.on(Hls.Events.MANIFEST_PARSED, () => {
+			hls.autoLevelCapping = -1;
+			hls.currentLevel = -1;
 			video.muted = true;
 			setIsMuted(true);
 			void startPlayback();
