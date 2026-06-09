@@ -484,10 +484,19 @@ export function RealWithMeetsPreview() {
 		const level = Number(value);
 		setSelectedVideoLevel(level);
 		if (hlsRef.current) {
+			const selectedLevel = videoLevels.find((videoLevel) => videoLevel.index === level);
+			const hlsLevelIndex =
+				level < 0
+					? -1
+					: hlsRef.current.levels.findIndex((hlsLevel) =>
+							isSameVideoLevel(hlsLevel, selectedLevel),
+						);
+			const nextLevel = hlsLevelIndex >= 0 ? hlsLevelIndex : level;
 			hlsRef.current.autoLevelCapping = -1;
-			hlsRef.current.currentLevel = level;
-			hlsRef.current.nextLevel = level;
-			hlsRef.current.loadLevel = level;
+			hlsRef.current.currentLevel = nextLevel;
+			hlsRef.current.nextLevel = nextLevel;
+			hlsRef.current.nextLoadLevel = nextLevel;
+			hlsRef.current.loadLevel = nextLevel;
 		}
 	}
 
@@ -671,6 +680,24 @@ function formatVideoLevelLabel(level: Hls["levels"][number], index: number) {
 	const bitrateMbps =
 		level.bitrate > 0 ? `${(level.bitrate / 1_000_000).toFixed(1)}Mbps` : "";
 	return bitrateMbps ? `${resolution} ${bitrateMbps}` : resolution;
+}
+
+function isSameVideoLevel(
+	hlsLevel: Hls["levels"][number],
+	selectedLevel: HlsVideoLevelOption | undefined,
+) {
+	if (!selectedLevel) return false;
+
+	if (
+		selectedLevel.width !== null &&
+		selectedLevel.height !== null &&
+		hlsLevel.width === selectedLevel.width &&
+		hlsLevel.height === selectedLevel.height
+	) {
+		return true;
+	}
+
+	return hlsLevel.bitrate === selectedLevel.bitrate;
 }
 
 function formatAudioTrackLabel(track: Hls["audioTracks"][number], index: number) {
