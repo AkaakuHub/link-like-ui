@@ -228,6 +228,10 @@ export function RealWithMeetsPreview() {
 
 		if (!mediaItem || !video || !videoSource) return;
 		hlsRef.current = null;
+		setAudioTracks([]);
+		setVideoLevels([]);
+		setSelectedAudioTrack(-1);
+		setSelectedVideoLevel(-1);
 		const updatePlaybackState = () => {
 			setPlaybackTime(video.currentTime);
 			setPlaybackDuration(video.duration);
@@ -380,20 +384,41 @@ export function RealWithMeetsPreview() {
 		hls.on(Hls.Events.MEDIA_ATTACHED, () => {
 			hls.loadSource(videoSource);
 		});
+		hls.on(Hls.Events.MANIFEST_LOADED, (_event, data) => {
+			setVideoLevels(
+				data.levels.map((level, index) => ({
+					bitrate: level.bitrate,
+					height: typeof level.height === "number" ? level.height : null,
+					index,
+					label: formatLoadedVideoLevelLabel(level, index),
+					uri: level.url,
+					width: typeof level.width === "number" ? level.width : null,
+				})),
+			);
+			setAudioTracks(
+				data.audioTracks.map((track, index) => ({
+					groupId: typeof track.groupId === "string" ? track.groupId : null,
+					index,
+					label: formatAudioTrackLabel(track, index),
+					language: typeof track.lang === "string" ? track.lang : null,
+					name: typeof track.name === "string" ? track.name : null,
+					uri: typeof track.url === "string" ? track.url : null,
+				})),
+			);
+		});
 		hls.on(Hls.Events.MANIFEST_PARSED, () => {
 			setVideoLevels(
 				hls.levels.map((level, index) => ({
 					bitrate: level.bitrate,
 					height: typeof level.height === "number" ? level.height : null,
 					index,
-					label: formatVideoLevelLabel(level, index),
+					label: `${formatVideoLevelLabel(level, index)} / level ${index}`,
 					uri: level.url[0] ?? null,
 					width: typeof level.width === "number" ? level.width : null,
 				})),
 			);
 			hls.autoLevelCapping = -1;
 			hls.currentLevel = -1;
-			setSelectedVideoLevel(-1);
 			video.muted = true;
 			setIsMuted(true);
 			void startPlayback();
@@ -449,59 +474,15 @@ export function RealWithMeetsPreview() {
 		};
 	}, [mediaItem, startPlayback, videoSource]);
 
-	useEffect(() => {
-		if (!videoSource) return;
-
-		let isDisposed = false;
-		setAudioTracks([]);
-		setVideoLevels([]);
-		setSelectedAudioTrack(-1);
-		setSelectedVideoLevel(-1);
-		void fetch(videoSource)
-			.then((response) => {
-				if (!response.ok) {
-					throw new Error(`Failed to load HLS master: ${response.status}`);
-				}
-				return response.text();
-			})
-			.then((text) => {
-				if (isDisposed) return;
-				const manifestOptions = parseHlsMasterPlaylist(text);
-				if (manifestOptions.videoLevels.length > 0) {
-					setVideoLevels(manifestOptions.videoLevels);
-				}
-				if (manifestOptions.audioTracks.length > 0) {
-					setAudioTracks(manifestOptions.audioTracks);
-					setSelectedAudioTrack((currentTrack) =>
-						currentTrack >= 0 ? currentTrack : manifestOptions.audioTracks[0]?.index ?? -1,
-					);
-				}
-			})
-			.catch(() => {});
-
-		return () => {
-			isDisposed = true;
-		};
-	}, [videoSource]);
-
 	function selectVideoLevel(value: string) {
 		const level = Number(value);
 		setSelectedVideoLevel(level);
 		if (hlsRef.current) {
 			const selectedLevel = videoLevels.find((videoLevel) => videoLevel.index === level);
-			const hlsLevelIndex =
-				level < 0
-					? -1
-					: hlsRef.current.levels.findIndex((hlsLevel) =>
-							isSameVideoLevel(hlsLevel, selectedLevel),
-						);
+			const hlsLevelIndex = level < 0 ? -1 : selectedLevel?.index ?? level;
 			const nextLevel = hlsLevelIndex >= 0 ? hlsLevelIndex : level;
 			hlsRef.current.autoLevelCapping = -1;
 			hlsRef.current.currentLevel = nextLevel;
-			hlsRef.current.nextLevel = nextLevel;
-			hlsRef.current.nextLoadLevel = nextLevel;
-			hlsRef.current.loadLevel = nextLevel;
-			hlsRef.current.startLoad(videoRef.current?.currentTime ?? -1);
 		}
 	}
 
@@ -696,29 +677,17 @@ function formatVideoLevelLabel(level: Hls["levels"][number], index: number) {
 	return bitrateMbps ? `${resolution} ${bitrateMbps}` : resolution;
 }
 
-function isSameVideoLevel(
-	hlsLevel: Hls["levels"][number],
-	selectedLevel: HlsVideoLevelOption | undefined,
+function formatLoadedVideoLevelLabel(
+	level: { bitrate: number; height?: number; width?: number },
+	index: number,
 ) {
-	if (!selectedLevel) return false;
-
-	if (
-		selectedLevel.uri !== null &&
-		hlsLevel.url.some((url) => url.endsWith(selectedLevel.uri ?? ""))
-	) {
-		return true;
-	}
-
-	if (
-		selectedLevel.width !== null &&
-		selectedLevel.height !== null &&
-		hlsLevel.width === selectedLevel.width &&
-		hlsLevel.height === selectedLevel.height
-	) {
-		return true;
-	}
-
-	return hlsLevel.bitrate === selectedLevel.bitrate;
+	const resolution =
+		typeof level.width === "number" && typeof level.height === "number"
+			? `${level.width}x${level.height}`
+			: `Level ${index + 1}`;
+	const bitrateMbps =
+		level.bitrate > 0 ? `${(level.bitrate / 1_000_000).toFixed(1)}Mbps` : "";
+	return bitrateMbps ? `${resolution} ${bitrateMbps}` : resolution;
 }
 
 function formatAudioTrackLabel(track: Hls["audioTracks"][number], index: number) {
@@ -729,86 +698,6 @@ function formatAudioTrackLabel(track: Hls["audioTracks"][number], index: number)
 	const groupId =
 		typeof track.groupId === "string" && track.groupId ? ` / ${track.groupId}` : "";
 	return `${name}${language}${groupId}`;
-}
-
-function parseHlsMasterPlaylist(text: string): {
-	audioTracks: readonly HlsAudioTrackOption[];
-	videoLevels: readonly HlsVideoLevelOption[];
-} {
-	const lines = text.split(/\r?\n/);
-	const audioTracks: HlsAudioTrackOption[] = [];
-	const parsedVideoLevels: Omit<HlsVideoLevelOption, "index">[] = [];
-
-	for (let index = 0; index < lines.length; index += 1) {
-		const line = lines[index] ?? "";
-
-		if (line.startsWith("#EXT-X-MEDIA:") && line.includes("TYPE=AUDIO")) {
-			const attributes = parseHlsAttributes(line.replace("#EXT-X-MEDIA:", ""));
-			const trackIndex = audioTracks.length;
-			const name = attributes.get("NAME") ?? null;
-			const language = attributes.get("LANGUAGE") ?? null;
-			const groupId = attributes.get("GROUP-ID") ?? null;
-			const uri = attributes.get("URI") ?? null;
-			audioTracks.push({
-				groupId,
-				index: trackIndex,
-				label: [`Track ${trackIndex + 1}`, name, language, groupId, uri]
-					.filter((value): value is string => Boolean(value))
-					.join(" / "),
-				language,
-				name,
-				uri,
-			});
-		}
-
-		if (line.startsWith("#EXT-X-STREAM-INF:")) {
-			const attributes = parseHlsAttributes(line.replace("#EXT-X-STREAM-INF:", ""));
-			const levelIndex = parsedVideoLevels.length;
-			const resolution = attributes.get("RESOLUTION") ?? "";
-			const [widthText, heightText] = resolution.split("x");
-			const width = widthText ? Number(widthText) : Number.NaN;
-			const height = heightText ? Number(heightText) : Number.NaN;
-			const bitrate = Number(attributes.get("AVERAGE-BANDWIDTH") ?? attributes.get("BANDWIDTH") ?? 0);
-			const widthValue = Number.isFinite(width) ? width : null;
-			const heightValue = Number.isFinite(height) ? height : null;
-			const resolutionLabel =
-				widthValue !== null && heightValue !== null
-					? `${widthValue}x${heightValue}`
-					: `Level ${levelIndex + 1}`;
-			const bitrateLabel =
-				bitrate > 0 ? `${(bitrate / 1_000_000).toFixed(1)}Mbps` : "";
-			parsedVideoLevels.push({
-				bitrate,
-				height: heightValue,
-				label: bitrateLabel ? `${resolutionLabel} ${bitrateLabel}` : resolutionLabel,
-				uri: lines[index + 1]?.trim() || null,
-				width: widthValue,
-			});
-		}
-	}
-
-	const videoLevels = parsedVideoLevels
-		.toSorted((left, right) => left.bitrate - right.bitrate)
-		.map((level, index) => ({ ...level, index }));
-
-	return { audioTracks, videoLevels };
-}
-
-function parseHlsAttributes(text: string) {
-	const attributes = new Map<string, string>();
-	const pattern = /([A-Z0-9-]+)=("[^"]*"|[^,]*)/g;
-	let match = pattern.exec(text);
-
-	while (match) {
-		const key = match[1];
-		const rawValue = match[2];
-		if (key && rawValue !== undefined) {
-			attributes.set(key, rawValue.replace(/^"|"$/g, ""));
-		}
-		match = pattern.exec(text);
-	}
-
-	return attributes;
 }
 
 function isSameAudioTrack(
