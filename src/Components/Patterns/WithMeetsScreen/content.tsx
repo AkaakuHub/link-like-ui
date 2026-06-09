@@ -401,9 +401,6 @@ function WithMeetsSidePanel({
 	title: string;
 	orientation: "horizontal" | "vertical";
 }) {
-	const firstChapterTimeSecond =
-		chapters.find((chapter) => chapter.playTimeSecond !== null)
-			?.playTimeSecond ?? 0;
 	const tabLabels =
 		mode === "comments"
 			? ["タイムライン"]
@@ -589,33 +586,16 @@ function WithMeetsSidePanel({
 						{chapters.map((chapter, index) => (
 							<button
 								key={`${chapter.name}-${chapter.playTimeSecond ?? index}`}
-								className={
-									index === 0
-										? "flex h-[3.2em] items-center justify-between rounded-[0.35em] bg-linear-to-r from-ll-system-left to-ll-system-right px-[1.1em] text-[0.82em] font-semibold"
-										: "flex h-[3.2em] items-center justify-between rounded-[0.35em] bg-ll-table px-[1.1em] text-[0.82em] font-semibold text-ll-true-white/58"
-								}
+								className="flex h-[3.2em] items-center justify-between rounded-[0.35em] bg-ll-table px-[1.1em] text-[0.82em] font-semibold text-ll-true-white/78"
 								type="button"
+								disabled={chapter.playTimeSecond === null}
 								onClick={() => {
 									if (chapter.playTimeSecond === null) return;
-									onSeek?.(
-										Math.max(
-											0,
-											chapter.playTimeSecond - firstChapterTimeSecond,
-										),
-									);
+									onSeek?.(Math.max(0, chapter.playTimeSecond));
 								}}
 							>
 								<span>{chapter.name}</span>
-								<span>
-									{formatChapterTime(
-										chapter.playTimeSecond === null
-											? null
-											: Math.max(
-													0,
-													chapter.playTimeSecond - firstChapterTimeSecond,
-												),
-									)}
-								</span>
+								<span>{formatChapterTime(chapter.playTimeSecond)}</span>
 							</button>
 						))}
 					</div>
