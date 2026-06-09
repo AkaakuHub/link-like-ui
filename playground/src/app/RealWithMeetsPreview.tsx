@@ -42,6 +42,7 @@ interface HlsAudioTrackOption {
 	label: string;
 	language: string | null;
 	name: string | null;
+	uri: string | null;
 }
 
 export function RealWithMeetsPreview() {
@@ -403,6 +404,7 @@ export function RealWithMeetsPreview() {
 					label: formatAudioTrackLabel(track, index),
 					language: typeof track.lang === "string" ? track.lang : null,
 					name: typeof track.name === "string" ? track.name : null,
+					uri: typeof track.url === "string" ? track.url : null,
 				})),
 			);
 			setSelectedAudioTrack(hls.audioTrack);
@@ -504,6 +506,15 @@ export function RealWithMeetsPreview() {
 		const audioTrack = Number(value);
 		setSelectedAudioTrack(audioTrack);
 		if (hlsRef.current) {
+			const selectedTrack = audioTracks.find((track) => track.index === audioTrack);
+			const hlsTrack = hlsRef.current.audioTracks.find((track) =>
+				isSameAudioTrack(track, selectedTrack),
+			);
+			if (hlsTrack) {
+				hlsRef.current.setAudioOption(hlsTrack);
+				setSelectedAudioTrack(hlsRef.current.audioTrack);
+				return;
+			}
 			hlsRef.current.audioTrack = audioTrack;
 		}
 	}
@@ -736,6 +747,7 @@ function parseHlsMasterPlaylist(text: string): {
 					.join(" / "),
 				language,
 				name,
+				uri,
 			});
 		}
 
@@ -786,4 +798,20 @@ function parseHlsAttributes(text: string) {
 	}
 
 	return attributes;
+}
+
+function isSameAudioTrack(
+	hlsTrack: Hls["audioTracks"][number],
+	selectedTrack: HlsAudioTrackOption | undefined,
+) {
+	if (!selectedTrack) return false;
+
+	const hlsTrackUrl = typeof hlsTrack.url === "string" ? hlsTrack.url : "";
+	return (
+		(selectedTrack.uri !== null && hlsTrackUrl.endsWith(selectedTrack.uri)) ||
+		(selectedTrack.name !== null &&
+			hlsTrack.name === selectedTrack.name &&
+			selectedTrack.groupId !== null &&
+			hlsTrack.groupId === selectedTrack.groupId)
+	);
 }
