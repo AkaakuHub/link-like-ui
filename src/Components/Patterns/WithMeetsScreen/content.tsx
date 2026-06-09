@@ -385,6 +385,7 @@ function WithMeetsSidePanel({
 	onSeek,
 	onModeChange,
 	orientation,
+	playbackTime,
 	showSupportSummary,
 	title,
 }: {
@@ -397,6 +398,7 @@ function WithMeetsSidePanel({
 	onClose: () => void;
 	onSeek: ((seconds: number) => void) | undefined;
 	onModeChange: (mode: Exclude<WithMeetsPanelMode, "none">) => void;
+	playbackTime: number;
 	showSupportSummary: boolean;
 	title: string;
 	orientation: "horizontal" | "vertical";
@@ -583,21 +585,29 @@ function WithMeetsSidePanel({
 				) : null}
 				{mode === "chapters" ? (
 					<div className="grid gap-[0.6em] p-[1.4em]">
-						{chapters.map((chapter, index) => (
-							<button
-								key={`${chapter.name}-${chapter.playTimeSecond ?? index}`}
-								className="flex h-[3.2em] items-center justify-between rounded-[0.35em] bg-ll-table px-[1.1em] text-[0.82em] font-semibold text-ll-true-white/78"
-								type="button"
-								disabled={chapter.playTimeSecond === null}
-								onClick={() => {
-									if (chapter.playTimeSecond === null) return;
-									onSeek?.(Math.max(0, chapter.playTimeSecond));
-								}}
-							>
-								<span>{chapter.name}</span>
-								<span>{formatChapterTime(chapter.playTimeSecond)}</span>
-							</button>
-						))}
+						{chapters.map((chapter, index) => {
+							const isActive = isActiveChapter(chapters, index, playbackTime);
+
+							return (
+								<button
+									key={`${chapter.name}-${chapter.playTimeSecond ?? index}`}
+									className={
+										isActive
+											? "flex h-[3.2em] items-center justify-between rounded-[0.35em] bg-linear-to-r from-ll-system-left to-ll-system-right px-[1.1em] text-[0.82em] font-semibold text-ll-true-white"
+											: "flex h-[3.2em] items-center justify-between rounded-[0.35em] bg-ll-table px-[1.1em] text-[0.82em] font-semibold text-ll-true-white/78 disabled:text-ll-true-white/34"
+									}
+									type="button"
+									disabled={chapter.playTimeSecond === null}
+									onClick={() => {
+										if (chapter.playTimeSecond === null) return;
+										onSeek?.(Math.max(0, chapter.playTimeSecond));
+									}}
+								>
+									<span>{chapter.name}</span>
+									<span>{formatChapterTime(chapter.playTimeSecond)}</span>
+								</button>
+							);
+						})}
 					</div>
 				) : null}
 				{isSurfaceVisible ? (
@@ -822,6 +832,7 @@ export function WithMeetsScreen({
 							setPanelMode(nextMode);
 							setPanelSurfaceVisible(true);
 						}}
+						playbackTime={playbackTime}
 						showSupportSummary={showSupportSummary}
 						title={title}
 					/>
@@ -869,6 +880,27 @@ function formatChapterTime(seconds: number | null) {
 	const minutes = Math.floor(seconds / 60);
 	const remainingSeconds = Math.floor(seconds % 60);
 	return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
+}
+
+function isActiveChapter(
+	chapters: readonly WithMeetsChapterInput[],
+	index: number,
+	playbackTime: number,
+) {
+	const chapter = chapters[index];
+	const chapterStart = chapter?.playTimeSecond;
+
+	if (chapterStart === null || chapterStart === undefined) return false;
+	if (playbackTime < chapterStart) return false;
+
+	const nextChapter = chapters
+		.slice(index + 1)
+		.find((candidate) => candidate.playTimeSecond !== null);
+	return (
+		nextChapter?.playTimeSecond === null ||
+		nextChapter?.playTimeSecond === undefined ||
+		playbackTime < nextChapter.playTimeSecond
+	);
 }
 
 function formatPlaybackTime(seconds: number) {
