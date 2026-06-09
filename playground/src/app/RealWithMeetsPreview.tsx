@@ -353,7 +353,7 @@ export function RealWithMeetsPreview() {
 			abrMaxWithRealBitrate: true,
 			abrEwmaSlowVoD: 9,
 			backBufferLength: 30,
-			capLevelToPlayerSize: true,
+			capLevelToPlayerSize: false,
 			enableWorker: true,
 			fragLoadingMaxRetry: 12,
 			fragLoadingRetryDelay: 1600,
@@ -484,7 +484,10 @@ export function RealWithMeetsPreview() {
 		const level = Number(value);
 		setSelectedVideoLevel(level);
 		if (hlsRef.current) {
+			hlsRef.current.autoLevelCapping = -1;
 			hlsRef.current.currentLevel = level;
+			hlsRef.current.nextLevel = level;
+			hlsRef.current.loadLevel = level;
 		}
 	}
 
