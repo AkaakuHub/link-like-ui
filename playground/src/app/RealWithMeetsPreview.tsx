@@ -226,10 +226,6 @@ export function RealWithMeetsPreview() {
 
 		if (!mediaItem || !video || !videoSource) return;
 		hlsRef.current = null;
-		setAudioTracks([]);
-		setVideoLevels([]);
-		setSelectedAudioTrack(-1);
-		setSelectedVideoLevel(-1);
 		const updatePlaybackState = () => {
 			setPlaybackTime(video.currentTime);
 			setPlaybackDuration(video.duration);
@@ -449,6 +445,41 @@ export function RealWithMeetsPreview() {
 		};
 	}, [mediaItem, startPlayback, videoSource]);
 
+	useEffect(() => {
+		if (!videoSource) return;
+
+		let isDisposed = false;
+		setAudioTracks([]);
+		setVideoLevels([]);
+		setSelectedAudioTrack(-1);
+		setSelectedVideoLevel(-1);
+		void fetch(videoSource)
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error(`Failed to load HLS master: ${response.status}`);
+				}
+				return response.text();
+			})
+			.then((text) => {
+				if (isDisposed) return;
+				const manifestOptions = parseHlsMasterPlaylist(text);
+				if (manifestOptions.videoLevels.length > 0) {
+					setVideoLevels(manifestOptions.videoLevels);
+				}
+				if (manifestOptions.audioTracks.length > 0) {
+					setAudioTracks(manifestOptions.audioTracks);
+					setSelectedAudioTrack((currentTrack) =>
+						currentTrack >= 0 ? currentTrack : manifestOptions.audioTracks[0]?.index ?? -1,
+					);
+				}
+			})
+			.catch(() => {});
+
+		return () => {
+			isDisposed = true;
+		};
+	}, [videoSource]);
+
 	function selectVideoLevel(value: string) {
 		const level = Number(value);
 		setSelectedVideoLevel(level);
@@ -647,4 +678,79 @@ function formatAudioTrackLabel(track: Hls["audioTracks"][number], index: number)
 	const groupId =
 		typeof track.groupId === "string" && track.groupId ? ` / ${track.groupId}` : "";
 	return `${name}${language}${groupId}`;
+}
+
+function parseHlsMasterPlaylist(text: string): {
+	audioTracks: readonly HlsAudioTrackOption[];
+	videoLevels: readonly HlsVideoLevelOption[];
+} {
+	const lines = text.split(/\r?\n/);
+	const audioTracks: HlsAudioTrackOption[] = [];
+	const videoLevels: HlsVideoLevelOption[] = [];
+
+	for (let index = 0; index < lines.length; index += 1) {
+		const line = lines[index] ?? "";
+
+		if (line.startsWith("#EXT-X-MEDIA:") && line.includes("TYPE=AUDIO")) {
+			const attributes = parseHlsAttributes(line.replace("#EXT-X-MEDIA:", ""));
+			const trackIndex = audioTracks.length;
+			const name = attributes.get("NAME") ?? null;
+			const language = attributes.get("LANGUAGE") ?? null;
+			const groupId = attributes.get("GROUP-ID") ?? null;
+			const uri = attributes.get("URI") ?? null;
+			audioTracks.push({
+				groupId,
+				index: trackIndex,
+				label: [`Track ${trackIndex + 1}`, name, language, groupId, uri]
+					.filter((value): value is string => Boolean(value))
+					.join(" / "),
+				language,
+				name,
+			});
+		}
+
+		if (line.startsWith("#EXT-X-STREAM-INF:")) {
+			const attributes = parseHlsAttributes(line.replace("#EXT-X-STREAM-INF:", ""));
+			const levelIndex = videoLevels.length;
+			const resolution = attributes.get("RESOLUTION") ?? "";
+			const [widthText, heightText] = resolution.split("x");
+			const width = widthText ? Number(widthText) : Number.NaN;
+			const height = heightText ? Number(heightText) : Number.NaN;
+			const bitrate = Number(attributes.get("AVERAGE-BANDWIDTH") ?? attributes.get("BANDWIDTH") ?? 0);
+			const widthValue = Number.isFinite(width) ? width : null;
+			const heightValue = Number.isFinite(height) ? height : null;
+			const resolutionLabel =
+				widthValue !== null && heightValue !== null
+					? `${widthValue}x${heightValue}`
+					: `Level ${levelIndex + 1}`;
+			const bitrateLabel =
+				bitrate > 0 ? `${(bitrate / 1_000_000).toFixed(1)}Mbps` : "";
+			videoLevels.push({
+				bitrate,
+				height: heightValue,
+				index: levelIndex,
+				label: bitrateLabel ? `${resolutionLabel} ${bitrateLabel}` : resolutionLabel,
+				width: widthValue,
+			});
+		}
+	}
+
+	return { audioTracks, videoLevels };
+}
+
+function parseHlsAttributes(text: string) {
+	const attributes = new Map<string, string>();
+	const pattern = /([A-Z0-9-]+)=("[^"]*"|[^,]*)/g;
+	let match = pattern.exec(text);
+
+	while (match) {
+		const key = match[1];
+		const rawValue = match[2];
+		if (key && rawValue !== undefined) {
+			attributes.set(key, rawValue.replace(/^"|"$/g, ""));
+		}
+		match = pattern.exec(text);
+	}
+
+	return attributes;
 }

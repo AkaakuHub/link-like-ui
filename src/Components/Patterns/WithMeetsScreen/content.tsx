@@ -785,7 +785,7 @@ export function WithMeetsScreen({
 					</WithMeetsIconButton>
 					<WithMeetsIconButton
 						type="button"
-						aria-label="Info"
+						aria-label="Settings"
 						onClick={() => {
 							onSettingsOpen?.();
 						}}
