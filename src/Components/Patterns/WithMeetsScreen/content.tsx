@@ -1,5 +1,6 @@
 import {
 	type RefObject,
+	type UIEvent,
 	useCallback,
 	useEffect,
 	useRef,
@@ -34,7 +35,6 @@ import {
 	WithMeetsPanelBody,
 	WithMeetsPanelHeader,
 	WithMeetsPanelTitle,
-	WithMeetsPillButton,
 	WithMeetsPlayBadge,
 	WithMeetsProgressArea,
 	WithMeetsRoot,
@@ -124,12 +124,14 @@ function WithMeetsPlaybackControls({
 	onSeek,
 	onToggle,
 	onRateChange,
+	onMenuOpen,
 	orientation,
 	rate,
 	time,
 }: {
 	duration: number;
 	isPlaying: boolean;
+	onMenuOpen: () => void;
 	onRateChange: ((rate: number) => void) | undefined;
 	onSeek: ((seconds: number) => void) | undefined;
 	onToggle: (() => void) | undefined;
@@ -138,7 +140,7 @@ function WithMeetsPlaybackControls({
 	time: number;
 }) {
 	const progress = duration > 0 ? Math.min(100, (time / duration) * 100) : 0;
-	const playbackRates = [1, 1.5, 2, 3, 4] as const;
+	const playbackRates: readonly number[] = [1, 1.5, 2, 3, 4];
 	return (
 		<WithMeetsProgressArea data-orientation={orientation}>
 			<button
@@ -161,7 +163,7 @@ function WithMeetsPlaybackControls({
 				/>
 			</button>
 			<WithMeetsControlRow>
-				<div className="inline-flex items-center gap-[1.4em] text-[0.95em] font-semibold">
+				<div className="inline-flex items-center gap-[1.15em] text-[0.95em] font-semibold">
 					<button
 						type="button"
 						className="grid h-[1.8em] w-[1.8em] place-items-center text-[1.8em] leading-none"
@@ -180,7 +182,7 @@ function WithMeetsPlaybackControls({
 					</span>
 					<button
 						type="button"
-						className="rounded-full border border-ll-true-white/42 px-[0.65em] py-[0.25em] text-[0.82em] leading-none text-ll-true-white"
+						className="min-h-[2.35em] min-w-[4.6em] rounded-full border border-ll-true-white/62 bg-ll-black/24 px-[1em] text-[0.98em] leading-none font-semibold text-ll-true-white shadow-[0_1px_4px_color-mix(in_srgb,var(--color-ll-black)_30%,transparent)]"
 						onClick={() => {
 							const currentIndex = playbackRates.indexOf(rate);
 							const nextRate =
@@ -191,7 +193,7 @@ function WithMeetsPlaybackControls({
 						{formatPlaybackRate(rate)}
 					</button>
 				</div>
-				<WithMeetsMenuButton type="button">
+				<WithMeetsMenuButton type="button" onClick={onMenuOpen}>
 					<LuChevronLeft className="h-[1.25em] w-[1.25em]" />
 					<span>MENU</span>
 				</WithMeetsMenuButton>
@@ -259,7 +261,7 @@ function WithMeetsVirtualTimeline({
 				className="ll-system-modal-scrollbar h-full min-h-0"
 				style={{ height: "100%" }}
 				scrollableNodeProps={{
-					onScroll: (event) => {
+					onScroll: (event: UIEvent<HTMLDivElement>) => {
 						const scrollContainer = event.currentTarget;
 						const distanceFromBottom =
 							scrollContainer.scrollHeight -
@@ -404,12 +406,12 @@ function WithMeetsSidePanel({
 			?.playTimeSecond ?? 0;
 	const tabLabels =
 		mode === "comments"
-			? ["Timeline", "Comments", "Gifts", "Cards"]
+			? ["タイムライン"]
 			: mode === "info"
-				? ["Overview", "Ranking"]
+				? ["概要"]
 				: mode === "chapters"
-					? ["Chapter Select"]
-					: ["Gift Log"];
+					? ["チャプター選択"]
+					: ["ギフトログ"];
 
 	return (
 		<WithMeetsPanel
@@ -620,8 +622,26 @@ function WithMeetsSidePanel({
 				) : null}
 				{isSurfaceVisible ? (
 					<div className="absolute right-0 bottom-[0.6em] grid w-[4.8em] justify-items-center gap-[1.2em] text-ll-true-white">
-						<LuMail className="h-[1.9em] w-[1.9em] text-ll-true-white/62" />
-						<LuGift className="h-[2em] w-[2em]" />
+						<button
+							aria-label="Show info"
+							className="grid h-[2.6em] w-[2.6em] place-items-center rounded-full text-ll-true-white/62"
+							type="button"
+							onClick={() => {
+								onModeChange("info");
+							}}
+						>
+							<LuMail className="h-[1.9em] w-[1.9em]" />
+						</button>
+						<button
+							aria-label="Show gifts"
+							className="grid h-[2.6em] w-[2.6em] place-items-center rounded-full text-ll-true-white"
+							type="button"
+							onClick={() => {
+								onModeChange("gifts");
+							}}
+						>
+							<LuGift className="h-[2em] w-[2em]" />
+						</button>
 					</div>
 				) : null}
 			</WithMeetsPanelBody>
@@ -654,12 +674,27 @@ export function WithMeetsScreen({
 	const [panelMode, setPanelMode] = useState<WithMeetsPanelMode>("comments");
 	const [isPanelSurfaceVisible, setPanelSurfaceVisible] =
 		useState<boolean>(true);
+	const [isBackConfirmVisible, setBackConfirmVisible] =
+		useState<boolean>(false);
 	const [isChromeVisible, setChromeVisible] = useState<boolean>(true);
 	const [lastChromeInteractionAt, setLastChromeInteractionAt] =
 		useState<number>(Date.now());
+	const frameRef = useRef<HTMLDivElement | null>(null);
 	const revealChrome = useCallback(() => {
 		setChromeVisible(true);
 		setLastChromeInteractionAt(Date.now());
+	}, []);
+	const openPanel = useCallback((mode: Exclude<WithMeetsPanelMode, "none">) => {
+		setPanelMode(mode);
+		setPanelSurfaceVisible(true);
+	}, []);
+	const toggleFullscreen = useCallback(() => {
+		if (document.fullscreenElement) {
+			void document.exitFullscreen();
+			return;
+		}
+
+		void frameRef.current?.requestFullscreen();
 	}, []);
 
 	useEffect(() => {
@@ -684,6 +719,7 @@ export function WithMeetsScreen({
 	return (
 		<WithMeetsRoot>
 			<WithMeetsFrame
+				ref={frameRef}
 				data-orientation={orientation}
 				onKeyDown={revealChrome}
 				onPointerDown={revealChrome}
@@ -716,7 +752,9 @@ export function WithMeetsScreen({
 						<WithMeetsIconButton
 							type="button"
 							aria-label="Back"
-							onClick={onBack}
+							onClick={() => {
+								setBackConfirmVisible(true);
+							}}
 						>
 							<LuChevronLeft className="h-[1.7em] w-[1.7em]" />
 						</WithMeetsIconButton>
@@ -728,15 +766,18 @@ export function WithMeetsScreen({
 					<WithMeetsScoreMeter />
 				</WithMeetsTopBar>
 				<WithMeetsSideActions className={chromeVisibilityClass}>
-					<WithMeetsIconButton type="button" aria-label="Fullscreen">
+					<WithMeetsIconButton
+						type="button"
+						aria-label="Fullscreen"
+						onClick={toggleFullscreen}
+					>
 						<LuExpand className="h-[1.75em] w-[1.75em]" />
 					</WithMeetsIconButton>
 					<WithMeetsIconButton
 						type="button"
 						aria-label="Comments"
 						onClick={() => {
-							setPanelMode("comments");
-							setPanelSurfaceVisible(true);
+							openPanel("comments");
 						}}
 					>
 						<LuMessageCircle className="h-[1.75em] w-[1.75em]" />
@@ -745,8 +786,7 @@ export function WithMeetsScreen({
 						type="button"
 						aria-label="Gift log"
 						onClick={() => {
-							setPanelMode("gifts");
-							setPanelSurfaceVisible(true);
+							openPanel("gifts");
 						}}
 					>
 						<LuGift className="h-[1.75em] w-[1.75em]" />
@@ -755,8 +795,7 @@ export function WithMeetsScreen({
 						type="button"
 						aria-label="Info"
 						onClick={() => {
-							setPanelMode("info");
-							setPanelSurfaceVisible(true);
+							openPanel("info");
 						}}
 					>
 						<LuSettings2 className="h-[1.75em] w-[1.75em]" />
@@ -765,43 +804,19 @@ export function WithMeetsScreen({
 						type="button"
 						aria-label="Chapter select"
 						onClick={() => {
-							setPanelMode("chapters");
-							setPanelSurfaceVisible(true);
+							openPanel("chapters");
 						}}
 					>
 						<LuMinimize className="h-[1.75em] w-[1.75em]" />
 					</WithMeetsIconButton>
 				</WithMeetsSideActions>
-				{panelMode === "none" ? (
-					<div
-						className={`absolute right-[4.6%] bottom-[5.5%] flex flex-col gap-[0.6em] ${chromeVisibilityClass}`}
-					>
-						<WithMeetsPillButton
-							type="button"
-							onClick={() => {
-								setPanelMode("comments");
-								setPanelSurfaceVisible(true);
-							}}
-						>
-							<LuMessageCircle className="mr-[0.25em] inline h-[1em] w-[1em]" />
-							Comment
-						</WithMeetsPillButton>
-						<WithMeetsPillButton
-							type="button"
-							onClick={() => {
-								setPanelMode("gifts");
-								setPanelSurfaceVisible(true);
-							}}
-						>
-							<LuList className="mr-[0.25em] inline h-[1em] w-[1em]" />
-							Log
-						</WithMeetsPillButton>
-					</div>
-				) : null}
 				<div className={chromeVisibilityClass}>
 					<WithMeetsPlaybackControls
 						duration={playbackDuration}
 						isPlaying={isPlaying}
+						onMenuOpen={() => {
+							openPanel("comments");
+						}}
 						onRateChange={onPlaybackRateChange}
 						onSeek={onSeek}
 						onToggle={onPlaybackToggle}
@@ -831,6 +846,38 @@ export function WithMeetsScreen({
 						title={title}
 					/>
 				)}
+				{isBackConfirmVisible ? (
+					<div className="absolute inset-0 z-30 grid place-items-center bg-ll-black/62 px-[12%] text-ll-gray">
+						<div className="w-full max-w-[36em] overflow-hidden rounded-[1.35em] bg-ll-true-white shadow-[0_1em_3em_color-mix(in_srgb,var(--color-ll-black)_45%,transparent)]">
+							<div className="bg-linear-to-r from-ll-system-left to-ll-system-right px-[1.2em] py-[0.8em] text-center text-[1.5em] font-semibold text-ll-true-white">
+								戻る
+							</div>
+							<div className="p-[1.8em]">
+								<div className="grid min-h-[8em] place-items-center rounded-[0.6em] bg-ll-table/18 px-[1em] text-center text-[1.15em] font-semibold">
+									前の画面に戻ります
+								</div>
+								<div className="mt-[1.8em] grid grid-cols-2 gap-[1.3em]">
+									<button
+										className="h-[3.4em] rounded-[0.6em] border border-ll-gray/18 bg-ll-true-white text-[1.05em] font-semibold shadow-[0_0.25em_1em_color-mix(in_srgb,var(--color-ll-black)_12%,transparent)]"
+										type="button"
+										onClick={() => {
+											setBackConfirmVisible(false);
+										}}
+									>
+										キャンセル
+									</button>
+									<button
+										className="h-[3.4em] rounded-[0.6em] bg-linear-to-r from-ll-system-left to-ll-system-right text-[1.05em] font-semibold text-ll-true-white shadow-[0_0.25em_1em_color-mix(in_srgb,var(--color-ll-black)_18%,transparent)]"
+										type="button"
+										onClick={onBack}
+									>
+										OK
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				) : null}
 			</WithMeetsFrame>
 		</WithMeetsRoot>
 	);

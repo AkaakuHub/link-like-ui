@@ -25,15 +25,18 @@ export function WithMeetsRoot({
 	);
 }
 
-export function WithMeetsFrame({
-	className,
-	"data-orientation": dataOrientation,
-	...props
-}: HTMLAttributes<HTMLDivElement> & {
-	"data-orientation"?: "horizontal" | "vertical";
-}) {
+export const WithMeetsFrame = forwardRef<
+	HTMLDivElement,
+	HTMLAttributes<HTMLDivElement> & {
+		"data-orientation"?: "horizontal" | "vertical";
+	}
+>(function WithMeetsFrame(
+	{ className, "data-orientation": dataOrientation, ...props },
+	ref,
+) {
 	return (
-		<WithMeetsDivBase
+		<div
+			ref={ref}
 			className={cn(
 				dataOrientation === "vertical"
 					? "relative aspect-1170/2532 h-dvh max-h-dvh w-auto max-w-dvw overflow-hidden bg-ll-black text-[clamp(0.5rem,1.3vw,0.78rem)]"
@@ -44,7 +47,7 @@ export function WithMeetsFrame({
 			{...props}
 		/>
 	);
-}
+});
 
 export function WithMeetsVideoViewport({
 	className,
@@ -272,21 +275,6 @@ export function WithMeetsPanelBody({
 	return (
 		<WithMeetsDivBase
 			className={cn("h-[calc(100%-3.2em)] min-h-0", className)}
-			{...props}
-		/>
-	);
-}
-
-export function WithMeetsPillButton({
-	className,
-	...props
-}: ComponentPropsWithoutRef<typeof WithMeetsButtonBase>) {
-	return (
-		<WithMeetsButtonBase
-			className={cn(
-				"rounded-full bg-ll-tab-active px-[0.7em] py-[0.35em] text-[0.7em] leading-none font-semibold text-ll-true-white",
-				className,
-			)}
 			{...props}
 		/>
 	);
