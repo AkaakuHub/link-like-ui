@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { IconType } from "react-icons";
 import { LuMusic2, LuPlus, LuRadio, LuUserRound } from "react-icons/lu";
 import {
@@ -229,20 +230,25 @@ export function MediaUpcomingList({
 }
 
 export function MediaArchiveList({
+	headerAction,
 	items,
 	onItemSelect,
 	title = "Archive",
 }: {
+	headerAction?: ReactNode;
 	items: readonly MediaArchiveItemInput[];
 	onItemSelect?: (item: MediaArchiveItemInput) => void;
 	title?: string;
 }) {
 	return (
 		<MediaArchiveRoot>
-			<MediaArchiveHeading>
-				<LuMusic2 className="h-6 w-6 stroke-2" />
-				<MediaSectionHeadingText>{title}</MediaSectionHeadingText>
-			</MediaArchiveHeading>
+			<div className="mb-4 flex items-center justify-between gap-3">
+				<MediaArchiveHeading className="mb-0">
+					<LuMusic2 className="h-6 w-6 stroke-2" />
+					<MediaSectionHeadingText>{title}</MediaSectionHeadingText>
+				</MediaArchiveHeading>
+				{headerAction}
+			</div>
 			<MediaArchiveGridFrame>
 				{items.map((item) => (
 					<MediaArchiveCardRoot key={item.id}>

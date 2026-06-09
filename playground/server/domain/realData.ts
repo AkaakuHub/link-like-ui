@@ -9,15 +9,19 @@ export interface RealDataConfig {
 
 export interface RealMediaItem {
 	chapters: readonly RealMediaChapter[];
+	characters: readonly string[];
 	description: string;
 	duration: string;
+	hasExtra: boolean;
 	hlsPath: string;
 	id: string;
 	imageAlt: string;
 	imageSrc: string;
 	isHorizontal: boolean;
+	liveType: number | null;
 	releasedAt: string;
 	title: string;
+	withStarCount: number;
 }
 
 export interface RealMediaChapter {
@@ -61,8 +65,13 @@ export interface RealDataRepository {
 }
 
 export interface RealDataPageOptions {
+	afterMode?: "all" | "has" | "none";
+	characterFilters?: Record<string, "all" | "show" | "hide">;
 	fromPlayTimeMs?: number;
+	keyword?: string;
 	limit: number;
+	liveType?: "all" | "withMeets" | "fesLive";
 	offset: number;
 	playTimeMs?: number;
+	sortBy?: "date" | "withStar";
 }

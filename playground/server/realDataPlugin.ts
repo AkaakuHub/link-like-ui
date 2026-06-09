@@ -3,7 +3,7 @@ import { stat } from "node:fs/promises";
 import { extname, resolve } from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
-import type { RealDataConfig } from "./domain/realData";
+import type { RealDataConfig, RealDataPageOptions } from "./domain/realData";
 import { RealDataService } from "./application/realDataService";
 import { createRealDataRepository } from "./repositories/createRealDataRepository";
 
@@ -96,10 +96,17 @@ export function realDataPlugin(): Plugin {
 	};
 }
 
-function readPageOptions(requestUrl: URL) {
+function readPageOptions(requestUrl: URL): RealDataPageOptions {
+	const afterMode = requestUrl.searchParams.get("afterMode");
+	const characterFilters = readCharacterFilters(
+		requestUrl.searchParams.get("characterFilters"),
+	);
 	const fromPlayTimeMs = requestUrl.searchParams.get("fromPlayTimeMs");
+	const keyword = requestUrl.searchParams.get("keyword");
+	const liveType = requestUrl.searchParams.get("liveType");
 	const playTimeMs = requestUrl.searchParams.get("playTimeMs");
-	const options = {
+	const sortBy = requestUrl.searchParams.get("sortBy");
+	const options: RealDataPageOptions = {
 		limit: clampNumber(
 			Number(requestUrl.searchParams.get("limit") ?? 60),
 			1,
@@ -107,15 +114,52 @@ function readPageOptions(requestUrl: URL) {
 		),
 		offset: Math.max(0, Number(requestUrl.searchParams.get("offset") ?? 0)),
 	};
-	return {
-		...options,
-		...(fromPlayTimeMs === null
-			? {}
-			: { fromPlayTimeMs: Math.max(0, Number(fromPlayTimeMs)) }),
-		...(playTimeMs === null
-			? {}
-			: { playTimeMs: Math.max(0, Number(playTimeMs)) }),
-	};
+
+	if (afterMode === "has" || afterMode === "none" || afterMode === "all") {
+		options.afterMode = afterMode;
+	}
+	if (characterFilters) {
+		options.characterFilters = characterFilters;
+	}
+	if (fromPlayTimeMs !== null) {
+		options.fromPlayTimeMs = Math.max(0, Number(fromPlayTimeMs));
+	}
+	if (keyword !== null) {
+		options.keyword = keyword.trim();
+	}
+	if (liveType === "withMeets" || liveType === "fesLive" || liveType === "all") {
+		options.liveType = liveType;
+	}
+	if (playTimeMs !== null) {
+		options.playTimeMs = Math.max(0, Number(playTimeMs));
+	}
+	if (sortBy === "withStar" || sortBy === "date") {
+		options.sortBy = sortBy;
+	}
+
+	return options;
+}
+
+function readCharacterFilters(value: string | null) {
+	if (!value) return null;
+
+	try {
+		const parsed: unknown = JSON.parse(value);
+		if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+			return null;
+		}
+
+		const filters: Record<string, "all" | "show" | "hide"> = {};
+		for (const [key, filterValue] of Object.entries(parsed)) {
+			if (filterValue === "all" || filterValue === "show" || filterValue === "hide") {
+				filters[key] = filterValue;
+			}
+		}
+
+		return filters;
+	} catch {
+		return null;
+	}
 }
 
 function clampNumber(value: number, min: number, max: number) {

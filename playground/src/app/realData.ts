@@ -7,9 +7,21 @@ import type {
 
 export interface RealMediaItem extends MediaArchiveItemInput {
 	chapters: readonly RealMediaChapter[];
+	characters: readonly string[];
 	description: string;
+	hasExtra: boolean;
 	hlsPath: string;
 	isHorizontal: boolean;
+	liveType: number | null;
+	withStarCount: number;
+}
+
+export interface RealMediaFilters {
+	afterMode: "all" | "has" | "none";
+	characterFilters: Record<string, "all" | "show" | "hide">;
+	keyword: string;
+	liveType: "all" | "withMeets" | "fesLive";
+	sortBy: "date" | "withStar";
 }
 
 export interface RealMediaChapter {
@@ -31,9 +43,23 @@ export interface RealDataPage<TItem> {
 export async function fetchRealMediaItems(
 	offset = 0,
 	limit = 40,
+	filters?: RealMediaFilters,
 ): Promise<RealDataPage<RealMediaItem>> {
+	const params = new URLSearchParams({
+		limit: String(limit),
+		offset: String(offset),
+	});
+
+	if (filters) {
+		params.set("afterMode", filters.afterMode);
+		params.set("characterFilters", JSON.stringify(filters.characterFilters));
+		params.set("keyword", filters.keyword);
+		params.set("liveType", filters.liveType);
+		params.set("sortBy", filters.sortBy);
+	}
+
 	const response = await fetch(
-		`/__real-data/media?offset=${offset}&limit=${limit}`,
+		`/__real-data/media?${params.toString()}`,
 	);
 
 	if (!response.ok) {

@@ -18,14 +18,18 @@ import { resolveInsideRoot, toServedFilePath } from "./pathUtils";
 const execFileAsync = promisify(execFile);
 
 interface PostgresMediaRow {
+	characterIds: number[] | null;
 	description: string;
 	duration: string;
+	hasExtra: boolean | null;
 	id: string;
 	imageAlt: string;
 	isHorizontal: boolean | null;
+	liveType: number | null;
 	releasedAt: string;
 	title: string;
 	videoUrl: string;
+	withStarCount: number | null;
 }
 
 interface ArchiveDetailMetadata {
@@ -57,26 +61,41 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 	async listMedia(
 		options: RealDataPageOptions,
 	): Promise<RealDataPage<RealMediaItem>> {
+		const whereConditions = mediaWhereConditions(options);
+		const orderBy =
+			options.sortBy === "withStar"
+				? "coalesce(with_meets.earned_star_count, 0) desc, coalesce(with_meets.live_start_time, live_archive_details.live_start_time) desc"
+				: "coalesce(with_meets.live_start_time, live_archive_details.live_start_time) desc";
 		const rows = await this.#queryJson<PostgresMediaRow>(`
 			select coalesce(json_agg(row_to_json(media_rows)), '[]'::json)
 			from (
 				select
+					coalesce(
+						(
+							select array_agg(live_archive_characters.character_id order by live_archive_characters.character_index)
+							from live_archive_characters
+							where live_archive_characters.live_id = with_meets.archives_id
+						),
+						array[]::integer[]
+					) as "characterIds",
 					with_meets.archives_id as id,
 					coalesce(live_archive_details.title, with_meets.name, with_meets.archives_id) as title,
 					coalesce(live_archive_details.title, with_meets.name, with_meets.archives_id) as "imageAlt",
 					coalesce(live_archive_details.description, '') as description,
+					coalesce(live_archive_details.has_extra, with_meets.has_extra, false) as "hasExtra",
 					live_archive_details.is_horizontal as "isHorizontal",
+					with_meets.live_type as "liveType",
 					to_char(coalesce(with_meets.live_start_time, live_archive_details.live_start_time), 'YYYY.MM.DD') as "releasedAt",
 					case
 						when coalesce(live_archive_details.total_play_time_second, with_meets.total_playing_time_second) is null then ''
 						else floor(coalesce(live_archive_details.total_play_time_second, with_meets.total_playing_time_second) / 60)::text || ':' || lpad((coalesce(live_archive_details.total_play_time_second, with_meets.total_playing_time_second) % 60)::text, 2, '0')
 					end as duration,
-					live_archive_details.video_url as "videoUrl"
+					live_archive_details.video_url as "videoUrl",
+					coalesce(with_meets.earned_star_count, 0) as "withStarCount"
 				from with_meets
 				left join live_archive_details on live_archive_details.live_id = with_meets.archives_id
-				where with_meets.thumbnail_image_url is not null
-					and live_archive_details.video_url is not null
-				order by coalesce(with_meets.live_start_time, live_archive_details.live_start_time) desc
+				where ${whereConditions.join("\n\t\t\t\t\tand ")}
+				order by ${orderBy}
 				limit ${options.limit + 1}
 				offset ${options.offset}
 			) media_rows
@@ -99,17 +118,28 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 			select coalesce(json_agg(row_to_json(media_rows)), '[]'::json)
 			from (
 				select
+					coalesce(
+						(
+							select array_agg(live_archive_characters.character_id order by live_archive_characters.character_index)
+							from live_archive_characters
+							where live_archive_characters.live_id = with_meets.archives_id
+						),
+						array[]::integer[]
+					) as "characterIds",
 					with_meets.archives_id as id,
 					coalesce(live_archive_details.title, with_meets.name, with_meets.archives_id) as title,
 					coalesce(live_archive_details.title, with_meets.name, with_meets.archives_id) as "imageAlt",
 					coalesce(live_archive_details.description, '') as description,
+					coalesce(live_archive_details.has_extra, with_meets.has_extra, false) as "hasExtra",
 					live_archive_details.is_horizontal as "isHorizontal",
+					with_meets.live_type as "liveType",
 					to_char(coalesce(with_meets.live_start_time, live_archive_details.live_start_time), 'YYYY.MM.DD') as "releasedAt",
 					case
 						when coalesce(live_archive_details.total_play_time_second, with_meets.total_playing_time_second) is null then ''
 						else floor(coalesce(live_archive_details.total_play_time_second, with_meets.total_playing_time_second) / 60)::text || ':' || lpad((coalesce(live_archive_details.total_play_time_second, with_meets.total_playing_time_second) % 60)::text, 2, '0')
 					end as duration,
-					live_archive_details.video_url as "videoUrl"
+					live_archive_details.video_url as "videoUrl",
+					coalesce(with_meets.earned_star_count, 0) as "withStarCount"
 				from with_meets
 				left join live_archive_details on live_archive_details.live_id = with_meets.archives_id
 				where with_meets.archives_id = ${sqlLiteral(liveId)}
@@ -245,18 +275,22 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 
 		return {
 			chapters: chapters.length > 0 ? chapters : normalizeChapters(detail?.chapters),
+			characters: characterIdsToNames(row.characterIds ?? []),
 			description: row.description,
 			duration: row.duration,
+			hasExtra: row.hasExtra ?? false,
 			hlsPath: toServedFilePath(hlsRelativePath),
 			id: row.id,
 			imageAlt: row.imageAlt,
 			imageSrc: toServedFilePath(thumbnailRelativePath),
 			isHorizontal:
-				typeof detail?.is_horizontal === "boolean"
-					? detail.is_horizontal
-					: row.isHorizontal ?? inferHorizontal(row.title),
+					typeof detail?.is_horizontal === "boolean"
+						? detail.is_horizontal
+						: row.isHorizontal ?? inferHorizontal(row.title),
+			liveType: row.liveType,
 			releasedAt: row.releasedAt,
 			title: row.title,
+			withStarCount: row.withStarCount ?? 0,
 		};
 	}
 
@@ -309,6 +343,85 @@ function pageFromLimitPlusOne<TItem>(
 
 function sqlLiteral(value: string) {
 	return `'${value.replaceAll("'", "''")}'`;
+}
+
+const characterNamesById = new Map<number, string>([
+	[1021, "梢"],
+	[1022, "綴理"],
+	[1023, "慈"],
+	[1031, "花帆"],
+	[1032, "さやか"],
+	[1033, "瑠璃乃"],
+	[1041, "吟子"],
+	[1042, "小鈴"],
+	[1043, "姫芽"],
+	[1051, "セラス"],
+	[1052, "泉"],
+]);
+
+function characterIdsToNames(characterIds: readonly number[]) {
+	return characterIds.flatMap((characterId) => {
+		const name = characterNamesById.get(characterId);
+		return name ? [name] : [];
+	});
+}
+
+function characterNameToId(characterName: string) {
+	for (const [characterId, name] of characterNamesById.entries()) {
+		if (name === characterName) return characterId;
+	}
+
+	return null;
+}
+
+function mediaWhereConditions(options: RealDataPageOptions) {
+	const conditions = [
+		"with_meets.thumbnail_image_url is not null",
+		"live_archive_details.video_url is not null",
+	];
+	const keyword = options.keyword?.trim();
+
+	if (options.liveType === "withMeets") {
+		conditions.push("with_meets.live_type = 2");
+	}
+	if (options.liveType === "fesLive") {
+		conditions.push("with_meets.live_type = 1");
+	}
+	if (options.afterMode === "has") {
+		conditions.push("coalesce(live_archive_details.has_extra, with_meets.has_extra, false) = true");
+	}
+	if (options.afterMode === "none") {
+		conditions.push("coalesce(live_archive_details.has_extra, with_meets.has_extra, false) = false");
+	}
+	if (keyword) {
+		const keywordPattern = sqlLikeLiteral(keyword);
+		conditions.push(`(
+			coalesce(live_archive_details.title, with_meets.name, with_meets.archives_id) ilike ${keywordPattern} escape '\\'
+			or coalesce(live_archive_details.description, '') ilike ${keywordPattern} escape '\\'
+			or coalesce(with_meets.archives_id, '') ilike ${keywordPattern} escape '\\'
+		)`);
+	}
+
+	for (const [character, filter] of Object.entries(
+		options.characterFilters ?? {},
+	)) {
+		if (filter === "all") continue;
+		const characterId = characterNameToId(character);
+		if (!characterId) continue;
+		const existsCondition = `exists (select 1 from live_archive_characters where live_archive_characters.live_id = with_meets.archives_id and live_archive_characters.character_id = ${characterId})`;
+		conditions.push(filter === "show" ? existsCondition : `not (${existsCondition})`);
+	}
+
+	return conditions;
+}
+
+function sqlLikeLiteral(value: string) {
+	return sqlLiteral(
+		`%${value
+			.replaceAll("\\", "\\\\")
+			.replaceAll("%", "\\%")
+			.replaceAll("_", "\\_")}%`,
+	);
 }
 
 function isObject(value: unknown): value is Record<string, unknown> {

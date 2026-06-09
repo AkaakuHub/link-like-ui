@@ -15,8 +15,12 @@ import { resolveInsideRoot, toServedFilePath } from "./pathUtils";
 
 interface ArchiveMetadata {
 	archives_id?: unknown;
+	character_list?: unknown;
 	description?: unknown;
+	earned_star_count?: unknown;
+	has_extra?: unknown;
 	live_id?: unknown;
+	live_type?: unknown;
 	name?: unknown;
 	thumbnail_image_url?: unknown;
 	total_playing_time_second?: unknown;
@@ -58,7 +62,7 @@ export class StaticRealDataRepository implements RealDataRepository {
 		options: RealDataPageOptions,
 	): Promise<RealDataPage<RealMediaItem>> {
 		this.#mediaItems ??= await this.#listMediaFromMetadata();
-		return pageItems(this.#mediaItems, options);
+		return pageItems(filterMediaItems(this.#mediaItems, options), options);
 	}
 
 	async getMedia(liveId: string): Promise<RealMediaItem | null> {
@@ -126,6 +130,7 @@ export class StaticRealDataRepository implements RealDataRepository {
 
 			items.push({
 				chapters: normalizeChapters(detail?.chapters),
+				characters: characterValuesToNames(metadata.character_list),
 				description:
 					stringValue(detail?.description) ??
 					stringValue(metadata.description) ??
@@ -134,6 +139,7 @@ export class StaticRealDataRepository implements RealDataRepository {
 					numberValue(detail?.total_play_time_second) ??
 						numberValue(metadata.total_playing_time_second),
 				),
+				hasExtra: metadata.has_extra === true,
 				hlsPath: toServedFilePath(hlsRelativePath),
 				id,
 				imageAlt: title,
@@ -142,8 +148,10 @@ export class StaticRealDataRepository implements RealDataRepository {
 					typeof detail?.is_horizontal === "boolean"
 						? detail.is_horizontal
 						: inferHorizontal(title),
+				liveType: numberValue(metadata.live_type),
 				releasedAt: dateLabelFromHlsPath(hlsPath),
 				title,
+				withStarCount: numberValue(metadata.earned_star_count) ?? 0,
 			});
 		}
 
@@ -229,6 +237,45 @@ function numberValue(value: unknown) {
 	return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
+const characterNamesById = new Map<number, string>([
+	[1021, "梢"],
+	[1022, "綴理"],
+	[1023, "慈"],
+	[1031, "花帆"],
+	[1032, "さやか"],
+	[1033, "瑠璃乃"],
+	[1041, "吟子"],
+	[1042, "小鈴"],
+	[1043, "姫芽"],
+	[1051, "セラス"],
+	[1052, "泉"],
+]);
+
+function characterValuesToNames(value: unknown) {
+	if (!Array.isArray(value)) return [];
+
+	return value.flatMap((item) => {
+		if (typeof item === "number") {
+			const name = characterNamesById.get(item);
+			return name ? [name] : [];
+		}
+		if (typeof item !== "string") return [];
+		const parsed = parseCharacterValue(item);
+		if (!isObject(parsed)) return [];
+		const characterId = numberValue(parsed["character_id"]);
+		const name = characterId ? characterNamesById.get(characterId) : null;
+		return name ? [name] : [];
+	});
+}
+
+function parseCharacterValue(value: string) {
+	try {
+		return JSON.parse(value) as unknown;
+	} catch {
+		return null;
+	}
+}
+
 function durationLabel(seconds: number | null) {
 	if (!seconds) return "";
 
@@ -266,6 +313,52 @@ function pageItems<TItem>(
 		items: page,
 		nextOffset,
 	};
+}
+
+function filterMediaItems(
+	items: readonly RealMediaItem[],
+	options: RealDataPageOptions,
+) {
+	const filtered = items.filter((item) => {
+		if (options.liveType === "withMeets" && item.liveType !== 2) return false;
+		if (options.liveType === "fesLive" && item.liveType !== 1) return false;
+		if (options.afterMode === "has" && !item.hasExtra) return false;
+		if (options.afterMode === "none" && item.hasExtra) return false;
+		if (options.keyword?.trim() && !mediaItemMatchesKeyword(item, options.keyword)) {
+			return false;
+		}
+
+		for (const [character, filter] of Object.entries(
+			options.characterFilters ?? {},
+		)) {
+			if (filter === "all") continue;
+			const exists = item.characters.includes(character);
+			if (filter === "show" && !exists) return false;
+			if (filter === "hide" && exists) return false;
+		}
+
+		return true;
+	});
+
+	if (options.sortBy === "withStar") {
+		return [...filtered].sort(
+			(left, right) => right.withStarCount - left.withStarCount,
+		);
+	}
+
+	return filtered;
+}
+
+function mediaItemMatchesKeyword(item: RealMediaItem, keyword: string) {
+	const normalizedKeyword = keyword.trim().toLowerCase();
+	if (!normalizedKeyword) return true;
+	return [
+		item.id,
+		item.title,
+		item.description,
+		item.releasedAt,
+		...item.characters,
+	].some((value) => value.toLowerCase().includes(normalizedKeyword));
 }
 
 function normalizeChapters(value: unknown): readonly RealMediaChapter[] {
