@@ -37,6 +37,17 @@ import {
 
 type RealMediaPrimaryTab = "archives" | "channelList" | "mypage";
 
+interface RealMediaListCache {
+	filters: RealMediaFilters;
+	hasMore: boolean;
+	items: readonly RealMediaItem[];
+	keywordInput: string;
+	nextOffset: number;
+	scrollY: number;
+}
+
+let realMediaListCache: RealMediaListCache | null = null;
+
 const realMediaTabs: readonly MediaTabItemInput<RealMediaPrimaryTab>[] = [
 	{
 		icon: LuHouse,
@@ -87,15 +98,26 @@ function createInitialFilters(): RealMediaFilters {
 
 export function RealMediaPreview() {
 	const [activeTab, setActiveTab] = useState<RealMediaPrimaryTab>("archives");
-	const [items, setItems] = useState<readonly RealMediaItem[]>([]);
-	const [filters, setFilters] = useState<RealMediaFilters>(createInitialFilters);
-	const [nextOffset, setNextOffset] = useState<number>(0);
-	const [hasMore, setHasMore] = useState<boolean>(false);
+	const [items, setItems] = useState<readonly RealMediaItem[]>(
+		realMediaListCache?.items ?? [],
+	);
+	const [filters, setFilters] = useState<RealMediaFilters>(
+		realMediaListCache?.filters ?? createInitialFilters,
+	);
+	const [nextOffset, setNextOffset] = useState<number>(
+		realMediaListCache?.nextOffset ?? 0,
+	);
+	const [hasMore, setHasMore] = useState<boolean>(
+		realMediaListCache?.hasMore ?? false,
+	);
 	const [isFilterOpen, setFilterOpen] = useState<boolean>(false);
-	const [isLoading, setIsLoading] = useState<boolean>(true);
+	const [isLoading, setIsLoading] = useState<boolean>(!realMediaListCache);
 	const [isSortOpen, setSortOpen] = useState<boolean>(false);
-	const [keywordInput, setKeywordInput] = useState<string>("");
+	const [keywordInput, setKeywordInput] = useState<string>(
+		realMediaListCache?.keywordInput ?? "",
+	);
 	const loadMoreRef = useRef<HTMLDivElement | null>(null);
+	const shouldRestoreCacheRef = useRef<boolean>(realMediaListCache !== null);
 
 	const loadMediaPage = useCallback(
 		async (offset: number, mode: "append" | "replace") => {
@@ -115,8 +137,26 @@ export function RealMediaPreview() {
 	);
 
 	useEffect(() => {
+		if (shouldRestoreCacheRef.current) {
+			shouldRestoreCacheRef.current = false;
+			requestAnimationFrame(() => {
+				globalThis.scrollTo(0, realMediaListCache?.scrollY ?? 0);
+			});
+			return;
+		}
 		void loadMediaPage(0, "replace");
 	}, [loadMediaPage]);
+
+	useEffect(() => {
+		realMediaListCache = {
+			filters,
+			hasMore,
+			items,
+			keywordInput,
+			nextOffset,
+			scrollY: globalThis.scrollY,
+		};
+	}, [filters, hasMore, items, keywordInput, nextOffset]);
 
 	const loadNextPage = useCallback(() => {
 		if (!hasMore || isLoading) return;
@@ -156,6 +196,14 @@ export function RealMediaPreview() {
 
 		if (!realItem) return;
 
+		realMediaListCache = {
+			filters,
+			hasMore,
+			items,
+			keywordInput,
+			nextOffset,
+			scrollY: globalThis.scrollY,
+		};
 		const params = new URLSearchParams({
 			hls: realItem.hlsPath,
 			id: realItem.id,

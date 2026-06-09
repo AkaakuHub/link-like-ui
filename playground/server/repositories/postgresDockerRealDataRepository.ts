@@ -1,7 +1,6 @@
 import { execFile } from "node:child_process";
-import { existsSync } from "node:fs";
-import { readdir, readFile } from "node:fs/promises";
-import { join, relative, resolve } from "node:path";
+import { readFile } from "node:fs/promises";
+import { join, resolve } from "node:path";
 import { promisify } from "node:util";
 import type {
 	RealComment,
@@ -27,6 +26,7 @@ interface PostgresMediaRow {
 	isHorizontal: boolean | null;
 	liveType: number | null;
 	releasedAt: string;
+	thumbnailImageUrl: string;
 	title: string;
 	videoUrl: string;
 	withStarCount: number | null;
@@ -61,38 +61,12 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 	async listMedia(
 		options: RealDataPageOptions,
 	): Promise<RealDataPage<RealMediaItem>> {
-		const items: RealMediaItem[] = [];
-		const batchLimit = Math.max(options.limit * 3, 80);
-		let availableOffset = 0;
-		let rawOffset = 0;
-
-		while (items.length <= options.limit) {
-			const rows = await this.#listMediaRows(options, batchLimit, rawOffset);
-			rawOffset += rows.length;
-
-			for (const row of rows) {
-				const item = await this.#toMediaItem(row);
-				if (!item) continue;
-				if (availableOffset < options.offset) {
-					availableOffset += 1;
-					continue;
-				}
-
-				items.push(item);
-				if (items.length > options.limit) break;
-			}
-
-			if (rows.length < batchLimit) break;
-		}
-
+		const rows = await this.#listMediaRows(options);
+		const items = rows.map((row) => this.#toMediaListItem(row));
 		return pageFromLimitPlusOne(items, options);
 	}
 
-	async #listMediaRows(
-		options: RealDataPageOptions,
-		limit: number,
-		offset: number,
-	) {
+	async #listMediaRows(options: RealDataPageOptions) {
 		const whereConditions = mediaWhereConditions(options);
 		const orderBy =
 			options.sortBy === "withStar"
@@ -118,6 +92,7 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 					live_archive_details.is_horizontal as "isHorizontal",
 					with_meets.live_type as "liveType",
 					to_char(coalesce(with_meets.live_start_time, live_archive_details.live_start_time), 'YYYY.MM.DD') as "releasedAt",
+					with_meets.thumbnail_image_url as "thumbnailImageUrl",
 					case
 						when coalesce(live_archive_details.total_play_time_second, with_meets.total_playing_time_second) is null then ''
 						else floor(coalesce(live_archive_details.total_play_time_second, with_meets.total_playing_time_second) / 60)::text || ':' || lpad((coalesce(live_archive_details.total_play_time_second, with_meets.total_playing_time_second) % 60)::text, 2, '0')
@@ -128,8 +103,8 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 				left join live_archive_details on live_archive_details.live_id = with_meets.archives_id
 				where ${whereConditions.join("\n\t\t\t\t\tand ")}
 				order by ${orderBy}
-				limit ${limit}
-				offset ${offset}
+				limit ${options.limit + 1}
+				offset ${options.offset}
 			) media_rows
 		`);
 		return rows;
@@ -156,6 +131,7 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 					live_archive_details.is_horizontal as "isHorizontal",
 					with_meets.live_type as "liveType",
 					to_char(coalesce(with_meets.live_start_time, live_archive_details.live_start_time), 'YYYY.MM.DD') as "releasedAt",
+					with_meets.thumbnail_image_url as "thumbnailImageUrl",
 					case
 						when coalesce(live_archive_details.total_play_time_second, with_meets.total_playing_time_second) is null then ''
 						else floor(coalesce(live_archive_details.total_play_time_second, with_meets.total_playing_time_second) / 60)::text || ':' || lpad((coalesce(live_archive_details.total_play_time_second, with_meets.total_playing_time_second) % 60)::text, 2, '0')
@@ -171,7 +147,7 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 			) media_rows
 		`);
 		const row = rows[0];
-		return row ? await this.#toMediaItem(row) : null;
+		return row ? await this.#toMediaDetailItem(row) : null;
 	}
 
 	async getComments(
@@ -264,34 +240,41 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 			? new URL(videoUrl).pathname
 			: videoUrl;
 		const hlsPath = pathname.replace(/^\/?archive\/hls\//, "");
-		const firstSegment = hlsPath.split("/")[0] ?? "";
-		const candidates = [
-			join("with-meets-hls", hlsPath),
-			join("with-meets-hls", firstSegment, "index.m3u8"),
-		];
-
-		return (
-			candidates.find((candidate) => existsSync(join(this.#rootDir, candidate))) ??
-			null
-		);
+		return join("with-meets-hls", hlsPath);
 	}
 
-	async #resolveThumbnailRelativePath(id: string) {
-		const dir = join(this.#rootDir, "with-meets-live-assets", "thumbnail", id);
-		const entries = await readdir(dir, { withFileTypes: true }).catch(() => []);
-		const image = entries.find(
-			(entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".jpg"),
-		);
-
-		return image ? relative(this.#rootDir, join(dir, image.name)) : null;
+	#resolveThumbnailRelativePath(thumbnailImageUrl: string) {
+		const pathname = thumbnailImageUrl.startsWith("http")
+			? new URL(thumbnailImageUrl).pathname
+			: thumbnailImageUrl;
+		return join("with-meets-live-assets", pathname.replace(/^\/?/, ""));
 	}
 
-	async #toMediaItem(row: PostgresMediaRow): Promise<RealMediaItem | null> {
+	#toMediaListItem(row: PostgresMediaRow): RealMediaItem {
 		const hlsRelativePath = this.#resolveHlsRelativePath(row.videoUrl);
-		const thumbnailRelativePath = await this.#resolveThumbnailRelativePath(row.id);
+		const thumbnailRelativePath = this.#resolveThumbnailRelativePath(row.thumbnailImageUrl);
 
-		if (!hlsRelativePath || !thumbnailRelativePath) return null;
+		return {
+			chapters: [],
+			characters: characterIdsToNames(row.characterIds ?? []),
+			description: row.description,
+			duration: row.duration,
+			hasExtra: row.hasExtra ?? false,
+			hlsPath: toServedFilePath(hlsRelativePath),
+			id: row.id,
+			imageAlt: row.imageAlt,
+			imageSrc: toServedFilePath(thumbnailRelativePath),
+			isHorizontal: row.isHorizontal ?? inferHorizontal(row.title),
+			liveType: row.liveType,
+			releasedAt: row.releasedAt,
+			title: row.title,
+			withStarCount: row.withStarCount ?? 0,
+		};
+	}
 
+	async #toMediaDetailItem(row: PostgresMediaRow): Promise<RealMediaItem> {
+		const hlsRelativePath = this.#resolveHlsRelativePath(row.videoUrl);
+		const thumbnailRelativePath = this.#resolveThumbnailRelativePath(row.thumbnailImageUrl);
 		const detail = await this.#readDetail(row.id);
 		const chapters = await this.#readChapters(row.id);
 
