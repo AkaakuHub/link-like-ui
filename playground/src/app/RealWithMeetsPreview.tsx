@@ -689,7 +689,7 @@ function parseHlsMasterPlaylist(text: string): {
 } {
 	const lines = text.split(/\r?\n/);
 	const audioTracks: HlsAudioTrackOption[] = [];
-	const videoLevels: HlsVideoLevelOption[] = [];
+	const parsedVideoLevels: Omit<HlsVideoLevelOption, "index">[] = [];
 
 	for (let index = 0; index < lines.length; index += 1) {
 		const line = lines[index] ?? "";
@@ -714,7 +714,7 @@ function parseHlsMasterPlaylist(text: string): {
 
 		if (line.startsWith("#EXT-X-STREAM-INF:")) {
 			const attributes = parseHlsAttributes(line.replace("#EXT-X-STREAM-INF:", ""));
-			const levelIndex = videoLevels.length;
+			const levelIndex = parsedVideoLevels.length;
 			const resolution = attributes.get("RESOLUTION") ?? "";
 			const [widthText, heightText] = resolution.split("x");
 			const width = widthText ? Number(widthText) : Number.NaN;
@@ -728,15 +728,18 @@ function parseHlsMasterPlaylist(text: string): {
 					: `Level ${levelIndex + 1}`;
 			const bitrateLabel =
 				bitrate > 0 ? `${(bitrate / 1_000_000).toFixed(1)}Mbps` : "";
-			videoLevels.push({
+			parsedVideoLevels.push({
 				bitrate,
 				height: heightValue,
-				index: levelIndex,
 				label: bitrateLabel ? `${resolutionLabel} ${bitrateLabel}` : resolutionLabel,
 				width: widthValue,
 			});
 		}
 	}
+
+	const videoLevels = parsedVideoLevels
+		.toSorted((left, right) => left.bitrate - right.bitrate)
+		.map((level, index) => ({ ...level, index }));
 
 	return { audioTracks, videoLevels };
 }
