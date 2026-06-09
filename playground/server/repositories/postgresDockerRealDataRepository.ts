@@ -243,16 +243,17 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 		return join("with-meets-hls", hlsPath);
 	}
 
-	#resolveThumbnailRelativePath(thumbnailImageUrl: string) {
+	#resolveThumbnailRelativePath(id: string, thumbnailImageUrl: string) {
 		const pathname = thumbnailImageUrl.startsWith("http")
 			? new URL(thumbnailImageUrl).pathname
 			: thumbnailImageUrl;
-		return join("with-meets-live-assets", pathname.replace(/^\/?/, ""));
+		const fileName = pathname.split("/").at(-1) ?? "";
+		return join("with-meets-live-assets", "thumbnail", id, fileName);
 	}
 
 	#toMediaListItem(row: PostgresMediaRow): RealMediaItem {
 		const hlsRelativePath = this.#resolveHlsRelativePath(row.videoUrl);
-		const thumbnailRelativePath = this.#resolveThumbnailRelativePath(row.thumbnailImageUrl);
+		const thumbnailRelativePath = this.#resolveThumbnailRelativePath(row.id, row.thumbnailImageUrl);
 
 		return {
 			chapters: [],
@@ -274,7 +275,7 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 
 	async #toMediaDetailItem(row: PostgresMediaRow): Promise<RealMediaItem> {
 		const hlsRelativePath = this.#resolveHlsRelativePath(row.videoUrl);
-		const thumbnailRelativePath = this.#resolveThumbnailRelativePath(row.thumbnailImageUrl);
+		const thumbnailRelativePath = this.#resolveThumbnailRelativePath(row.id, row.thumbnailImageUrl);
 		const detail = await this.#readDetail(row.id);
 		const chapters = await this.#readChapters(row.id);
 
