@@ -1,7 +1,21 @@
 import Hls from "hls.js";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { WithMeetsScreen } from "../../../src/Components/Patterns/WithMeetsScreen";
+import { Button } from "../../../src/Components/System/Button";
 import { LoadingOverlay } from "../../../src/Components/System/Loading";
+import { RadioField } from "../../../src/Components/System/Radio";
+import {
+	SystemModal,
+	SystemModalActionGrid,
+	SystemModalBody,
+	SystemModalClose,
+	SystemModalContent,
+	SystemModalFooter,
+	SystemModalHeader,
+	SystemModalHeading,
+	SystemModalPanel,
+	SystemModalTitle,
+} from "../../../src/Components/System/SystemModal";
 import {
 	fetchRealComments,
 	fetchRealMediaItem,
@@ -14,8 +28,25 @@ type QueuedRealComment = RealComment & {
 	displayAt: number;
 };
 
+interface HlsVideoLevelOption {
+	bitrate: number;
+	height: number | null;
+	index: number;
+	label: string;
+	width: number | null;
+}
+
+interface HlsAudioTrackOption {
+	groupId: string | null;
+	index: number;
+	label: string;
+	language: string | null;
+	name: string | null;
+}
+
 export function RealWithMeetsPreview() {
 	const videoRef = useRef<HTMLVideoElement | null>(null);
+	const hlsRef = useRef<Hls | null>(null);
 	const commentLoadPromiseRef = useRef<Promise<void>>(Promise.resolve());
 	const lastCommentFetchSecondRef = useRef<number>(-1);
 	const lastFetchedCommentTimeMsRef = useRef<number>(0);
@@ -44,6 +75,11 @@ export function RealWithMeetsPreview() {
 	const [isVideoLoading, setVideoLoading] = useState<boolean>(true);
 	const [isMuted, setIsMuted] = useState<boolean>(true);
 	const [isPlaying, setIsPlaying] = useState<boolean>(false);
+	const [isSettingsOpen, setSettingsOpen] = useState<boolean>(false);
+	const [selectedAudioTrack, setSelectedAudioTrack] = useState<number>(-1);
+	const [selectedVideoLevel, setSelectedVideoLevel] = useState<number>(-1);
+	const [audioTracks, setAudioTracks] = useState<readonly HlsAudioTrackOption[]>([]);
+	const [videoLevels, setVideoLevels] = useState<readonly HlsVideoLevelOption[]>([]);
 	const videoSource = mediaItem?.hlsPath ?? hlsPath;
 	const isLoading =
 		isInitialDataLoading ||
@@ -189,6 +225,11 @@ export function RealWithMeetsPreview() {
 		const video = videoRef.current;
 
 		if (!mediaItem || !video || !videoSource) return;
+		hlsRef.current = null;
+		setAudioTracks([]);
+		setVideoLevels([]);
+		setSelectedAudioTrack(-1);
+		setSelectedVideoLevel(-1);
 		const updatePlaybackState = () => {
 			setPlaybackTime(video.currentTime);
 			setPlaybackDuration(video.duration);
@@ -332,6 +373,7 @@ export function RealWithMeetsPreview() {
 			testBandwidth: true,
 		});
 
+		hlsRef.current = hls;
 		setVideoLoading(true);
 		video.autoplay = true;
 		video.muted = true;
@@ -341,11 +383,36 @@ export function RealWithMeetsPreview() {
 			hls.loadSource(videoSource);
 		});
 		hls.on(Hls.Events.MANIFEST_PARSED, () => {
+			setVideoLevels(
+				hls.levels.map((level, index) => ({
+					bitrate: level.bitrate,
+					height: typeof level.height === "number" ? level.height : null,
+					index,
+					label: formatVideoLevelLabel(level, index),
+					width: typeof level.width === "number" ? level.width : null,
+				})),
+			);
 			hls.autoLevelCapping = -1;
 			hls.currentLevel = -1;
+			setSelectedVideoLevel(-1);
 			video.muted = true;
 			setIsMuted(true);
 			void startPlayback();
+		});
+		hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, () => {
+			setAudioTracks(
+				hls.audioTracks.map((track, index) => ({
+					groupId: typeof track.groupId === "string" ? track.groupId : null,
+					index,
+					label: formatAudioTrackLabel(track, index),
+					language: typeof track.lang === "string" ? track.lang : null,
+					name: typeof track.name === "string" ? track.name : null,
+				})),
+			);
+			setSelectedAudioTrack(hls.audioTrack);
+		});
+		hls.on(Hls.Events.AUDIO_TRACK_SWITCHED, () => {
+			setSelectedAudioTrack(hls.audioTrack);
 		});
 		hls.on(Hls.Events.FRAG_BUFFERED, () => {
 			setVideoLoading(false);
@@ -377,9 +444,26 @@ export function RealWithMeetsPreview() {
 			video.removeEventListener("pause", updatePlaybackState);
 			video.removeEventListener("play", updatePlaybackState);
 			cancelAnimationFrame(animationFrameId);
+			hlsRef.current = null;
 			hls.destroy();
 		};
 	}, [mediaItem, startPlayback, videoSource]);
+
+	function selectVideoLevel(value: string) {
+		const level = Number(value);
+		setSelectedVideoLevel(level);
+		if (hlsRef.current) {
+			hlsRef.current.currentLevel = level;
+		}
+	}
+
+	function selectAudioTrack(value: string) {
+		const audioTrack = Number(value);
+		setSelectedAudioTrack(audioTrack);
+		if (hlsRef.current) {
+			hlsRef.current.audioTrack = audioTrack;
+		}
+	}
 
 	useEffect(() => {
 		const video = videoRef.current;
@@ -445,13 +529,122 @@ export function RealWithMeetsPreview() {
 				onPlaybackRateChange={(rate) => {
 					setPlaybackRate(rate);
 				}}
+				onSettingsOpen={() => {
+					setSettingsOpen(true);
+				}}
 				title={mediaItem.title}
 				videoRef={videoRef}
 				videoMuted={isMuted}
 				videoSrc={videoSource}
 				showSupportSummary={false}
 			/>
+			<RealPlaybackSettingsModal
+				audioTracks={audioTracks}
+				onAudioTrackChange={selectAudioTrack}
+				onOpenChange={setSettingsOpen}
+				onVideoLevelChange={selectVideoLevel}
+				open={isSettingsOpen}
+				selectedAudioTrack={selectedAudioTrack}
+				selectedVideoLevel={selectedVideoLevel}
+				videoLevels={videoLevels}
+			/>
 			{isLoading ? <LoadingOverlay text="Loading..." /> : null}
 		</div>
 	);
+}
+
+function RealPlaybackSettingsModal({
+	audioTracks,
+	onAudioTrackChange,
+	onOpenChange,
+	onVideoLevelChange,
+	open,
+	selectedAudioTrack,
+	selectedVideoLevel,
+	videoLevels,
+}: {
+	audioTracks: readonly HlsAudioTrackOption[];
+	onAudioTrackChange: (value: string) => void;
+	onOpenChange: (open: boolean) => void;
+	onVideoLevelChange: (value: string) => void;
+	open: boolean;
+	selectedAudioTrack: number;
+	selectedVideoLevel: number;
+	videoLevels: readonly HlsVideoLevelOption[];
+}) {
+	return (
+		<SystemModal open={open} onOpenChange={onOpenChange}>
+			<SystemModalContent width="md">
+				<SystemModalHeader>
+					<SystemModalTitle>再生設定</SystemModalTitle>
+				</SystemModalHeader>
+				<SystemModalBody>
+					<SystemModalPanel>
+						<SystemModalHeading size="compact" tone="label" withoutTopMargin>
+							画質
+						</SystemModalHeading>
+						<RadioField
+							groupProps={{
+								onValueChange: onVideoLevelChange,
+								value: String(selectedVideoLevel),
+							}}
+							options={[
+								{ label: "自動", value: "-1" },
+								...videoLevels.map((level) => ({
+									label: level.label,
+									value: String(level.index),
+								})),
+							]}
+						/>
+						<SystemModalHeading size="compact" tone="label">
+							音声チャネル
+						</SystemModalHeading>
+						<RadioField
+							groupProps={{
+								onValueChange: onAudioTrackChange,
+								value: String(selectedAudioTrack),
+							}}
+							options={
+								audioTracks.length > 0
+									? audioTracks.map((track) => ({
+											label: track.label,
+											value: String(track.index),
+										}))
+									: [{ disabled: true, label: "音声トラック情報なし", value: "-1" }]
+							}
+						/>
+					</SystemModalPanel>
+				</SystemModalBody>
+				<SystemModalFooter>
+					<SystemModalActionGrid className="grid-cols-1">
+						<SystemModalClose asChild>
+							<Button radius="dialog" size="modal">
+								閉じる
+							</Button>
+						</SystemModalClose>
+					</SystemModalActionGrid>
+				</SystemModalFooter>
+			</SystemModalContent>
+		</SystemModal>
+	);
+}
+
+function formatVideoLevelLabel(level: Hls["levels"][number], index: number) {
+	const resolution =
+		typeof level.width === "number" && typeof level.height === "number"
+			? `${level.width}x${level.height}`
+			: `Level ${index + 1}`;
+	const bitrateMbps =
+		level.bitrate > 0 ? `${(level.bitrate / 1_000_000).toFixed(1)}Mbps` : "";
+	return bitrateMbps ? `${resolution} ${bitrateMbps}` : resolution;
+}
+
+function formatAudioTrackLabel(track: Hls["audioTracks"][number], index: number) {
+	const name =
+		typeof track.name === "string" && track.name ? track.name : `Track ${index + 1}`;
+	const language =
+		typeof track.lang === "string" && track.lang ? ` / ${track.lang}` : "";
+	const groupId =
+		typeof track.groupId === "string" && track.groupId ? ` / ${track.groupId}` : "";
+	return `${name}${language}${groupId}`;
 }

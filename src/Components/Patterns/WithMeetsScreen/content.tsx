@@ -83,6 +83,7 @@ export interface WithMeetsScreenProps {
 	onPlaybackToggle?: () => void;
 	onPlaybackRateChange?: (rate: number) => void;
 	onSeek?: (seconds: number) => void;
+	onSettingsOpen?: () => void;
 	showSupportSummary?: boolean;
 	videoRef?: RefObject<HTMLVideoElement | null>;
 	videoMuted?: boolean;
@@ -656,6 +657,7 @@ export function WithMeetsScreen({
 	onPlaybackToggle,
 	onPlaybackRateChange,
 	onSeek,
+	onSettingsOpen,
 	showSupportSummary = true,
 	videoRef,
 	videoMuted = false,
@@ -785,7 +787,7 @@ export function WithMeetsScreen({
 						type="button"
 						aria-label="Info"
 						onClick={() => {
-							openPanel("info");
+							onSettingsOpen?.();
 						}}
 					>
 						<LuSettings2 className="h-[1.75em] w-[1.75em]" />
