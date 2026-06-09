@@ -33,6 +33,7 @@ interface HlsVideoLevelOption {
 	height: number | null;
 	index: number;
 	label: string;
+	uri: string | null;
 	width: number | null;
 }
 
@@ -386,6 +387,7 @@ export function RealWithMeetsPreview() {
 					height: typeof level.height === "number" ? level.height : null,
 					index,
 					label: formatVideoLevelLabel(level, index),
+					uri: level.url[0] ?? null,
 					width: typeof level.width === "number" ? level.width : null,
 				})),
 			);
@@ -499,6 +501,7 @@ export function RealWithMeetsPreview() {
 			hlsRef.current.nextLevel = nextLevel;
 			hlsRef.current.nextLoadLevel = nextLevel;
 			hlsRef.current.loadLevel = nextLevel;
+			hlsRef.current.startLoad(videoRef.current?.currentTime ?? -1);
 		}
 	}
 
@@ -700,6 +703,13 @@ function isSameVideoLevel(
 	if (!selectedLevel) return false;
 
 	if (
+		selectedLevel.uri !== null &&
+		hlsLevel.url.some((url) => url.endsWith(selectedLevel.uri ?? ""))
+	) {
+		return true;
+	}
+
+	if (
 		selectedLevel.width !== null &&
 		selectedLevel.height !== null &&
 		hlsLevel.width === selectedLevel.width &&
@@ -771,6 +781,7 @@ function parseHlsMasterPlaylist(text: string): {
 				bitrate,
 				height: heightValue,
 				label: bitrateLabel ? `${resolutionLabel} ${bitrateLabel}` : resolutionLabel,
+				uri: lines[index + 1]?.trim() || null,
 				width: widthValue,
 			});
 		}
