@@ -61,6 +61,38 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 	async listMedia(
 		options: RealDataPageOptions,
 	): Promise<RealDataPage<RealMediaItem>> {
+		const items: RealMediaItem[] = [];
+		const batchLimit = Math.max(options.limit * 3, 80);
+		let availableOffset = 0;
+		let rawOffset = 0;
+
+		while (items.length <= options.limit) {
+			const rows = await this.#listMediaRows(options, batchLimit, rawOffset);
+			rawOffset += rows.length;
+
+			for (const row of rows) {
+				const item = await this.#toMediaItem(row);
+				if (!item) continue;
+				if (availableOffset < options.offset) {
+					availableOffset += 1;
+					continue;
+				}
+
+				items.push(item);
+				if (items.length > options.limit) break;
+			}
+
+			if (rows.length < batchLimit) break;
+		}
+
+		return pageFromLimitPlusOne(items, options);
+	}
+
+	async #listMediaRows(
+		options: RealDataPageOptions,
+		limit: number,
+		offset: number,
+	) {
 		const whereConditions = mediaWhereConditions(options);
 		const orderBy =
 			options.sortBy === "withStar"
@@ -96,21 +128,11 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 				left join live_archive_details on live_archive_details.live_id = with_meets.archives_id
 				where ${whereConditions.join("\n\t\t\t\t\tand ")}
 				order by ${orderBy}
-				limit ${options.limit + 1}
-				offset ${options.offset}
+				limit ${limit}
+				offset ${offset}
 			) media_rows
 		`);
-
-		const items: RealMediaItem[] = [];
-
-		for (const row of rows) {
-			const item = await this.#toMediaItem(row);
-			if (item) {
-				items.push(item);
-			}
-		}
-
-		return pageFromLimitPlusOne(items, options);
+		return rows;
 	}
 
 	async getMedia(liveId: string): Promise<RealMediaItem | null> {

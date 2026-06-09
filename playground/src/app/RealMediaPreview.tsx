@@ -96,7 +96,6 @@ export function RealMediaPreview() {
 	const [isSortOpen, setSortOpen] = useState<boolean>(false);
 	const [keywordInput, setKeywordInput] = useState<string>("");
 	const loadMoreRef = useRef<HTMLDivElement | null>(null);
-	const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
 	const loadMediaPage = useCallback(
 		async (offset: number, mode: "append" | "replace") => {
@@ -135,7 +134,6 @@ export function RealMediaPreview() {
 				}
 			},
 			{
-				root: scrollContainerRef.current,
 				rootMargin: "360px 0px",
 			},
 		);
@@ -179,7 +177,6 @@ export function RealMediaPreview() {
 							tabs={realMediaTabs}
 						/>
 						<div
-							ref={scrollContainerRef}
 							className="min-h-0 overflow-y-auto bg-ll-white pb-4"
 						>
 							{activeTab === "mypage" || activeTab === "archives" ? (
