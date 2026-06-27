@@ -240,7 +240,7 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 			? new URL(videoUrl).pathname
 			: videoUrl;
 		const hlsPath = pathname.replace(/^\/?archive\/hls\//, "");
-		return join("with-meets-hls", hlsPath);
+		return join("official-assets", "archive", "hls", hlsPath);
 	}
 
 	#resolveThumbnailRelativePath(id: string, thumbnailImageUrl: string) {

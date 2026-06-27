@@ -207,8 +207,14 @@ export class StaticRealDataRepository implements RealDataRepository {
 			: videoUrl;
 		const hlsPath = pathname.replace(/^\/?archive\/hls\//, "");
 		const candidates = [
-			join("with-meets-hls", hlsPath),
-			join("with-meets-hls", firstPathSegment(hlsPath), "index.m3u8"),
+			join("official-assets", "archive", "hls", hlsPath),
+			join(
+				"official-assets",
+				"archive",
+				"hls",
+				firstPathSegment(hlsPath),
+				"index.m3u8",
+			),
 		];
 
 		return candidates.find((candidate) => existsSync(join(this.#rootDir, candidate))) ?? null;
