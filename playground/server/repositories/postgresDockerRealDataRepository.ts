@@ -12,7 +12,7 @@ import type {
 	RealMediaChapter,
 	RealMediaItem,
 } from "../domain/realData";
-import { resolveInsideRoot, toServedFilePath } from "./pathUtils";
+import { resolveServedFilePath, toServedFilePath } from "./pathUtils";
 
 const execFileAsync = promisify(execFile);
 
@@ -47,15 +47,25 @@ interface ChapterMetadata {
 
 export class PostgresDockerRealDataRepository implements RealDataRepository {
 	readonly #config: RealDataConfig;
-	readonly #rootDir: string;
+	readonly #hlsRoot: string;
+	readonly #liveAssetsRoot: string;
+	readonly #metadataRoot: string;
 
 	constructor(config: RealDataConfig) {
 		this.#config = config;
-		this.#rootDir = resolve(config.rootDir);
+		this.#hlsRoot = resolve(config.hlsRoot);
+		this.#liveAssetsRoot = resolve(config.liveAssetsRoot);
+		this.#metadataRoot = resolve(config.metadataRoot);
 	}
 
 	resolveFilePath(relativePath: string) {
-		return resolveInsideRoot(this.#rootDir, relativePath);
+		return resolveServedFilePath(
+			{
+				hlsRoot: this.#hlsRoot,
+				liveAssetsRoot: this.#liveAssetsRoot,
+			},
+			relativePath,
+		);
 	}
 
 	async listMedia(
@@ -240,7 +250,7 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 			? new URL(videoUrl).pathname
 			: videoUrl;
 		const hlsPath = pathname.replace(/^\/?archive\/hls\//, "");
-		return join("official-assets", "archive", "hls", hlsPath);
+		return join("hls", hlsPath);
 	}
 
 	#resolveThumbnailRelativePath(id: string, thumbnailImageUrl: string) {
@@ -248,7 +258,7 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 			? new URL(thumbnailImageUrl).pathname
 			: thumbnailImageUrl;
 		const fileName = pathname.split("/").at(-1) ?? "";
-		return join("with-meets-live-assets", "thumbnail", id, fileName);
+		return join("live-assets", "thumbnail", id, fileName);
 	}
 
 	#toMediaListItem(row: PostgresMediaRow): RealMediaItem {
@@ -303,7 +313,7 @@ export class PostgresDockerRealDataRepository implements RealDataRepository {
 	async #readDetail(liveId: string): Promise<ArchiveDetailMetadata | null> {
 		for (const fileName of ["archive-details.json", "with-station-details.json"]) {
 			const content = await readFile(
-				join(this.#rootDir, "linkura-live-data", "data", fileName),
+				join(this.#metadataRoot, "data", fileName),
 				"utf8",
 			).catch(() => null);
 

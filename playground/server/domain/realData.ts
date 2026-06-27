@@ -1,7 +1,9 @@
 export interface RealDataConfig {
+	hlsRoot: string;
+	liveAssetsRoot: string;
 	metadataRoot: string;
-	rootDir: string;
 	source: "postgresDocker" | "static";
+	commentsRoot?: string;
 	postgresContainer?: string;
 	postgresDatabase?: string;
 	postgresUser?: string;

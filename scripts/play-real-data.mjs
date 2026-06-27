@@ -2,11 +2,13 @@ import { spawn } from "node:child_process";
 
 const args = process.argv.slice(2);
 const optionNames = new Set([
+	"--commentsRoot",
+	"--hlsRoot",
+	"--liveAssetsRoot",
 	"--metadataRoot",
 	"--postgresContainer",
 	"--postgresDatabase",
 	"--postgresUser",
-	"--rootDir",
 	"--source",
 ]);
 const options = new Map();
@@ -35,10 +37,26 @@ for (let index = 0; index < args.length; index += 1) {
 	index += 1;
 }
 
-const rootDir = options.get("--rootDir");
+const hlsRoot = options.get("--hlsRoot");
+const liveAssetsRoot = options.get("--liveAssetsRoot");
+const metadataRoot = options.get("--metadataRoot");
+const source = options.get("--source") ?? "static";
 
-if (typeof rootDir !== "string") {
-	console.error("Usage: pnpm play:real -- --rootDir <data-root>");
+if (
+	typeof hlsRoot !== "string" ||
+	typeof liveAssetsRoot !== "string" ||
+	typeof metadataRoot !== "string"
+) {
+	console.error(
+		"Usage: pnpm play:real -- --metadataRoot <metadata-root> --hlsRoot <hls-root> --liveAssetsRoot <live-assets-root>",
+	);
+	process.exit(1);
+}
+
+if (source !== "postgresDocker" && !options.has("--commentsRoot")) {
+	console.error(
+		"--commentsRoot is required unless --source postgresDocker is used.",
+	);
 	process.exit(1);
 }
 
@@ -48,9 +66,12 @@ const child = spawn(
 	{
 		env: {
 			...process.env,
-			...(options.has("--metadataRoot")
-				? { LINK_LIKE_UI_METADATA_ROOT: options.get("--metadataRoot") }
+			...(options.has("--commentsRoot")
+				? { LINK_LIKE_UI_COMMENTS_ROOT: options.get("--commentsRoot") }
 				: {}),
+			LINK_LIKE_UI_HLS_ROOT: hlsRoot,
+			LINK_LIKE_UI_LIVE_ASSETS_ROOT: liveAssetsRoot,
+			LINK_LIKE_UI_METADATA_ROOT: metadataRoot,
 			...(options.has("--postgresContainer")
 				? {
 						LINK_LIKE_UI_POSTGRES_CONTAINER: options.get("--postgresContainer"),
@@ -62,10 +83,7 @@ const child = spawn(
 			...(options.has("--postgresUser")
 				? { LINK_LIKE_UI_POSTGRES_USER: options.get("--postgresUser") }
 				: {}),
-			...(options.has("--source")
-				? { LINK_LIKE_UI_REAL_DATA_SOURCE: options.get("--source") }
-				: {}),
-			LINK_LIKE_UI_REAL_DATA_ROOT: rootDir,
+			LINK_LIKE_UI_REAL_DATA_SOURCE: source,
 			VITE_LINK_LIKE_UI_REAL_DATA: "1",
 		},
 		stdio: "inherit",

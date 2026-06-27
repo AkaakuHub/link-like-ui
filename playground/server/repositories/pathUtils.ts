@@ -1,5 +1,10 @@
 import { normalize, resolve, sep } from "node:path";
 
+export interface ServedFileRoots {
+	hlsRoot: string;
+	liveAssetsRoot: string;
+}
+
 export function isInsideRoot(rootDir: string, targetPath: string) {
 	const normalizedRoot = normalize(rootDir);
 	const normalizedTarget = normalize(targetPath);
@@ -16,6 +21,24 @@ export function resolveInsideRoot(rootDir: string, relativePath: string) {
 	}
 
 	return targetPath;
+}
+
+export function resolveServedFilePath(
+	roots: ServedFileRoots,
+	servedPath: string,
+) {
+	const [rootName, ...relativeSegments] = servedPath.split(/[\\/]/);
+	const relativePath = relativeSegments.join(sep);
+
+	if (rootName === "hls") {
+		return resolveInsideRoot(roots.hlsRoot, relativePath);
+	}
+
+	if (rootName === "live-assets") {
+		return resolveInsideRoot(roots.liveAssetsRoot, relativePath);
+	}
+
+	throw new Error("Unknown real data file root.");
 }
 
 export function toServedFilePath(relativePath: string) {

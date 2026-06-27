@@ -12,19 +12,19 @@ function readArg(name) {
 	return index >= 0 ? args[index + 1] : undefined;
 }
 
-const rootDir = readArg("--rootDir") ?? process.env.LINK_LIKE_UI_REAL_DATA_ROOT;
+const commentsRoot =
+	readArg("--commentsRoot") ?? process.env.LINK_LIKE_UI_COMMENTS_ROOT;
 
-if (!rootDir) {
-	console.error("Usage: pnpm real-data:prepare -- --rootDir <data-root>");
+if (!commentsRoot) {
+	console.error(
+		"Usage: pnpm real-data:prepare -- --commentsRoot <comments-root>",
+	);
 	process.exit(1);
 }
 
-const dumpPath =
-	readArg("--dump") ??
-	join(rootDir, "with-meets-comments", "full-withmeets.dump");
+const dumpPath = readArg("--dump") ?? join(commentsRoot, "full-withmeets.dump");
 const outputPath =
-	readArg("--out") ??
-	join(rootDir, "with-meets-comments", "withlive-comments.json");
+	readArg("--out") ?? join(commentsRoot, "withlive-comments.json");
 const sqlPath = join(
 	tmpdir(),
 	`link-like-ui-withlive-comments-${process.pid}.sql`,

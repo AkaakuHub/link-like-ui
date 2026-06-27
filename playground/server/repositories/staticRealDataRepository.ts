@@ -11,7 +11,7 @@ import type {
 	RealMediaChapter,
 	RealMediaItem,
 } from "../domain/realData";
-import { resolveInsideRoot, toServedFilePath } from "./pathUtils";
+import { resolveServedFilePath, toServedFilePath } from "./pathUtils";
 
 interface ArchiveMetadata {
 	archives_id?: unknown;
@@ -45,17 +45,31 @@ interface ChapterMetadata {
 
 export class StaticRealDataRepository implements RealDataRepository {
 	readonly #metadataRoot: string;
-	readonly #rootDir: string;
+	readonly #hlsRoot: string;
+	readonly #liveAssetsRoot: string;
+	readonly #commentsRoot: string;
 	#commentsByLiveId: Record<string, readonly RealComment[]> | null = null;
 	#mediaItems: readonly RealMediaItem[] | null = null;
 
 	constructor(config: RealDataConfig) {
+		if (!config.commentsRoot) {
+			throw new Error("commentsRoot is required for static real data.");
+		}
+
+		this.#commentsRoot = resolve(config.commentsRoot);
+		this.#hlsRoot = resolve(config.hlsRoot);
+		this.#liveAssetsRoot = resolve(config.liveAssetsRoot);
 		this.#metadataRoot = resolve(config.metadataRoot);
-		this.#rootDir = resolve(config.rootDir);
 	}
 
 	resolveFilePath(relativePath: string) {
-		return resolveInsideRoot(this.#rootDir, relativePath);
+		return resolveServedFilePath(
+			{
+				hlsRoot: this.#hlsRoot,
+				liveAssetsRoot: this.#liveAssetsRoot,
+			},
+			relativePath,
+		);
 	}
 
 	async listMedia(
@@ -161,22 +175,17 @@ export class StaticRealDataRepository implements RealDataRepository {
 	async #readJsonArray(
 		fileName: string,
 	): Promise<readonly Record<string, unknown>[]> {
-		const candidates = [
-			join(this.#rootDir, "linkura-live-data", "data", fileName),
+		const content = await readFile(
 			join(this.#metadataRoot, "data", fileName),
-		];
-		for (const candidate of candidates) {
-			const content = await readFile(candidate, "utf8").catch(() => null);
+			"utf8",
+		).catch(() => null);
 
-			if (!content) continue;
+		if (!content) return [];
 
-			const parsed = JSON.parse(content) as unknown;
-			return Array.isArray(parsed)
-				? parsed.filter(isObject)
-				: Object.values(isObject(parsed) ? parsed : {}).filter(isObject);
-		}
-
-		return [];
+		const parsed = JSON.parse(content) as unknown;
+		return Array.isArray(parsed)
+			? parsed.filter(isObject)
+			: Object.values(isObject(parsed) ? parsed : {}).filter(isObject);
 	}
 
 	async #readMetadataItems(
@@ -192,11 +201,7 @@ export class StaticRealDataRepository implements RealDataRepository {
 	}
 
 	async #readComments(): Promise<Record<string, readonly RealComment[]>> {
-		const commentsPath = join(
-			this.#rootDir,
-			"with-meets-comments",
-			"withlive-comments.json",
-		);
+		const commentsPath = join(this.#commentsRoot, "withlive-comments.json");
 		const content = await readFile(commentsPath, "utf8").catch(() => "{}");
 		return JSON.parse(content) as Record<string, readonly RealComment[]>;
 	}
@@ -206,28 +211,19 @@ export class StaticRealDataRepository implements RealDataRepository {
 			? new URL(videoUrl).pathname
 			: videoUrl;
 		const hlsPath = pathname.replace(/^\/?archive\/hls\//, "");
-		const candidates = [
-			join("official-assets", "archive", "hls", hlsPath),
-			join(
-				"official-assets",
-				"archive",
-				"hls",
-				firstPathSegment(hlsPath),
-				"index.m3u8",
-			),
-		];
-
-		return candidates.find((candidate) => existsSync(join(this.#rootDir, candidate))) ?? null;
+		return existsSync(join(this.#hlsRoot, hlsPath)) ? join("hls", hlsPath) : null;
 	}
 
 	async #resolveThumbnailRelativePath(id: string) {
-		const dir = join(this.#rootDir, "with-meets-live-assets", "thumbnail", id);
+		const dir = join(this.#liveAssetsRoot, "thumbnail", id);
 		const entries = await readdir(dir, { withFileTypes: true }).catch(() => []);
 		const image = entries.find(
 			(entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".jpg"),
 		);
 
-		return image ? relative(this.#rootDir, join(dir, image.name)) : null;
+		return image
+			? join("live-assets", relative(this.#liveAssetsRoot, join(dir, image.name)))
+			: null;
 	}
 }
 
@@ -386,10 +382,6 @@ function normalizeChapters(value: unknown): readonly RealMediaChapter[] {
 			},
 		];
 	});
-}
-
-function firstPathSegment(pathname: string) {
-	return pathname.split("/")[0] ?? "";
 }
 
 function inferHorizontal(title: string) {

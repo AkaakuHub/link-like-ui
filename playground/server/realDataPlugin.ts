@@ -8,28 +8,31 @@ import { RealDataService } from "./application/realDataService";
 import { createRealDataRepository } from "./repositories/createRealDataRepository";
 
 export function realDataPlugin(): Plugin {
-	const rootDir = process.env["LINK_LIKE_UI_REAL_DATA_ROOT"];
+	const hlsRoot = process.env["LINK_LIKE_UI_HLS_ROOT"];
+	const liveAssetsRoot = process.env["LINK_LIKE_UI_LIVE_ASSETS_ROOT"];
+	const metadataRoot = process.env["LINK_LIKE_UI_METADATA_ROOT"];
 
-	if (!rootDir) {
+	if (!hlsRoot || !liveAssetsRoot || !metadataRoot) {
 		return {
 			name: "link-like-ui-real-data-disabled",
 		};
 	}
 
 	const config: RealDataConfig = {
-		metadataRoot: resolve(
-			process.env["LINK_LIKE_UI_METADATA_ROOT"] ?? "../linkura-live-data",
-		),
-		rootDir: resolve(rootDir),
+		hlsRoot: resolve(hlsRoot),
+		liveAssetsRoot: resolve(liveAssetsRoot),
+		metadataRoot: resolve(metadataRoot),
 		source:
 			process.env["LINK_LIKE_UI_REAL_DATA_SOURCE"] === "postgresDocker"
 				? "postgresDocker"
 				: "static",
 	};
+	const commentsRoot = process.env["LINK_LIKE_UI_COMMENTS_ROOT"];
 	const postgresContainer = process.env["LINK_LIKE_UI_POSTGRES_CONTAINER"];
 	const postgresDatabase = process.env["LINK_LIKE_UI_POSTGRES_DATABASE"];
 	const postgresUser = process.env["LINK_LIKE_UI_POSTGRES_USER"];
 
+	if (commentsRoot) config.commentsRoot = resolve(commentsRoot);
 	if (postgresContainer) config.postgresContainer = postgresContainer;
 	if (postgresDatabase) config.postgresDatabase = postgresDatabase;
 	if (postgresUser) config.postgresUser = postgresUser;
